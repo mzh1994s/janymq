@@ -1,0 +1,17 @@
+# ºó×º
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+*.iml
+# ÎÄ¼þ¼Ð
+**.settings/
+**.idea/
+**out/
+**logs/
+**target/

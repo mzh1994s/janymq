@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:janymq="http://www.mzhong.cn/schema/janymq"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.mzhong.cn/schema/janymq http://www.mzhong.cn/schema/janymq.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--redis 实现-->
+    <janymq:application basePackage="cn.mzhong">
+        <!--<jsimplemq:redis hostName="91.18.26.72" port="6379" password="cnctlogin"/>-->
+        <janymq:redis hostName="mzhong.cn" port="6379"/>
+        <janymq:pipleline idleInterval="5000"/>
+        <janymq:loopline idleInterval="5000"/>
+    </janymq:application>
+
+    <bean class="cn.mzhong.janymq.consumer.TestBean"/>
+    <context:component-scan base-package="cn.mzhong"/>
+</beans>

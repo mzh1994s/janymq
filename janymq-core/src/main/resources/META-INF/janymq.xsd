@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.mzhong.cn/schema/janymq"
+            targetNamespace="http://www.mzhong.cn/schema/janymq">
+
+    <xsd:annotation>
+        <xsd:documentation><![CDATA[ JSimpleMQ 配置文件 ]]></xsd:documentation>
+    </xsd:annotation>
+
+    <xsd:complexType name="redisType">
+        <xsd:attribute name="hostName" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ redis的IP地址或者域名 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="port" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ redis的端口 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ redis的密码 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="database" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ redis的数据库 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="timeout" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ redis连接超时时间 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="keyPrefix" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ redis的key前缀 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <!-- JedisPoolConfig中的配置 -->
+        <xsd:attribute name="maxTotal" type="xsd:int"/>
+        <xsd:attribute name="maxIdle" type="xsd:int"/>
+        <xsd:attribute name="minIdle" type="xsd:int"/>
+        <xsd:attribute name="lifo" type="xsd:boolean"/>
+        <xsd:attribute name="maxWaitMillis" type="xsd:long"/>
+        <xsd:attribute name="minEvictableIdleTimeMillis" type="xsd:long"/>
+        <xsd:attribute name="softMinEvictableIdleTimeMillis" type="xsd:long"/>
+        <xsd:attribute name="numTestsPerEvictionRun" type="xsd:int"/>
+        <xsd:attribute name="evictionPolicyClassName" type="xsd:string"/>
+        <xsd:attribute name="testOnBorrow" type="xsd:boolean"/>
+        <xsd:attribute name="testOnReturn" type="xsd:boolean"/>
+        <xsd:attribute name="testWhileIdle" type="xsd:boolean"/>
+        <xsd:attribute name="timeBetweenEvictionRunsMillis" type="xsd:long"/>
+        <xsd:attribute name="blockWhenExhausted" type="xsd:boolean"/>
+        <xsd:attribute name="jmxEnabled" type="xsd:boolean"/>
+        <xsd:attribute name="jmxNamePrefix" type="xsd:string"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="zookeeperType">
+        <xsd:attribute name="hostName" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ zookeeper的IP地址或者域名 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="port" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ zookeeper的端口 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="password" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ zookeeper的密码 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="lineConfig">
+        <xsd:attribute name="idleInterval" type="xsd:long">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 空闲时休息时间 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="sleepInterval" type="xsd:long">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 完成一次消息处理后休息时间 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!--环线配置项-->
+    <xsd:complexType name="looplineConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="lineConfig"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--流水线配置项-->
+    <xsd:complexType name="piplelineConfigType">
+        <xsd:complexContent>
+            <xsd:extension base="lineConfig"/>
+        </xsd:complexContent>
+    </xsd:complexType>
+
+    <!--应用程序配置项和应用程序-->
+    <xsd:complexType name="applicationType">
+        <xsd:sequence>
+            <xsd:choice minOccurs="1">
+                <xsd:element ref="redis"/>
+                <!--<xsd:element ref="zookeeper"/>-->
+            </xsd:choice>
+            <xsd:element ref="pipleline" minOccurs="0"/>
+            <xsd:element ref="loopline" minOccurs="0"/>
+        </xsd:sequence>
+        <xsd:attribute name="id" type="xsd:ID">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ The unique identifier for a bean. ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="basePackage" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 基本包路径，支持通配符* ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!--节点-->
+    <xsd:element name="application" type="applicationType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[ JSimpleMQ应用程序配置 ]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="redis" type="redisType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[ Redis配置 ]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="pipleline" type="piplelineConfigType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[ 流水线配置项 ]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="loopline" type="looplineConfigType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[ 环线配置项 ]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <!--<xsd:element name="zookeeper" type="zookeeperType">-->
+        <!--<xsd:annotation>-->
+            <!--<xsd:documentation><![CDATA[ Zookeeper配置 ]]></xsd:documentation>-->
+        <!--</xsd:annotation>-->
+    <!--</xsd:element>-->
+</xsd:schema>
