@@ -7,7 +7,7 @@ public interface LineManager {
      *
      * @return
      */
-    String lineId();
+    String ID();
 
     /**
      * 推送消息

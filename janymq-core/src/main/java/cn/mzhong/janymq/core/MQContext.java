@@ -3,10 +3,12 @@ package cn.mzhong.janymq.core;
 import cn.mzhong.janymq.config.ApplicationConfig;
 import cn.mzhong.janymq.config.LooplineConfig;
 import cn.mzhong.janymq.config.PiplelineConfig;
+import cn.mzhong.janymq.initializer.MQComponentInitializer;
 import cn.mzhong.janymq.line.DataSerializer;
 import cn.mzhong.janymq.line.LineManager;
 import cn.mzhong.janymq.line.LineManagerProvider;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

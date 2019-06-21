@@ -8,16 +8,14 @@ public class TestBean {
     @Autowired
     TestMQ testMQ;
 
-    public void testPipleline(){
-        testMQ.testPipleline("哈哈");
+    int piplelineCnt = 0;
+    int looplineCnt = 0;
+
+    public void testPipleline() {
+        testMQ.testPipleline("Pipleline:value=" + String.valueOf(piplelineCnt++));
     }
 
-    public void testLoopline(){
-        testMQ.testLoopline("哈哈");
-    }
-
-    @Override
-    public String toString() {
-        return "TestBean{}";
+    public void testLoopline() {
+        testMQ.testLoopline("Loopline:value=" + String.valueOf(looplineCnt++));
     }
 }

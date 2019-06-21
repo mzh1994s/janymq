@@ -41,16 +41,8 @@ public abstract class RedisLineManager implements LineManager {
      * @return
      */
     protected boolean lock(Jedis jedis, byte[] key) {
-        boolean locked = false;
-        try {
-            byte[] value = (System.currentTimeMillis() + "").getBytes();
-            locked = jedis.hsetnx(lockKey, key, value) == 1;
-        } catch (Exception e) {
-            Log.error("索引'" + new String(key) + "'加锁异常", e);
-        } finally {
-            jedis.close();
-        }
-        return locked;
+        byte[] value = (System.currentTimeMillis() + "").getBytes();
+        return jedis.hsetnx(lockKey, key, value) == 1;
     }
 
     /**
@@ -60,15 +52,7 @@ public abstract class RedisLineManager implements LineManager {
      * @return
      */
     protected boolean unlock(Jedis jedis, byte[] key) {
-        boolean unlocked = false;
-        try {
-            unlocked = jedis.hdel(lockKey, key) == 1;
-        } catch (Exception e) {
-            Log.error("索引'" + new String(key) + "'解锁异常", e);
-        } finally {
-            jedis.close();
-        }
-        return unlocked;
+        return jedis.hdel(lockKey, key) == 1;
     }
 
     protected abstract void keyFilter(List<byte[]> keys);
@@ -81,7 +65,6 @@ public abstract class RedisLineManager implements LineManager {
             if (cacheKeys.isEmpty()) {
                 cacheKeys.addAll(jedis.hkeys(waitKey));
                 keyFilter(cacheKeys);
-                System.out.println("全量key" + cacheKeys.size());
             }
             // 可能当前缓存的key中某些已经被处理了。
             // 所以遍历列表，查找能被处理的key

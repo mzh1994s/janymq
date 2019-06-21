@@ -7,8 +7,11 @@ import cn.mzhong.janymq.config.LooplineConfig;
 import cn.mzhong.janymq.config.PiplelineConfig;
 import cn.mzhong.janymq.exception.MQInitExcepition;
 import cn.mzhong.janymq.exception.MQNotFoundException;
+import cn.mzhong.janymq.initializer.MQConsumerInitializer;
+import cn.mzhong.janymq.initializer.MQProducerInitializer;
+import cn.mzhong.janymq.initializer.MQLineManagerInitializer;
 import cn.mzhong.janymq.line.DataSerializer;
-import cn.mzhong.janymq.util.ClasspathUtils;
+import cn.mzhong.janymq.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +54,7 @@ public class MQApplication extends MQContext {
             dataSerializer = new DataSerializer();
         }
         if (LineManagerInitializer == null) {
-            LineManagerInitializer = new MQStoreManagerInitializer();
+            LineManagerInitializer = new MQLineManagerInitializer();
         }
         if (consumerInitializer == null) {
             consumerInitializer = new MQConsumerInitializer();
@@ -61,9 +64,9 @@ public class MQApplication extends MQContext {
         }
         setDataSerializer(dataSerializer);
         // 扫描所有的消费者
-        setConsumerClassSet(ClasspathUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
+        setConsumerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
         // 扫描所有的生产者
-        setProducerClassSet(ClasspathUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
+        setProducerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
         LineManagerInitializer.init(this);
         producerInitializer.init(this);
         consumerInitializer.init(this);

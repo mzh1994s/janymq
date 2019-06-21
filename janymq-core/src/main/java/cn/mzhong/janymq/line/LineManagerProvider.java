@@ -1,7 +1,5 @@
 package cn.mzhong.janymq.line;
 
-import cn.mzhong.janymq.annotation.Loopline;
-import cn.mzhong.janymq.annotation.Pipleline;
 import cn.mzhong.janymq.core.MQContext;
 
 /**

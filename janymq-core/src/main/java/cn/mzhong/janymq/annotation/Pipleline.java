@@ -5,17 +5,16 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
 public @interface Pipleline {
     /**
-     * 流水线名称、ID
+     * 列表名称，默认为接口全名 + 方法名
      */
-    String value();
+    String value() default "";
 
     /**
-     * 流水线版本号，参数级修改更新时使用，默认版本号为default
+     * 列表版本号，参数级修改更新时使用，默认版本号为default
      */
-    String version() default "default";
+    String version() default "";
 
     /**
      * 空闲时每次检测延时时间

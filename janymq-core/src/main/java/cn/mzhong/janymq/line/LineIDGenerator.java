@@ -30,16 +30,4 @@ public class LineIDGenerator {
     public String toString() {
         return generate();
     }
-
-    public static String generate(Pipleline pipleline) {
-        LineIDGenerator generator = new LineIDGenerator(pipleline.value(), "?");
-        generator.append("version=" + pipleline.version());
-        return generator.toString();
-    }
-
-    public static String generate(Loopline loopLine) {
-        LineIDGenerator generator = new LineIDGenerator(loopLine.value(), "?");
-        generator.append("version=" + loopLine.version());
-        return generator.toString();
-    }
 }

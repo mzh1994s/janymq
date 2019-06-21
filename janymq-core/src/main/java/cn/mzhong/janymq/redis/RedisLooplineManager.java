@@ -1,8 +1,7 @@
 package cn.mzhong.janymq.redis;
 
-import cn.mzhong.janymq.annotation.Loopline;
 import cn.mzhong.janymq.core.MQContext;
-import cn.mzhong.janymq.line.LineIDGenerator;
+import cn.mzhong.janymq.line.Loopline;
 
 import java.util.Collections;
 import java.util.List;
@@ -12,17 +11,17 @@ import java.util.List;
  */
 public class RedisLooplineManager extends RedisLineManager {
 
-    protected String lineId;
+    protected String ID;
 
     private static String key(String keyPrefix, Loopline loopLine) {
-        RedisKeyGenerator generator = new RedisKeyGenerator(loopLine.value());
-        generator.append(loopLine.version());
+        RedisKeyGenerator generator = new RedisKeyGenerator(loopLine.getValue());
+        generator.append(loopLine.getVersion());
         return keyPrefix + ":Loopline:" + generator.generate();
     }
 
     public RedisLooplineManager(MQContext context, RedisLineManagerProvider provider, Loopline loopLine) {
         super(key(provider.keyPrefix, loopLine), provider.getJedisPool(), context);
-        lineId = LineIDGenerator.generate(loopLine);
+        this.ID = loopLine.ID();
     }
 
     @Override
@@ -32,7 +31,7 @@ public class RedisLooplineManager extends RedisLineManager {
     }
 
     @Override
-    public String lineId() {
-        return lineId;
+    public String ID() {
+        return ID;
     }
 }

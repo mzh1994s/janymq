@@ -8,13 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
+import java.text.NumberFormat;
 
 public abstract class MQLineExecutor implements Runnable {
     final static Logger Log = LoggerFactory.getLogger(MQLineExecutor.class);
 
     protected MQContext context;
     protected LineManager lineManager;
-    protected String lineId;
+    protected String ID;
     protected Method method;
     protected Object consumer;
     protected long idleInterval;
@@ -29,7 +30,7 @@ public abstract class MQLineExecutor implements Runnable {
                           long sleepInterval) {
         this.context = context;
         this.lineManager = lineManager;
-        this.lineId = lineManager.lineId();
+        this.ID = lineManager.ID();
         this.method = method;
         this.consumer = consumer;
         this.idleInterval = idleInterval;
@@ -43,7 +44,7 @@ public abstract class MQLineExecutor implements Runnable {
         long length = lineManager.length();
         long startTimeMillis = 0;
         if (Log.isDebugEnabled()) {
-            Log.debug("'{}'：第{}轮消息处理开始, 本次目标长度:{}", lineId, cnt, length);
+            Log.debug("'{}'：第{}轮消息处理开始, 本次目标长度:{}", ID, cnt, length);
             startTimeMillis = System.currentTimeMillis();
         }
         long done = 0;
@@ -60,10 +61,13 @@ public abstract class MQLineExecutor implements Runnable {
             done++;
         }
         if (Log.isDebugEnabled()) {
-            long time = System.currentTimeMillis() - startTimeMillis;
-            int seconds = (int) (time / 1000);
-            int speed = (int) (done / (seconds == 0 ? 1 : seconds));
-            Log.debug("'{}'：第{}轮消息处理完毕，数量:{}，耗时:{}秒，速度:{}消息/秒", lineId, cnt, done, seconds, speed);
+            int speed = 0;
+            int time = (int) (System.currentTimeMillis() - startTimeMillis + 1);
+            int seconds = Math.round(time / 1000);
+            if (done > 0) {
+                speed = (int) (time / done);
+            }
+            Log.debug("'{}'：第{}轮消息处理完毕，数量:{}，总耗时:{}秒，单条耗时:{}毫秒", ID, cnt, done, seconds, speed);
         }
         ThreadUtils.sleep(idleInterval);
     }

@@ -1,8 +1,8 @@
 package cn.mzhong.janymq.redis;
 
-import cn.mzhong.janymq.annotation.Loopline;
-import cn.mzhong.janymq.annotation.Pipleline;
 import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.line.Loopline;
+import cn.mzhong.janymq.line.Pipleline;
 import cn.mzhong.janymq.line.LineManager;
 import cn.mzhong.janymq.line.LineManagerProvider;
 import redis.clients.jedis.JedisPool;
@@ -15,7 +15,7 @@ public class RedisLineManagerProvider extends JedisPoolConfig implements LineMan
     protected String password;
     protected int database = 0;
     protected int timeout = 0;
-    protected String keyPrefix = "JSimpleMQ";
+    protected String keyPrefix = "JAnyMQ";
     // jedis连接池实例
     private JedisPool jedisPool;
 

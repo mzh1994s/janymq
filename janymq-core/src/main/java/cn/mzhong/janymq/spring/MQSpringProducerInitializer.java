@@ -1,8 +1,8 @@
 package cn.mzhong.janymq.spring;
 
 import cn.mzhong.janymq.core.MQContext;
-import cn.mzhong.janymq.core.MQProducerFactory;
-import cn.mzhong.janymq.core.MQProducerInitializer;
+import cn.mzhong.janymq.producer.MQProducerFactory;
+import cn.mzhong.janymq.initializer.MQProducerInitializer;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

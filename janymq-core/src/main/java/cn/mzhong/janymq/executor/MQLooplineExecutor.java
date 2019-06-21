@@ -1,9 +1,8 @@
 package cn.mzhong.janymq.executor;
 
-import cn.mzhong.janymq.annotation.Loopline;
 import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.line.Loopline;
 import cn.mzhong.janymq.line.Message;
-import cn.mzhong.janymq.line.LineIDGenerator;
 import cn.mzhong.janymq.util.ValueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +17,11 @@ public class MQLooplineExecutor extends MQLineExecutor {
 
     public MQLooplineExecutor(MQContext context, Object consumer, Method method, Loopline loopline) {
         super(context,
-                context.getLineManagerMap().get(LineIDGenerator.generate(loopline)),
+                context.getLineManagerMap().get(loopline.ID()),
                 method,
                 consumer,
-                ValueUtils.uLong(loopline.idleInterval(), context.getLooplineConfig().getIdleInterval()),
-                ValueUtils.uLong(loopline.sleepInterval(), context.getLooplineConfig().getSleepInterval()));
+                ValueUtils.uLong(loopline.getIdleInterval(), context.getLooplineConfig().getIdleInterval()),
+                ValueUtils.uLong(loopline.getSleepInterval(), context.getLooplineConfig().getSleepInterval()));
         this.loopline = loopline;
     }
 

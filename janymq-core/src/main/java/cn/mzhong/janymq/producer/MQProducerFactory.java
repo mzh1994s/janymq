@@ -1,10 +1,11 @@
-package cn.mzhong.janymq.core;
+package cn.mzhong.janymq.producer;
 
 import cn.mzhong.janymq.annotation.Loopline;
 import cn.mzhong.janymq.annotation.Pipleline;
+import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.line.Line;
 import cn.mzhong.janymq.exception.MQNotFoundException;
 import cn.mzhong.janymq.line.Message;
-import cn.mzhong.janymq.line.LineIDGenerator;
 import cn.mzhong.janymq.line.LineManager;
 
 import java.lang.reflect.InvocationHandler;
@@ -37,18 +38,18 @@ class ProducerInvocationHandler implements InvocationHandler {
     synchronized LineManager getStoreManager(Method method) {
         LineManager storeManager = storeManagerMap.get(method);
         if (storeManager == null) {
-            String lineId = null;
+            String ID = null;
             Pipleline pipleline = method.getAnnotation(Pipleline.class);
             if (pipleline != null) {
-                lineId = LineIDGenerator.generate(pipleline);
+                ID = Line.ID(pipleline);
             } else {
                 Loopline loopline = method.getAnnotation(Loopline.class);
                 if (loopline != null) {
-                    lineId = LineIDGenerator.generate(loopline);
+                    ID = Line.ID(loopline);
                 }
             }
-            if (lineId != null) {
-                storeManager = context.getLineManagerMap().get(lineId);
+            if (ID != null) {
+                storeManager = context.getLineManagerMap().get(ID);
                 storeManagerMap.put(method, storeManager);
             }
         }

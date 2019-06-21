@@ -7,9 +7,9 @@ import cn.mzhong.janymq.annotation.Producer;
 @Producer
 public interface TestMQ {
 
-    @Pipleline(value = "testPipleline")
+    @Pipleline
     void testPipleline(String value);
 
-    @Loopline(value = "testLoopline")
+    @Loopline
     boolean testLoopline(String value);
 }

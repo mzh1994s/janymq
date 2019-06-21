@@ -1,5 +1,7 @@
-package cn.mzhong.janymq.core;
+package cn.mzhong.janymq.initializer;
 
+import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.producer.MQProducerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

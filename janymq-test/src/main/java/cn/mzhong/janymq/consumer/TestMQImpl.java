@@ -4,7 +4,6 @@ import cn.mzhong.janymq.annotation.Consumer;
 import cn.mzhong.janymq.producer.TestMQ;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 @Consumer
 public class TestMQImpl implements TestMQ {
@@ -14,18 +13,14 @@ public class TestMQImpl implements TestMQ {
         System.out.println("init");
     }
 
-    @Resource
-    TestBean testBean;
-
     @Override
     public void testPipleline(String value) {
-        System.out.println("testPipleline：" + value);
-        System.out.println(testBean);
+        System.out.println(value);
     }
 
     @Override
     public boolean testLoopline(String value) {
-        System.out.println("testLoopline：" + value);
-        return false;
+        System.out.println(value);
+        return true;
     }
 }

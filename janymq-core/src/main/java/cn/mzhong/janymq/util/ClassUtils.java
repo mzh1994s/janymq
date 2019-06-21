@@ -3,22 +3,23 @@ package cn.mzhong.janymq.util;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * classpath 工具类
  */
-public class ClasspathUtils {
+public class ClassUtils {
 
-    private ClasspathUtils() {
+    private ClassUtils() {
     }
 
     public final static String classpath;
     private final static int cutstart;
 
     static {
-        File classpathFile = new File(ClasspathUtils.class.getClassLoader().getResource("").getFile());
+        File classpathFile = new File(ClassUtils.class.getClassLoader().getResource("").getFile());
         classpath = classpathFile.getAbsolutePath();
         cutstart = classpath.length() + 1;
     }
@@ -52,7 +53,7 @@ public class ClasspathUtils {
      * @return
      */
     public static Set<Class<?>> scanByPackage(String _package) {
-        final URL classpathUrl = ClasspathUtils.class.getClassLoader().getResource("");
+        final URL classpathUrl = ClassUtils.class.getClassLoader().getResource("");
         File classpathFile = new File(classpathUrl.getFile());
         String packagePattern = _package.replace(".", "\\.");
         packagePattern = packagePattern.replaceAll("\\*{2}", ".+");
@@ -79,6 +80,22 @@ public class ClasspathUtils {
             }
         }
         return list;
+    }
+
+    /**
+     * 扫描一个类实现的所有接口
+     *
+     * @param _class
+     * @return
+     */
+    public static Set<Class<?>> getInterfaces(Class<?> _class) {
+        Set<Class<?>> interfaces = new HashSet<>();
+        Class<?> superclass = _class.getSuperclass();
+        if (superclass != null) {
+            interfaces.addAll(getInterfaces(superclass));
+        }
+        interfaces.addAll(Arrays.asList(_class.getInterfaces()));
+        return interfaces;
     }
 
     public static void main(String[] args) {
