@@ -3,15 +3,8 @@ package cn.mzhong.janymq.consumer;
 import cn.mzhong.janymq.annotation.Consumer;
 import cn.mzhong.janymq.producer.TestMQ;
 
-import javax.annotation.PostConstruct;
-
 @Consumer
 public class TestMQImpl implements TestMQ {
-
-    @PostConstruct
-    public void init(){
-        System.out.println("init");
-    }
 
     @Override
     public void testPipleline(String value) {

@@ -104,7 +104,7 @@ public class MQApplicationParser extends AbstractSingleBeanDefinitionParser {
     }
 
     protected void doParseLooplineConfig(Element root, BeanDefinitionBuilder builder) {
-        Element element = getFirstElementByName(root, "loopline");
+        Element element = getFirstElementByName(root, "looplineInfo");
         if (element != null) {
             builder.addPropertyValue("looplineConfig", doParse(element, LooplineConfig.class, null));
         }

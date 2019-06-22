@@ -1,19 +1,19 @@
 package cn.mzhong.janymq.line;
 
-import cn.mzhong.janymq.annotation.Loopline;
-import cn.mzhong.janymq.annotation.Pipleline;
-
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-public abstract class Line {
+public abstract class LineInfo {
+    protected String ID;
+    protected Class<?> _interface;
+    protected Method method;
     /**
-     * 流水线名称
+     * 列表名称
      */
     protected String value;
 
     /**
-     * 流水线版本号，参数级修改更新时使用，默认版本号为default
+     * 列表版本号，参数级修改更新时使用，默认版本号为default
      */
     protected String version;
 
@@ -30,6 +30,16 @@ public abstract class Line {
      * @return
      */
     protected long sleepInterval;
+
+    public LineInfo(Class<?> _interface, Method method, String value, String version, long idleInterval, long sleepInterval) {
+        this._interface = _interface;
+        this.method = method;
+        this.value = value(_interface, method, value);
+        this.version = version;
+        this.idleInterval = idleInterval;
+        this.sleepInterval = sleepInterval;
+        this.ID = ID(this.value, version);
+    }
 
     public String getValue() {
         return value;
@@ -63,7 +73,29 @@ public abstract class Line {
         this.sleepInterval = sleepInterval;
     }
 
-    public abstract String ID();
+    public Class<?> getInterface() {
+        return _interface;
+    }
+
+    public void setInterface(Class<?> _interface) {
+        this._interface = _interface;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
+    public void value() {
+
+    }
+
+    public String ID() {
+        return this.ID;
+    }
 
     protected static String parameterTypeString(Method method) {
         StringBuilder parameterBuilder = new StringBuilder();
@@ -77,28 +109,19 @@ public abstract class Line {
         return parameterBuilder.toString();
     }
 
-    protected static String lineName(Class<?> _interface, Method method) {
-        return _interface.getName() + "." + method.getName() + "(" + parameterTypeString(method) + ")";
+    protected static String value(Class<?> _interface, Method method, String value) {
+        String lineName = value;
+        if (Objects.equals(lineName.trim(), "")) {
+            lineName = _interface.getName() + "." + method.getName() + "(" + parameterTypeString(method) + ")";
+        }
+        return lineName;
     }
 
-    public static String ID(Class<?> _interface, Method method, Pipleline annotation) {
-        String lineName = annotation.value();
-        if (Objects.equals(lineName.trim(), "")) {
-            lineName = lineName(_interface, method);
+    protected static String ID(String value, String... items) {
+        LineIDGenerator generator = new LineIDGenerator(value, "#");
+        for (String item : items) {
+            generator.append(item);
         }
-        LineIDGenerator generator = new LineIDGenerator(lineName, "#");
-        generator.append(annotation.version());
         return generator.generate();
     }
-
-    public static String ID(Class<?> _interface, Method method, Loopline annotation) {
-        String lineName = annotation.value();
-        if (Objects.equals(lineName.trim(), "")) {
-            lineName = lineName(_interface, method);
-        }
-        LineIDGenerator generator = new LineIDGenerator(annotation.value(), "#");
-        generator.append(annotation.version());
-        return generator.generate();
-    }
-
 }

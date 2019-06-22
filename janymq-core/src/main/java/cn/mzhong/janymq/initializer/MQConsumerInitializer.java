@@ -1,7 +1,9 @@
 package cn.mzhong.janymq.initializer;
 
-import cn.mzhong.janymq.line.Loopline;
-import cn.mzhong.janymq.line.Pipleline;
+import cn.mzhong.janymq.annotation.Loopline;
+import cn.mzhong.janymq.annotation.Pipleline;
+import cn.mzhong.janymq.line.LooplineInfo;
+import cn.mzhong.janymq.line.PiplelineInfo;
 import cn.mzhong.janymq.core.MQContext;
 import cn.mzhong.janymq.executor.MQExecutorService;
 import cn.mzhong.janymq.executor.MQLooplineExecutor;
@@ -27,16 +29,16 @@ public class MQConsumerInitializer implements MQComponentInitializer {
      * @param method
      * @return
      */
-    protected static <A extends Annotation> LineInfo findLineInfo(Class<?> consumerClass, Method method, Class<A> annotationType) {
+    protected static <A extends Annotation> FindInfo<A> findLineInfo(Class<?> consumerClass, Method method, Class<A> annotationType) {
         Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
-        LineInfo lineInfo = null;
+        FindInfo lineInfo = null;
         for (Class<?> _interface : interfaces) {
             try {
                 Method pMethod = _interface.getMethod(method.getName(), method.getParameterTypes());
                 if (pMethod != null) {
-                    Annotation annotation = pMethod.getAnnotation(annotationType);
+                    A annotation = pMethod.getAnnotation(annotationType);
                     if (annotation != null) {
-                        lineInfo = new LineInfo(_interface, pMethod, annotation);
+                        lineInfo = new FindInfo<A>(_interface, pMethod, annotation);
                         break;
                     }
                 }
@@ -47,22 +49,22 @@ public class MQConsumerInitializer implements MQComponentInitializer {
         return lineInfo;
     }
 
-    protected static Pipleline findPipleline(Class<?> consumerClass, Method method) {
-        LineInfo<cn.mzhong.janymq.annotation.Pipleline> lineInfo =
-                findLineInfo(consumerClass, method, cn.mzhong.janymq.annotation.Pipleline.class);
+    protected static PiplelineInfo findPipleline(Class<?> consumerClass, Method method) {
+        FindInfo<Pipleline> lineInfo =
+                findLineInfo(consumerClass, method, Pipleline.class);
         if (lineInfo != null) {
-            cn.mzhong.janymq.annotation.Pipleline piplelineAnnotation = lineInfo.annotation;
-            return new Pipleline(lineInfo._interface, lineInfo.method, piplelineAnnotation);
+            Pipleline piplelineAnnotation = lineInfo.annotation;
+            return new PiplelineInfo(lineInfo._interface, lineInfo.method, piplelineAnnotation);
         }
         return null;
     }
 
-    protected static Loopline findLoopline(Class<?> consumerClass, Method method) {
-        LineInfo<cn.mzhong.janymq.annotation.Loopline> lineInfo =
-                findLineInfo(consumerClass, method, cn.mzhong.janymq.annotation.Loopline.class);
+    protected static LooplineInfo findLoopline(Class<?> consumerClass, Method method) {
+        FindInfo<Loopline> lineInfo =
+                findLineInfo(consumerClass, method, Loopline.class);
         if (lineInfo != null) {
-            cn.mzhong.janymq.annotation.Loopline looplineAnnotation = lineInfo.annotation;
-            return new Loopline(lineInfo._interface, lineInfo.method, looplineAnnotation);
+            Loopline looplineAnnotation = lineInfo.annotation;
+            return new LooplineInfo(lineInfo._interface, lineInfo.method, looplineAnnotation);
         }
         return null;
     }
@@ -72,12 +74,12 @@ public class MQConsumerInitializer implements MQComponentInitializer {
         for (Object consumer : consumerSet) {
             Class<?> consumerClass = consumer.getClass();
             for (Method method : consumerClass.getMethods()) {
-                Pipleline pipleline = findPipleline(consumerClass, method);
+                PiplelineInfo pipleline = findPipleline(consumerClass, method);
                 if (pipleline != null) {
                     consumerExecutor.execute(new MQPiplelineExecutor(context, consumer, method, pipleline));
                     continue;
                 }
-                Loopline loopline = findLoopline(consumerClass, method);
+                LooplineInfo loopline = findLoopline(consumerClass, method);
                 if (loopline != null) {
                     consumerExecutor.execute(new MQLooplineExecutor(context, consumer, method, loopline));
                 }
@@ -102,12 +104,12 @@ public class MQConsumerInitializer implements MQComponentInitializer {
     }
 }
 
-class LineInfo<A extends Annotation> {
+class FindInfo<A extends Annotation> {
     Class<?> _interface;
     Method method;
     A annotation;
 
-    public LineInfo(Class<?> _class, Method method, A annotation) {
+    public FindInfo(Class<?> _class, Method method, A annotation) {
         this._interface = _class;
         this.method = method;
         this.annotation = annotation;

@@ -80,6 +80,8 @@ public abstract class RedisLineManager implements LineManager {
                     if (data != null) {
                         message = (Message) serializer.deserialize(data);
                         break;
+                    } else {
+                        unlock(jedis, key);
                     }
                 }
             }

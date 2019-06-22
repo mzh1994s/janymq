@@ -3,7 +3,6 @@ package cn.mzhong.janymq.producer;
 import cn.mzhong.janymq.annotation.Loopline;
 import cn.mzhong.janymq.annotation.Pipleline;
 import cn.mzhong.janymq.core.MQContext;
-import cn.mzhong.janymq.line.Line;
 import cn.mzhong.janymq.exception.MQNotFoundException;
 import cn.mzhong.janymq.line.Message;
 import cn.mzhong.janymq.line.LineManager;
@@ -11,7 +10,6 @@ import cn.mzhong.janymq.line.LineManager;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -23,37 +21,20 @@ import java.util.Map;
 public class MQProducerFactory {
 
     public static Object newInstance(MQContext context, Class<?> _class) {
-        return Proxy.newProxyInstance(_class.getClassLoader(), new Class[]{_class}, new ProducerInvocationHandler(context));
+        return Proxy.newProxyInstance(
+                _class.getClassLoader(),
+                new Class[]{_class},
+                new ProducerInvocationHandler(context));
     }
 }
 
 class ProducerInvocationHandler implements InvocationHandler {
     MQContext context;
-    Map<Method, LineManager> storeManagerMap = new HashMap<>();
+    Map<Method, LineManager> lineManagerMap;
 
     ProducerInvocationHandler(MQContext context) {
         this.context = context;
-    }
-
-    synchronized LineManager getStoreManager(Method method) {
-        LineManager storeManager = storeManagerMap.get(method);
-        if (storeManager == null) {
-            String ID = null;
-            Pipleline pipleline = method.getAnnotation(Pipleline.class);
-            if (pipleline != null) {
-                ID = Line.ID(pipleline);
-            } else {
-                Loopline loopline = method.getAnnotation(Loopline.class);
-                if (loopline != null) {
-                    ID = Line.ID(loopline);
-                }
-            }
-            if (ID != null) {
-                storeManager = context.getLineManagerMap().get(ID);
-                storeManagerMap.put(method, storeManager);
-            }
-        }
-        return storeManager;
+        lineManagerMap = context.getMethodLineManagerMap();
     }
 
     /**
@@ -62,18 +43,18 @@ class ProducerInvocationHandler implements InvocationHandler {
      * @param method
      * @return
      */
-    private boolean methodAccess(Method method) {
-        boolean piplelineAccess = method.getAnnotation(Pipleline.class) != null;
-        boolean looplineAccess = method.getAnnotation(Loopline.class) != null;
-        return piplelineAccess || looplineAccess;
+    static boolean isLineMethod(Method method) {
+        boolean isPipleline = method.getAnnotation(Pipleline.class) != null;
+        boolean isLoopline = method.getAnnotation(Loopline.class) != null;
+        return isPipleline || isLoopline;
     }
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (!methodAccess(method)) {
-            return false;
+        if (!isLineMethod(method)) {
+            return method.invoke(proxy, args);
         }
-        LineManager storeManager = getStoreManager(method);
+        LineManager storeManager = lineManagerMap.get(method);
         if (storeManager == null) {
             throw new MQNotFoundException("此方法不能作为提供者使用：" + method.getName());
         }

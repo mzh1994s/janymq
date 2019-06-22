@@ -1,7 +1,7 @@
 package cn.mzhong.janymq.executor;
 
 import cn.mzhong.janymq.core.MQContext;
-import cn.mzhong.janymq.line.Pipleline;
+import cn.mzhong.janymq.line.PiplelineInfo;
 import cn.mzhong.janymq.line.Message;
 import cn.mzhong.janymq.util.ValueUtils;
 import org.slf4j.Logger;
@@ -12,13 +12,13 @@ import java.lang.reflect.Method;
 public class MQPiplelineExecutor extends MQLineExecutor {
     final static Logger Log = LoggerFactory.getLogger(MQPiplelineExecutor.class);
 
-    public MQPiplelineExecutor(MQContext context, Object consumer, Method method, Pipleline pipleline) {
+    public MQPiplelineExecutor(MQContext context, Object consumer, Method method, PiplelineInfo piplelineInfo) {
         super(context,
-                context.getLineManagerMap().get(pipleline.ID()),
+                context.getMethodLineManagerMap().get(piplelineInfo.getMethod()),
                 method,
                 consumer,
-                ValueUtils.uLong(pipleline.getIdleInterval(), context.getPiplelineConfig().getIdleInterval()),
-                ValueUtils.uLong(pipleline.getSleepInterval(), context.getPiplelineConfig().getSleepInterval()));
+                ValueUtils.uLong(piplelineInfo.getIdleInterval(), context.getPiplelineConfig().getIdleInterval()),
+                ValueUtils.uLong(piplelineInfo.getSleepInterval(), context.getPiplelineConfig().getSleepInterval()));
     }
 
     @Override

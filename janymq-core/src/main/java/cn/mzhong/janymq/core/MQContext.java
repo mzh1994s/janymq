@@ -47,7 +47,7 @@ public abstract class MQContext {
     protected ExecutorService consumerExecutorService;
     protected Map<Class<?>, Object> producerMap = new HashMap<>();
     protected Set<Class<?>> producerClassSet = new HashSet<>();
-    protected Map<String, LineManager> lineManagerMap = new HashMap<>();
+    protected Map<Method, LineManager> methodLineManagerMap = new HashMap<>();
 
     protected MQComponentInitializer LineManagerInitializer;
     protected MQComponentInitializer consumerInitializer;
@@ -137,12 +137,12 @@ public abstract class MQContext {
         this.producerClassSet = producerClassSet;
     }
 
-    public Map<String, LineManager> getLineManagerMap() {
-        return lineManagerMap;
+    public Map<Method, LineManager> getMethodLineManagerMap() {
+        return methodLineManagerMap;
     }
 
-    public void setLineManagerMap(Map<String, LineManager> lineManagerMap) {
-        this.lineManagerMap = lineManagerMap;
+    public void setMethodLineManagerMap(Map<Method, LineManager> methodLineManagerMap) {
+        this.methodLineManagerMap = methodLineManagerMap;
     }
 
     public MQComponentInitializer getLineManagerInitializer() {

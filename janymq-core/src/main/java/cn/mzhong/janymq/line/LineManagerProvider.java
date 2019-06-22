@@ -8,9 +8,9 @@ import cn.mzhong.janymq.core.MQContext;
  */
 public interface LineManagerProvider {
 
-    LineManager getPiplelineManager(MQContext context, Pipleline pipleline);
+    LineManager getPiplelineManager(MQContext context, PiplelineInfo pipleline);
 
-    LineManager getLoopLineManager(MQContext context, Loopline loopLine);
+    LineManager getlooplinemanager(MQContext context, LooplineInfo loopLine);
 
     void init();
 }

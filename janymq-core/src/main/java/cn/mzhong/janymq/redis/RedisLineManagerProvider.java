@@ -1,8 +1,8 @@
 package cn.mzhong.janymq.redis;
 
 import cn.mzhong.janymq.core.MQContext;
-import cn.mzhong.janymq.line.Loopline;
-import cn.mzhong.janymq.line.Pipleline;
+import cn.mzhong.janymq.line.LooplineInfo;
+import cn.mzhong.janymq.line.PiplelineInfo;
 import cn.mzhong.janymq.line.LineManager;
 import cn.mzhong.janymq.line.LineManagerProvider;
 import redis.clients.jedis.JedisPool;
@@ -82,13 +82,13 @@ public class RedisLineManagerProvider extends JedisPoolConfig implements LineMan
     }
 
     @Override
-    public LineManager getPiplelineManager(MQContext context, Pipleline pipleline) {
+    public LineManager getPiplelineManager(MQContext context, PiplelineInfo pipleline) {
         RedisPiplelineManager redisPiplelineManager = new RedisPiplelineManager(context, this, pipleline);
         return redisPiplelineManager;
     }
 
     @Override
-    public LineManager getLoopLineManager(MQContext context, Loopline loopLine) {
+    public LineManager getlooplinemanager(MQContext context, LooplineInfo loopLine) {
         RedisLooplineManager looplineManager = new RedisLooplineManager(context, this, loopLine);
         return looplineManager;
     }

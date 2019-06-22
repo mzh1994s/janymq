@@ -12,10 +12,10 @@ public class TestBean {
     int looplineCnt = 0;
 
     public void testPipleline() {
-        testMQ.testPipleline("Pipleline:value=" + String.valueOf(piplelineCnt++));
+        testMQ.testPipleline("PiplelineInfo:value=" + String.valueOf(piplelineCnt++));
     }
 
     public void testLoopline() {
-        testMQ.testLoopline("Loopline:value=" + String.valueOf(looplineCnt++));
+        testMQ.testLoopline("LooplineInfo:value=" + String.valueOf(looplineCnt++));
     }
 }
