@@ -55,6 +55,16 @@ public abstract class RedisLineManager implements LineManager {
         return jedis.hdel(lockKey, key) == 1;
     }
 
+    /**
+     * 重新加载key
+     * @param jedis
+     */
+    protected void reloadKeys(Jedis jedis){
+        Object res = jedis.eval("return 'redis.call(\"hkeys\",\"key[0]\")'", 1, "");
+        cacheKeys.addAll(jedis.hkeys(waitKey));
+        keyFilter(cacheKeys);
+    }
+
     protected abstract void keyFilter(List<byte[]> keys);
 
     @Override
@@ -63,8 +73,7 @@ public abstract class RedisLineManager implements LineManager {
         Jedis jedis = jedisPool.getResource();
         try {
             if (cacheKeys.isEmpty()) {
-                cacheKeys.addAll(jedis.hkeys(waitKey));
-                keyFilter(cacheKeys);
+                reloadKeys(jedis);
             }
             // 可能当前缓存的key中某些已经被处理了。
             // 所以遍历列表，查找能被处理的key
