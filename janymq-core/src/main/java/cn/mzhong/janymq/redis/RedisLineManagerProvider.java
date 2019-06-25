@@ -17,7 +17,7 @@ public class RedisLineManagerProvider extends JedisPoolConfig implements LineMan
     protected int timeout = 0;
     protected String keyPrefix = "JAnyMQ";
     // jedis连接池实例
-    private JedisPool jedisPool;
+    protected JedisPool jedisPool;
 
     public String getHostName() {
         return hostName;
