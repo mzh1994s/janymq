@@ -57,10 +57,10 @@ public abstract class RedisLineManager implements LineManager {
 
     /**
      * 重新加载key
+     *
      * @param jedis
      */
-    protected void reloadKeys(Jedis jedis){
-        Object res = jedis.eval("return 'redis.call(\"hkeys\",\"key[0]\")'", 1, "");
+    protected void reloadKeys(Jedis jedis) {
         cacheKeys.addAll(jedis.hkeys(waitKey));
         keyFilter(cacheKeys);
     }
