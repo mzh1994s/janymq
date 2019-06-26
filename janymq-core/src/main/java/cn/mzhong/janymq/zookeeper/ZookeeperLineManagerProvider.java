@@ -8,14 +8,24 @@ import cn.mzhong.janymq.line.PiplelineInfo;
 
 public class ZookeeperLineManagerProvider implements LineManagerProvider {
 
+    protected String connectString;
+
+    public String getConnectString() {
+        return connectString;
+    }
+
+    public void setConnectString(String connectString) {
+        this.connectString = connectString;
+    }
+
     @Override
     public LineManager getPiplelineManager(MQContext context, PiplelineInfo pipleline) {
-        return null;
+        return new ZookeeperPiplelineManager(context, pipleline, connectString);
     }
 
     @Override
     public LineManager getlooplinemanager(MQContext context, LooplineInfo loopLine) {
-        return null;
+        return new ZookeeperLooplineManager(context, loopLine, connectString);
     }
 
     @Override

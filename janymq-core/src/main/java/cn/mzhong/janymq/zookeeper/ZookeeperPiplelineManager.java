@@ -1,10 +1,11 @@
 package cn.mzhong.janymq.zookeeper;
 
-import org.apache.zookeeper.ZooKeeper;
+import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.line.PiplelineInfo;
 
 public class ZookeeperPiplelineManager extends ZookeeperLineManager {
 
-    ZookeeperPiplelineManager(ZooKeeper zooKeeper) {
-        super(zooKeeper);
+    ZookeeperPiplelineManager(MQContext context, PiplelineInfo pipleline, String connectString) {
+        super(context, pipleline, connectString);
     }
 }
