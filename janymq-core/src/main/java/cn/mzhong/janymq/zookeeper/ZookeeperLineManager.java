@@ -16,7 +16,7 @@ import java.util.List;
 public abstract class ZookeeperLineManager extends AbstractLineManager implements Watcher {
 
     protected String connectString;
-    protected ZookeeperClient zkclient;
+    protected ZookeeperClient zkClient;
     protected String waitPath;
     protected String donePath;
     protected String errorPath;
@@ -27,7 +27,7 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
     public void initZookeeperClient(String connectString) {
         this.connectString = connectString;
         try {
-            this.zkclient = new ZookeeperClient(new ZooKeeper(connectString, 1500, this));
+            this.zkClient = new ZookeeperClient(new ZooKeeper(connectString, 1500, this));
         } catch (IOException e) {
             throw new RuntimeException("Zookeeper客户端初始化失败！", e);
         }
@@ -42,10 +42,10 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
         this.errorPath = parentPath + "/error";
         this.lockPath = parentPath + "/lock";
         // 创建父级目录
-        zkclient.create(waitPath, null, CreateMode.PERSISTENT);
-        zkclient.create(donePath, null, CreateMode.PERSISTENT);
-        zkclient.create(errorPath, null, CreateMode.PERSISTENT);
-        zkclient.create(lockPath, null, CreateMode.PERSISTENT);
+        zkClient.create(waitPath, null, CreateMode.PERSISTENT);
+        zkClient.create(donePath, null, CreateMode.PERSISTENT);
+        zkClient.create(errorPath, null, CreateMode.PERSISTENT);
+        zkClient.create(lockPath, null, CreateMode.PERSISTENT);
     }
 
     public void initRootPath(String root) {
@@ -64,7 +64,7 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
         try {
             byte[] data = context.getDataSerializer().serialize(message);
             String path = waitPath + "/" + message.getKey();
-            zkclient.create(path, data, CreateMode.PERSISTENT);
+            zkClient.create(path, data, CreateMode.PERSISTENT);
         } catch (Exception e) {
             throw new RuntimeException("推送消息出错！", e);
         }
@@ -73,7 +73,7 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
     @Override
     public Message poll() {
         if(cacheKeys.isEmpty()){
-            cacheKeys = zkclient.getChildren(waitPath);
+            cacheKeys = zkClient.getChildren(waitPath);
         }
         return null;
     }
@@ -95,7 +95,7 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
 
     @Override
     public long length() {
-        return zkclient.getChildren(waitPath).size();
+        return zkClient.getChildren(waitPath).size();
     }
 
     @Override
