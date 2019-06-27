@@ -5,7 +5,7 @@ import cn.mzhong.janymq.line.PiplelineInfo;
 
 public class ZookeeperPiplelineManager extends ZookeeperLineManager {
 
-    ZookeeperPiplelineManager(MQContext context, PiplelineInfo pipleline, String connectString) {
-        super(context, pipleline, connectString);
+    ZookeeperPiplelineManager(MQContext context, PiplelineInfo pipleline, String connectString, String root) {
+        super(context, pipleline, connectString, root);
     }
 }

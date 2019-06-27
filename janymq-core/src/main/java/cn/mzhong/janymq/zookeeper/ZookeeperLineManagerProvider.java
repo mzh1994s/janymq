@@ -9,6 +9,7 @@ import cn.mzhong.janymq.line.PiplelineInfo;
 public class ZookeeperLineManagerProvider implements LineManagerProvider {
 
     protected String connectString;
+    protected String root;
 
     public String getConnectString() {
         return connectString;
@@ -20,12 +21,12 @@ public class ZookeeperLineManagerProvider implements LineManagerProvider {
 
     @Override
     public LineManager getPiplelineManager(MQContext context, PiplelineInfo pipleline) {
-        return new ZookeeperPiplelineManager(context, pipleline, connectString);
+        return new ZookeeperPiplelineManager(context, pipleline, connectString, root);
     }
 
     @Override
     public LineManager getlooplinemanager(MQContext context, LooplineInfo loopLine) {
-        return new ZookeeperLooplineManager(context, loopLine, connectString);
+        return new ZookeeperLooplineManager(context, loopLine, connectString, root);
     }
 
     @Override
