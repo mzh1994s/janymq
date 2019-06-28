@@ -58,19 +58,14 @@
     </xsd:complexType>
 
     <xsd:complexType name="zookeeperType">
-        <xsd:attribute name="hostName" type="xsd:string">
+        <xsd:attribute name="connectString" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation><![CDATA[ zookeeper的IP地址或者域名 ]]></xsd:documentation>
+                <xsd:documentation><![CDATA[ zookeeper连接字符串 ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="port" type="xsd:int">
+        <xsd:attribute name="root" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation><![CDATA[ zookeeper的端口 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="password" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ zookeeper的密码 ]]></xsd:documentation>
+                <xsd:documentation><![CDATA[ zookeeper根节点名称 ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
@@ -107,7 +102,7 @@
         <xsd:sequence>
             <xsd:choice minOccurs="1">
                 <xsd:element ref="redis"/>
-                <!--<xsd:element ref="zookeeper"/>-->
+                <xsd:element ref="zookeeper"/>
             </xsd:choice>
             <xsd:element ref="pipleline" minOccurs="0"/>
             <xsd:element ref="loopline" minOccurs="0"/>
@@ -145,9 +140,9 @@
             <xsd:documentation><![CDATA[ 环线配置项 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <!--<xsd:element name="zookeeper" type="zookeeperType">-->
-        <!--<xsd:annotation>-->
-            <!--<xsd:documentation><![CDATA[ Zookeeper配置 ]]></xsd:documentation>-->
-        <!--</xsd:annotation>-->
-    <!--</xsd:element>-->
+    <xsd:element name="zookeeper" type="zookeeperType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[ Zookeeper配置 ]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
 </xsd:schema>

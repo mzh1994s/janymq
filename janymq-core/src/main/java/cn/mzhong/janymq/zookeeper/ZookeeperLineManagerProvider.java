@@ -9,7 +9,7 @@ import cn.mzhong.janymq.line.PiplelineInfo;
 public class ZookeeperLineManagerProvider implements LineManagerProvider {
 
     protected String connectString;
-    protected String root;
+    protected String root = "janymq";
 
     public String getConnectString() {
         return connectString;

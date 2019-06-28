@@ -8,7 +8,6 @@ import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -51,8 +50,8 @@ public abstract class ZookeeperLineManager extends AbstractLineManager {
         return zkClient.create(lockPath + "/" + key, null, CreateMode.EPHEMERAL);
     }
 
-    protected boolean unlock(String key) {
-        return false;
+    protected void unlock(String key) {
+        zkClient.delete(lockPath + "/" + key);
     }
 
     ZookeeperLineManager(MQContext context, LineInfo lineInfo, String connectString, String root) {
@@ -62,8 +61,7 @@ public abstract class ZookeeperLineManager extends AbstractLineManager {
         this.initParentPath();
     }
 
-    @Override
-    public void push(Message message) {
+    protected void push(String key, Message message) {
         try {
             byte[] data = dataSerializer.serialize(message);
             String path = waitPath + "/" + message.getKey();
@@ -71,6 +69,11 @@ public abstract class ZookeeperLineManager extends AbstractLineManager {
         } catch (Exception e) {
             throw new RuntimeException("推送消息出错！", e);
         }
+    }
+
+    @Override
+    public void push(Message message) {
+        push(waitPath, message);
     }
 
     @Override
@@ -94,17 +97,24 @@ public abstract class ZookeeperLineManager extends AbstractLineManager {
 
     @Override
     public void back(Message message) {
-
+        String key = message.getKey();
+        unlock(key);
     }
 
     @Override
     public void done(Message message) {
-
+        String key = message.getKey();
+        push(donePath, message);
+        zkClient.delete(waitPath + "/" + key);
+        unlock(key);
     }
 
     @Override
     public void error(Message message) {
-
+        String key = message.getKey();
+        push(errorPath, message);
+        zkClient.delete(waitPath + "/" + key);
+        unlock(key);
     }
 
     @Override

@@ -5,6 +5,7 @@ import cn.mzhong.janymq.config.LooplineConfig;
 import cn.mzhong.janymq.config.PiplelineConfig;
 import cn.mzhong.janymq.redis.RedisLineManagerProvider;
 import cn.mzhong.janymq.util.FieldUtils;
+import cn.mzhong.janymq.zookeeper.ZookeeperLineManagerProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -77,11 +78,11 @@ public class MQApplicationParser extends AbstractSingleBeanDefinitionParser {
 
     protected void doParseLineManagerProvider(Element root, BeanDefinitionBuilder builder) {
         String[] storeComponents = new String[]{"redis", "zookeeper"};
-        Class<?>[] configClasses = new Class<?>[]{RedisLineManagerProvider.class, null};
+        Class<?>[] configClasses = new Class<?>[]{RedisLineManagerProvider.class, ZookeeperLineManagerProvider.class};
         Element element = null;
         Class<?> _class = null;
         for (int i = 0; i < storeComponents.length; i++) {
-            element = getFirstElementByName(root, "redis");
+            element = getFirstElementByName(root, storeComponents[i]);
             if (element != null) {
                 _class = configClasses[i];
                 break;

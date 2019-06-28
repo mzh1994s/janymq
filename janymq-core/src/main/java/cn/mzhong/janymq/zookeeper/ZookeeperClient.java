@@ -27,6 +27,7 @@ public class ZookeeperClient implements Watcher {
             path = path.substring(0, path.length() - 1);
         }
         int indexOfSeparator = path.lastIndexOf('/');
+        System.out.println(path);
         try {
             // 如果不是root路径
             if (indexOfSeparator != 0) {
@@ -47,6 +48,14 @@ public class ZookeeperClient implements Watcher {
             return true;
         } catch (Exception e) {
             throw new RuntimeException("创建Zookeeper路径出现错误！", e);
+        }
+    }
+
+    public void delete(String path) {
+        try {
+            zookeeper.delete(path, 0);
+        } catch (Exception e) {
+            throw new RuntimeException("删除Zookeeper路径出现错误！", e);
         }
     }
 
