@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public abstract class ZookeeperLineManager extends AbstractLineManager {
@@ -64,17 +65,23 @@ public abstract class ZookeeperLineManager extends AbstractLineManager {
     protected void push(String key, Message message) {
         try {
             byte[] data = dataSerializer.serialize(message);
-            String path = waitPath + "/" + message.getKey();
+            String path = key + "/" + message.getKey();
             zkClient.create(path, data, CreateMode.PERSISTENT);
         } catch (Exception e) {
             throw new RuntimeException("推送消息出错！", e);
         }
     }
 
+    protected void delete(String key, Message message) {
+        zkClient.delete(key + "/" + message.getKey());
+    }
+
     @Override
     public void push(Message message) {
         push(waitPath, message);
     }
+
+    public abstract List<String> keys();
 
     @Override
     public Message poll() {
@@ -105,7 +112,7 @@ public abstract class ZookeeperLineManager extends AbstractLineManager {
     public void done(Message message) {
         String key = message.getKey();
         push(donePath, message);
-        zkClient.delete(waitPath + "/" + key);
+        delete(waitPath, message);
         unlock(key);
     }
 
@@ -113,7 +120,7 @@ public abstract class ZookeeperLineManager extends AbstractLineManager {
     public void error(Message message) {
         String key = message.getKey();
         push(errorPath, message);
-        zkClient.delete(waitPath + "/" + key);
+        delete(waitPath, message);
         unlock(key);
     }
 

@@ -3,17 +3,19 @@ package cn.mzhong.janymq.zookeeper;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class ZookeeperClient implements Watcher {
 
     protected ZooKeeper zookeeper;
+    CountDownLatch countDownLatch = new CountDownLatch(1);
 
     public ZookeeperClient(String connectString) {
         try {
             this.zookeeper = new ZooKeeper(connectString, 1500, this);
-        } catch (IOException e) {
+            countDownLatch.await();
+        } catch (Exception e) {
             throw new RuntimeException("Zookeeper客户端初始化失败！", e);
         }
     }
@@ -27,7 +29,6 @@ public class ZookeeperClient implements Watcher {
             path = path.substring(0, path.length() - 1);
         }
         int indexOfSeparator = path.lastIndexOf('/');
-        System.out.println(path);
         try {
             // 如果不是root路径
             if (indexOfSeparator != 0) {
@@ -77,6 +78,8 @@ public class ZookeeperClient implements Watcher {
 
     @Override
     public void process(WatchedEvent watchedEvent) {
+        System.out.println("inited");
+        countDownLatch.countDown();
         // 无监听
     }
 }
