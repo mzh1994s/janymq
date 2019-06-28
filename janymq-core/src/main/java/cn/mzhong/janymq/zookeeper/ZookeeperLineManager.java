@@ -5,16 +5,15 @@ import cn.mzhong.janymq.line.AbstractLineManager;
 import cn.mzhong.janymq.line.LineInfo;
 import cn.mzhong.janymq.line.Message;
 import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 
-public abstract class ZookeeperLineManager extends AbstractLineManager implements Watcher {
-
+public abstract class ZookeeperLineManager extends AbstractLineManager {
+    final static Logger Log = LoggerFactory.getLogger(ZookeeperLineManager.class);
     protected String connectString;
     protected ZookeeperClient zkClient;
     protected String waitPath;
@@ -22,15 +21,11 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
     protected String errorPath;
     protected String lockPath;
     protected String root;
-    protected List<String> cacheKeys = new ArrayList<>();
+    protected Queue<String> cacheKeys = new LinkedList<>();
 
     public void initZookeeperClient(String connectString) {
         this.connectString = connectString;
-        try {
-            this.zkClient = new ZookeeperClient(new ZooKeeper(connectString, 1500, this));
-        } catch (IOException e) {
-            throw new RuntimeException("Zookeeper客户端初始化失败！", e);
-        }
+        this.zkClient = new ZookeeperClient(connectString);
     }
 
     public void initParentPath() {
@@ -52,6 +47,14 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
         this.root = root.startsWith("/") ? root : "/" + root;
     }
 
+    protected boolean lock(String key) {
+        return zkClient.create(lockPath + "/" + key, null, CreateMode.EPHEMERAL);
+    }
+
+    protected boolean unlock(String key) {
+        return false;
+    }
+
     ZookeeperLineManager(MQContext context, LineInfo lineInfo, String connectString, String root) {
         super(context, lineInfo);
         this.initZookeeperClient(connectString);
@@ -62,7 +65,7 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
     @Override
     public void push(Message message) {
         try {
-            byte[] data = context.getDataSerializer().serialize(message);
+            byte[] data = dataSerializer.serialize(message);
             String path = waitPath + "/" + message.getKey();
             zkClient.create(path, data, CreateMode.PERSISTENT);
         } catch (Exception e) {
@@ -72,8 +75,19 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
 
     @Override
     public Message poll() {
-        if(cacheKeys.isEmpty()){
-            cacheKeys = zkClient.getChildren(waitPath);
+        if (cacheKeys.isEmpty()) {
+            cacheKeys.addAll(zkClient.getChildren(waitPath));
+        }
+        while (!cacheKeys.isEmpty()) {
+            String key = cacheKeys.poll();
+            if (lock(key)) {
+                byte[] data = zkClient.getData(waitPath + "/" + key);
+                try {
+                    return (Message) dataSerializer.deserialize(data);
+                } catch (Exception e) {
+                    Log.error("消息反序列化出错，消息已被忽略！消息ID:" + key, e);
+                }
+            }
         }
         return null;
     }
@@ -96,10 +110,5 @@ public abstract class ZookeeperLineManager extends AbstractLineManager implement
     @Override
     public long length() {
         return zkClient.getChildren(waitPath).size();
-    }
-
-    @Override
-    public void process(WatchedEvent watchedEvent) {
-        // 无监听逻辑
     }
 }

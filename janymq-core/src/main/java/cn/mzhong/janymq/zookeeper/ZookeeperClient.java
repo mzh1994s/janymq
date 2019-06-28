@@ -1,18 +1,21 @@
 package cn.mzhong.janymq.zookeeper;
 
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 
+import java.io.IOException;
 import java.util.List;
 
-public class ZookeeperClient {
+public class ZookeeperClient implements Watcher {
 
     protected ZooKeeper zookeeper;
 
-    public ZookeeperClient(ZooKeeper zookeeper) {
-        this.zookeeper = zookeeper;
+    public ZookeeperClient(String connectString) {
+        try {
+            this.zookeeper = new ZooKeeper(connectString, 1500, this);
+        } catch (IOException e) {
+            throw new RuntimeException("Zookeeper客户端初始化失败！", e);
+        }
     }
 
     public boolean create(String path, byte[] data, CreateMode createMode) {
@@ -36,14 +39,14 @@ public class ZookeeperClient {
             }
             // 如果已存在，则不创建
             Stat exists = this.zookeeper.exists(path, false);
-            if(exists != null){
+            if (exists != null) {
                 return false;
             }
             // 创建本级
             this.zookeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, createMode);
             return true;
         } catch (Exception e) {
-            throw new RuntimeException("Zookeeper创建路径出现错误！", e);
+            throw new RuntimeException("创建Zookeeper路径出现错误！", e);
         }
     }
 
@@ -51,7 +54,20 @@ public class ZookeeperClient {
         try {
             return zookeeper.getChildren(path, false);
         } catch (Exception e) {
-            throw new RuntimeException("获取子节点出错！", e);
+            throw new RuntimeException("获取Zookeeper子节点出错！", e);
         }
+    }
+
+    public byte[] getData(String path) {
+        try {
+            return zookeeper.getData(path, false, null);
+        } catch (Exception e) {
+            throw new RuntimeException("获取Zookeeper数据出错！", e);
+        }
+    }
+
+    @Override
+    public void process(WatchedEvent watchedEvent) {
+        // 无监听
     }
 }
