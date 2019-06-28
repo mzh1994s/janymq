@@ -9,12 +9,12 @@ import java.util.concurrent.CountDownLatch;
 public class ZookeeperClient implements Watcher {
 
     protected ZooKeeper zookeeper;
-    CountDownLatch countDownLatch = new CountDownLatch(1);
+    CountDownLatch initCountDownLatch = new CountDownLatch(1);
 
     public ZookeeperClient(String connectString) {
         try {
             this.zookeeper = new ZooKeeper(connectString, 1500, this);
-            countDownLatch.await();
+            initCountDownLatch.await();
         } catch (Exception e) {
             throw new RuntimeException("Zookeeper客户端初始化失败！", e);
         }
@@ -78,8 +78,6 @@ public class ZookeeperClient implements Watcher {
 
     @Override
     public void process(WatchedEvent watchedEvent) {
-        System.out.println("inited");
-        countDownLatch.countDown();
-        // 无监听
+        initCountDownLatch.countDown();
     }
 }
