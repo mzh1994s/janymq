@@ -9,8 +9,8 @@
     <!--redis 实现-->
     <janymq:application basePackage="cn.mzhong">
         <!--<janymq:redis hostName="91.18.26.72" port="6379" password="cnctlogin"/>-->
-        <!--<janymq:redis hostName="mzhong.cn" port="6379"/>-->
-        <janymq:zookeeper connectString="mzhong.cn:2181"/>
+        <janymq:redis hostName="mzhong.cn" port="6379"/>
+        <!--<janymq:zookeeper connectString="mzhong.cn:2181"/>-->
         <janymq:pipleline idleInterval="5000"/>
         <janymq:loopline idleInterval="5000"/>
     </janymq:application>

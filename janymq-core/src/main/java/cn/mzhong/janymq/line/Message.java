@@ -3,6 +3,7 @@ package cn.mzhong.janymq.line;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Random;
 import java.util.UUID;
 
 public class Message implements Serializable {
@@ -15,7 +16,7 @@ public class Message implements Serializable {
     protected Object data;
 
     public Message() {
-        key = UUID.randomUUID().toString();
+        key = System.nanoTime() + "-R" + Math.random() * 10000;
     }
 
     public String getKey() {
