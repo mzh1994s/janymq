@@ -16,7 +16,7 @@ public class Message implements Serializable {
     protected Object data;
 
     public Message() {
-        key = System.nanoTime() + "-R" + Math.random() * 10000;
+        key = System.nanoTime() + "-R" + Math.round(Math.random() * 10000);
     }
 
     public String getKey() {
