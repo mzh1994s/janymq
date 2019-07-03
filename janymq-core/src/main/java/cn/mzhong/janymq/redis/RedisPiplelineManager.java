@@ -9,13 +9,13 @@ public class RedisPiplelineManager extends RedisLineManager {
 
     protected String ID;
 
-    private static String key(String keyPrefix, PiplelineInfo pipleline) {
+    private static String key(String rootPath, PiplelineInfo pipleline) {
         RedisKeyGenerator keyGenerator = new RedisKeyGenerator(pipleline);
-        return keyPrefix + ":Pipleline:" + keyGenerator.generate();
+        return rootPath + ":Pipleline:" + keyGenerator.generate();
     }
 
     public RedisPiplelineManager(MQContext context, RedisLineManagerProvider provider, PiplelineInfo pipleline) {
-        super(key(provider.keyPrefix, pipleline), provider.getJedisPool(), context);
+        super(key(provider.rootPath, pipleline), provider.getConnectionFactory(), context);
         this.ID = pipleline.ID();
     }
 

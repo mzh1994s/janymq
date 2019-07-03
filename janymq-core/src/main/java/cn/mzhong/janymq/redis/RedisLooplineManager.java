@@ -13,13 +13,13 @@ public class RedisLooplineManager extends RedisLineManager {
 
     protected String ID;
 
-    private static String key(String keyPrefix, LooplineInfo loopLine) {
+    private static String key(String rootPath, LooplineInfo loopLine) {
         RedisKeyGenerator generator = new RedisKeyGenerator(loopLine);
-        return keyPrefix + ":Loopline:" + generator.generate();
+        return rootPath + ":Loopline:" + generator.generate();
     }
 
     public RedisLooplineManager(MQContext context, RedisLineManagerProvider provider, LooplineInfo loopLine) {
-        super(key(provider.keyPrefix, loopLine), provider.getJedisPool(), context);
+        super(key(provider.rootPath, loopLine), provider.getConnectionFactory(), context);
         this.ID = loopLine.ID();
     }
 

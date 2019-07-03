@@ -30,7 +30,10 @@ public class MQApplication extends MQContext {
 
     final static Logger Log = LoggerFactory.getLogger(MQApplication.class);
 
-    protected static void wellcome() {
+    protected void wellcome() {
+        Log.debug(this.applicationConfig.toString());
+        Log.debug(this.piplelineConfig.toString());
+        Log.debug(this.looplineConfig.toString());
         Log.debug("JSimpleMQ application started!");
     }
 
@@ -72,7 +75,7 @@ public class MQApplication extends MQContext {
         consumerInitializer.init(this);
         // 正常终结
         Runtime.getRuntime().addShutdownHook(new MQShutdownHook(this));
-        MQApplication.wellcome();
+        this.wellcome();
     }
 
     public <T> T getProducer(Class<T> producerClass) {

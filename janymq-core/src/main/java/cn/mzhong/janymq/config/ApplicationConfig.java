@@ -17,4 +17,11 @@ public class ApplicationConfig {
     public void setBasePackage(String basePackage) {
         this.basePackage = basePackage;
     }
+
+    @Override
+    public String toString() {
+        return "ApplicationConfig{" +
+                "basePackage='" + basePackage + '\'' +
+                '}';
+    }
 }

@@ -28,18 +28,18 @@ class MQShutdownHookExecutor implements Runnable {
 
     @Override
     public void run() {
-        Log.debug("JAnyMQ应用程序正在终结...");
+        Log.debug("janymq应用程序正在终结...");
         // 写终结
         context.setShutdown(true);
         executorService.shutdown();
         try {
             if (executorService.awaitTermination(1000, TimeUnit.SECONDS)) {
-                Log.debug("JAnyMQ应用程序已终结，拜拜!");
+                Log.debug("janymq应用程序已终结，拜拜!");
                 return;
             }
         } catch (InterruptedException e) {
             Log.debug(e.getLocalizedMessage(), e);
         }
-        Log.debug("JAnyMQ应用程序可能未正常终结!");
+        Log.debug("janymq应用程序可能未正常终结!");
     }
 }

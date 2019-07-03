@@ -19,17 +19,17 @@ public abstract class RedisLineManager implements LineManager {
     protected byte[] doneKey;
     protected byte[] errorKey;
     protected byte[] lockKey;
-    protected JedisPool jedisPool;
+    protected RedisConnectionFactory connectionFactory;
     protected DataSerializer serializer;
     protected LinkedList<byte[]> cacheKeys = new LinkedList<>();
     protected MQContext context;
 
-    public RedisLineManager(String keyPrefixKey, JedisPool jedisPool, MQContext context) {
-        this.waitKey = (keyPrefixKey + ":wait").getBytes();
-        this.doneKey = (keyPrefixKey + ":done").getBytes();
-        this.errorKey = (keyPrefixKey + ":error").getBytes();
-        this.lockKey = (keyPrefixKey + ":lock").getBytes();
-        this.jedisPool = jedisPool;
+    public RedisLineManager(String keyPrefix, RedisConnectionFactory connectionFactory, MQContext context) {
+        this.waitKey = (keyPrefix + ":wait").getBytes();
+        this.doneKey = (keyPrefix + ":done").getBytes();
+        this.errorKey = (keyPrefix + ":error").getBytes();
+        this.lockKey = (keyPrefix + ":lock").getBytes();
+        this.connectionFactory = connectionFactory;
         this.serializer = context.getDataSerializer();
         this.context = context;
     }
@@ -70,7 +70,7 @@ public abstract class RedisLineManager implements LineManager {
     @Override
     public Message poll() {
         Message message = null;
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = connectionFactory.getConnection();
         try {
             if (cacheKeys.isEmpty()) {
                 reloadKeys(jedis);
@@ -104,7 +104,7 @@ public abstract class RedisLineManager implements LineManager {
 
     @Override
     public void push(Message message) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = connectionFactory.getConnection();
         try {
             byte[] data = serializer.serialize(message);
             jedis.hset(waitKey, message.getKey().getBytes(), data);
@@ -116,7 +116,7 @@ public abstract class RedisLineManager implements LineManager {
     }
 
     private void complete(byte[] key, Message message) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = connectionFactory.getConnection();
         try {
             byte[] data = serializer.serialize(message);
             byte[] field = message.getKey().getBytes();
@@ -145,7 +145,7 @@ public abstract class RedisLineManager implements LineManager {
 
     @Override
     public void back(Message message) {
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = connectionFactory.getConnection();
         try {
             byte[] field = message.getKey().getBytes();
             // 将锁删除
@@ -160,7 +160,7 @@ public abstract class RedisLineManager implements LineManager {
     @Override
     public long length() {
         long len = 0;
-        Jedis jedis = jedisPool.getResource();
+        Jedis jedis = connectionFactory.getConnection();
         try {
             len = jedis.hlen(waitKey);
         } catch (Exception e) {

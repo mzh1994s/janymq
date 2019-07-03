@@ -25,4 +25,12 @@ public abstract class LineConfig {
     public void setSleepInterval(long sleepInterval) {
         this.sleepInterval = sleepInterval;
     }
+
+    @Override
+    public String toString() {
+        return "LineConfig{" +
+                "idleInterval=" + idleInterval +
+                ", sleepInterval=" + sleepInterval +
+                '}';
+    }
 }

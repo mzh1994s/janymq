@@ -12,7 +12,7 @@ public class TestSpring {
         int cnt = 1;
         while (cnt >= 0) {
 //            testBean.testPipleline();
-            testBean.testLoopline();
+//            testBean.testLoopline();
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
