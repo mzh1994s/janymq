@@ -40,12 +40,12 @@ public class DataSourceLineManagerProvider implements LineManagerProvider {
 
     @Override
     public LineManager getPiplelineManager(PiplelineInfo pipleline) {
-        return new DataSourceLineManager(messageMapper, pipleline.ID());
+        return new DataSourceLineManager(context, messageMapper, pipleline.ID());
     }
 
     @Override
     public LineManager getlooplinemanager(LooplineInfo loopLine) {
-        return new DataSourceLineManager(messageMapper, loopLine.ID());
+        return new DataSourceLineManager(context, messageMapper, loopLine.ID());
     }
 
     protected String getJdbcDriverClassName() {
@@ -66,15 +66,6 @@ public class DataSourceLineManagerProvider implements LineManagerProvider {
             }
         }
         return jdbcDriverClassName;
-    }
-
-    protected boolean isTableExists() {
-        try {
-            this.sqlExecutor.executeQuery("select count(*) from " + table);
-        } catch (RuntimeException e) {
-            return false;
-        }
-        return true;
     }
 
     @Override

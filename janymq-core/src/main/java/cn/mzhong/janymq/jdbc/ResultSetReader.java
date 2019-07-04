@@ -5,6 +5,9 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResultSetReader {
 
@@ -15,41 +18,25 @@ public class ResultSetReader {
         this.resultSet = resultSet;
     }
 
-    public boolean next() {
+    public <T> List<T> readList(ResultSetIterator<T> iterator) {
+        List<T> list = new ArrayList<>();
         try {
-            return resultSet.next();
-        } catch (SQLException e) {
+            while (resultSet.next()) {
+                list.add(iterator.read(resultSet));
+            }
+            return list;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    public String getString(String columnLabel) {
+    public <T> T readOne(ResultSetIterator<T> iterator) {
         try {
-            return this.resultSet.getString(columnLabel);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public String getString(int columnIndex) {
-        try {
-            return this.resultSet.getString(columnIndex);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Object getObject(int columnIndex) {
-        try {
-            return this.resultSet.getObject(columnIndex);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    public long getLong(int columnIndex) {
-        try {
-            return this.resultSet.getLong(columnIndex);
-        } catch (SQLException e) {
+            if(resultSet.next()){
+                return iterator.read(resultSet);
+            }
+            return null;
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

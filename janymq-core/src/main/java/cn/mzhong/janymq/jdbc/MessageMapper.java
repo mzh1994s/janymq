@@ -1,8 +1,5 @@
 package cn.mzhong.janymq.jdbc;
 
-import cn.mzhong.janymq.line.Message;
-
-import java.util.LinkedList;
 import java.util.List;
 
 public interface MessageMapper {
@@ -38,14 +35,14 @@ public interface MessageMapper {
      *
      * @param message
      */
-    void save(Message message);
+    void save(JdbcMessage message);
 
     /**
      * 返回wait状态下的key，一般情况下返回所有，具体返回数量由实现方决定
      *
      * @return
      */
-    LinkedList<String> keys();
+    List<String> keys();
 
     /**
      * 将一个key锁定
@@ -69,21 +66,21 @@ public interface MessageMapper {
      * @param key
      * @return
      */
-    Message get(String key);
+    JdbcMessage get(String key);
 
     /**
      * 将一个消息设置为完成状态
      *
      * @param message
      */
-    void done(Message message);
+    void done(JdbcMessage message);
 
     /**
      * 将一个消息设置为错误状态
      *
      * @param message
      */
-    void error(Message message);
+    void error(JdbcMessage message);
 
     /**
      * 返回指定LineID的等待执行的消息数量

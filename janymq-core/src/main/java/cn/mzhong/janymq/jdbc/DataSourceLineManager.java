@@ -1,5 +1,7 @@
 package cn.mzhong.janymq.jdbc;
 
+import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.line.DataSerializer;
 import cn.mzhong.janymq.line.LineManager;
 import cn.mzhong.janymq.line.Message;
 import org.slf4j.Logger;
@@ -12,11 +14,16 @@ public class DataSourceLineManager implements LineManager {
 
     final static Logger Log = LoggerFactory.getLogger(DataSourceLineManager.class);
 
+    protected MQContext context;
     protected MessageMapper messageMapper;
     protected String ID;
     protected LinkedList<String> cacheKeys = new LinkedList<>();
 
-    public DataSourceLineManager(MessageMapper messageMapper, String ID) {
+    protected DataSerializer dataSerializer;
+
+    public DataSourceLineManager(MQContext context, MessageMapper messageMapper, String ID) {
+        this.context = context;
+        this.dataSerializer = context.getDataSerializer();
         this.messageMapper = messageMapper;
         this.ID = ID;
     }
@@ -28,20 +35,25 @@ public class DataSourceLineManager implements LineManager {
 
     @Override
     public void push(Message message) {
-        message.setPushTime(new Date());
-        message.setLineID(ID);
-        this.messageMapper.save(message);
+        JdbcMessage jdbcMessage = new JdbcMessage(message);
+        jdbcMessage.setContentBytes(this.dataSerializer.serialize(message.getContent()));
+        jdbcMessage.setPushTime(new Date());
+        jdbcMessage.setLineID(ID);
+        this.messageMapper.save(jdbcMessage);
     }
 
     @Override
     public Message poll() {
         if (cacheKeys.isEmpty()) {
-            cacheKeys = this.messageMapper.keys();
+            cacheKeys.addAll(this.messageMapper.keys());
         }
         while (!cacheKeys.isEmpty()) {
             String key = cacheKeys.poll();
             if (this.messageMapper.lock(key)) {
-                return this.messageMapper.get(key);
+                JdbcMessage jdbcMessage = this.messageMapper.get(key);
+                Object[] content = (Object[]) this.dataSerializer.deserialize(jdbcMessage.getContentBytes());
+                jdbcMessage.setContent(content);
+                return jdbcMessage;
             }
         }
         return null;
@@ -54,12 +66,16 @@ public class DataSourceLineManager implements LineManager {
 
     @Override
     public void done(Message message) {
-        this.messageMapper.done(message);
+        JdbcMessage jdbcMessage = new JdbcMessage(message);
+        jdbcMessage.setDoneTime(new Date());
+        this.messageMapper.done(jdbcMessage);
     }
 
     @Override
     public void error(Message message) {
-        this.messageMapper.error(message);
+        JdbcMessage jdbcMessage = new JdbcMessage(message);
+        jdbcMessage.setErrorTime(new Date());
+        this.messageMapper.error(jdbcMessage);
     }
 
     @Override

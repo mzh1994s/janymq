@@ -1,16 +1,11 @@
 package cn.mzhong.janymq.jdbc;
 
 import cn.mzhong.janymq.core.MQContext;
-import cn.mzhong.janymq.line.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
-import java.util.LinkedList;
+import java.util.List;
 
 public class MysqlMessageMapper extends AbstractMessageMapper {
-
-    final static Logger Log = LoggerFactory.getLogger(MysqlMessageMapper.class);
 
     public MysqlMessageMapper(MQContext context, SqlExecutor sqlExecutor, String table) {
         super(context, sqlExecutor, table);
@@ -18,12 +13,15 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
 
     @Override
     public boolean isTableExists() {
-        try {
-            this.sqlExecutor.executeQuery("select count(*) from " + table);
-        } catch (RuntimeException e) {
-            return false;
-        }
-        return true;
+        return this.sqlExecutor.query(
+                "show tables like ?",
+                new Object[]{table},
+                new ResultSetIterator<String>() {
+                    @Override
+                    public String read(ResultSet resultSet) throws Exception {
+                        return resultSet.getString(1);
+                    }
+                }) != null;
     }
 
     @Override
@@ -38,65 +36,71 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
                         "`throwable` BLOB," +
                         "`content` BLOB," +
                         "`status` CHAR(1)," +
-                        "PRIMARY KEY (`key`)" +
+                        "PRIMARY KEY (`key`)," +
+                        "INDEX `" + table + "_line_id` (`line_id`)" +
                         ")");
     }
 
     @Override
-    public void save(Message message) {
-        this.sqlExecutor.executeUpdate("INSERT INTO `" + table + "`" +
+    public void save(JdbcMessage message) {
+        this.sqlExecutor.update("INSERT INTO `" + table + "`" +
                         "(`key`,`line_id`,`push_time`,`content`,`status`) VALUES (?,?,?,?,?)",
                 message.getKey(),
                 message.getLineID(),
                 message.getPushTime(),
-                message.getContent(),
+                message.getContentBytes(),
                 MESSAGE_STATUS_WAIT);
     }
 
     @Override
-    public LinkedList<String> keys() {
-        ResultSetReader reader = new ResultSetReader(
-                this.sqlExecutor.executeQuery(
-                        "SELECT `KEY` FROM `" + table + "` WHERE `status`=?", MESSAGE_STATUS_WAIT));
-        LinkedList<String> keys = new LinkedList<>();
-        while (reader.next()) {
-            reader.next();
-            keys.add(reader.getString(1));
-        }
-        return keys;
+    public List<String> keys() {
+        return this.sqlExecutor.queryList(
+                "SELECT `KEY` FROM `" + table + "` WHERE `status`=?",
+                new Object[]{MESSAGE_STATUS_WAIT},
+                new ResultSetIterator<String>() {
+                    @Override
+                    public String read(ResultSet resultSet) throws Exception {
+                        return resultSet.getString(1);
+                    }
+                });
     }
 
     @Override
     public boolean lock(String key) {
-        return 1 == this.sqlExecutor.executeUpdate(
+        return 1 == this.sqlExecutor.update(
                 "UPDATE `" + table + "` SET `status`=? WHERE `key`=? AND `status`=?",
                 MESSAGE_STATUS_LOCK, key, MESSAGE_STATUS_WAIT);
     }
 
     @Override
     public boolean unLock(String key) {
-        return 1 == this.sqlExecutor.executeUpdate(
+        return 1 == this.sqlExecutor.update(
                 "UPDATE `" + table + "` SET `status`=? WHERE `key`=? AND `status`=?",
                 MESSAGE_STATUS_WAIT, key, MESSAGE_STATUS_LOCK);
     }
 
     @Override
-    public Message get(String key) {
-        ResultSet resultSet = this.sqlExecutor.executeQuery("SELECT `content` FROM `" + table + "` WHERE `key`=?", key);
-        ResultSetReader reader = new ResultSetReader(resultSet);
-        if (reader.next()) {
-            Message message = new Message();
-            message.setKey(key);
-            Object[] content = (Object[]) reader.getObject(1);
-            message.setContent(content);
-            return message;
-        }
-        return null;
+    public JdbcMessage get(String key) {
+        return this.sqlExecutor.query(
+                "SELECT `content` FROM `" + table + "` WHERE `key`=?",
+                new Object[]{key},
+                new ResultSetIterator<JdbcMessage>() {
+                    @Override
+                    public JdbcMessage read(ResultSet resultSet) throws Exception {
+                        if (resultSet.next()) {
+                            JdbcMessage message = new JdbcMessage();
+                            message.setKey(key);
+                            message.setContentBytes(resultSet.getBytes(1));
+                            return message;
+                        }
+                        return null;
+                    }
+                });
     }
 
     @Override
-    public void done(Message message) {
-        this.sqlExecutor.executeUpdate(
+    public void done(JdbcMessage message) {
+        this.sqlExecutor.update(
                 "UPDATE FROM `" + table + "` SET " +
                         "`status`=?, " +
                         "`done_time`=? " +
@@ -107,8 +111,8 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
     }
 
     @Override
-    public void error(Message message) {
-        this.sqlExecutor.executeUpdate(
+    public void error(JdbcMessage message) {
+        this.sqlExecutor.update(
                 "UPDATE FROM `" + table + "` SET " +
                         "`status`=?, " +
                         "`error_time`=?, " +
@@ -116,18 +120,23 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
                         "WHERE `key`=?",
                 MESSAGE_STATUS_ERROR,
                 message.getErrorTime(),
-                message.getThrowable(),
+                message.getThrowableBytes(),
                 message.getKey());
     }
 
     @Override
     public long length(String lineID) {
-        ResultSet resultSet = this.sqlExecutor.executeQuery(
-                "SELECT COUNT(*) FROM `" + table + "` WHERE `line_id`=? AND `status`=?", lineID, MESSAGE_STATUS_WAIT);
-        ResultSetReader reader = new ResultSetReader(resultSet);
-        if (reader.next()) {
-            return reader.getLong(1);
-        }
-        return 0;
+        return this.sqlExecutor.query(
+                "SELECT COUNT(*) FROM `" + table + "` WHERE `line_id`=? AND `status`=?",
+                new Object[]{lineID, MESSAGE_STATUS_WAIT},
+                new ResultSetIterator<Long>() {
+                    @Override
+                    public Long read(ResultSet resultSet) throws Exception {
+                        if (resultSet.next()) {
+                            return resultSet.getLong(1);
+                        }
+                        return 0L;
+                    }
+                });
     }
 }

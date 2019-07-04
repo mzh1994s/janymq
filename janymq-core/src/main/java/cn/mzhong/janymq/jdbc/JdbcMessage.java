@@ -1,0 +1,45 @@
+package cn.mzhong.janymq.jdbc;
+
+import cn.mzhong.janymq.line.Message;
+
+import java.util.Date;
+
+/**
+ * 各数据库软件之间与jdbc对接存在序列化兼容性问题，这里所以有序列化操作使用手工方式。
+ * 在从数据库获取throwable、content两个字段时，首先使用{@link java.sql.ResultSet#getBytes(int)}方法得到byte数组。
+ * 再分别赋值给throwableBytes、contentBytes两个字段并返回，框架会自动将byte数组反序列化，并赋值给throwable、content字段
+ */
+public class JdbcMessage extends Message {
+    private static final long serialVersionUID = -744128535422190869L;
+    public JdbcMessage() {
+
+    }
+    public JdbcMessage(Message message) {
+        this.key = message.getKey();
+        this.lineID = message.getLineID();
+        this.pushTime = message.getPushTime();
+        this.doneTime = message.getDoneTime();
+        this.errorTime = message.getErrorTime();
+        this.throwable = message.getThrowable();
+        this.content = message.getContent();
+    }
+
+    protected byte[] throwableBytes;
+    protected byte[] contentBytes;
+
+    public byte[] getThrowableBytes() {
+        return throwableBytes;
+    }
+
+    public void setThrowableBytes(byte[] throwableBytes) {
+        this.throwableBytes = throwableBytes;
+    }
+
+    public byte[] getContentBytes() {
+        return contentBytes;
+    }
+
+    public void setContentBytes(byte[] contentBytes) {
+        this.contentBytes = contentBytes;
+    }
+}
