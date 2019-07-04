@@ -8,9 +8,9 @@
     </xsd:annotation>
 
     <xsd:complexType name="redisType">
-        <xsd:attribute name="hostName" type="xsd:string">
+        <xsd:attribute name="host" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis HostName ]]></xsd:documentation>
+                <xsd:documentation><![CDATA[ redis Host ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="port" type="xsd:int">
@@ -73,6 +73,11 @@
                 <xsd:documentation><![CDATA[ 数据源引用 ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="table" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 表名 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="lineConfig">
@@ -106,8 +111,9 @@
     <xsd:complexType name="applicationType">
         <xsd:sequence>
             <xsd:choice minOccurs="1">
-                <xsd:element ref="service-redis"/>
-                <xsd:element ref="service-zookeeper"/>
+                <xsd:element ref="provider-redis"/>
+                <xsd:element ref="provider-zookeeper"/>
+                <xsd:element ref="provider-jdbc"/>
             </xsd:choice>
             <xsd:element ref="conf-pipleline" minOccurs="0"/>
             <xsd:element ref="conf-loopline" minOccurs="0"/>
@@ -130,17 +136,17 @@
             <xsd:documentation><![CDATA[ JSimpleMQ应用程序配置 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="service-redis" type="redisType">
+    <xsd:element name="provider-redis" type="redisType">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ Redis配置 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="service-zookeeper" type="zookeeperType">
+    <xsd:element name="provider-zookeeper" type="zookeeperType">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ Zookeeper配置 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="service-jdbc" type="jdbcType">
+    <xsd:element name="provider-jdbc" type="jdbcType">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ 数据库配置 ]]></xsd:documentation>
         </xsd:annotation>

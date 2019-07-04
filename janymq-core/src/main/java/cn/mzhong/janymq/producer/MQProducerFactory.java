@@ -59,7 +59,7 @@ class ProducerInvocationHandler implements InvocationHandler {
             throw new MQNotFoundException("此方法不能作为提供者使用：" + method.getName());
         }
         Message message = new Message();
-        message.setData(args);
+        message.setContent(args);
         storeManager.push(message);
         return false;
     }

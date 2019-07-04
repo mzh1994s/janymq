@@ -3,6 +3,7 @@ package cn.mzhong.janymq.spring;
 import cn.mzhong.janymq.config.ApplicationConfig;
 import cn.mzhong.janymq.config.LooplineConfig;
 import cn.mzhong.janymq.config.PiplelineConfig;
+import cn.mzhong.janymq.jdbc.DataSourceLineManagerProvider;
 import cn.mzhong.janymq.redis.GenericRedisConnectionFactory;
 import cn.mzhong.janymq.redis.RedisLineManagerProvider;
 import cn.mzhong.janymq.redis.SpringRedisConnectionFactory;
@@ -33,7 +34,7 @@ public class MQApplicationParser extends AbstractSingleBeanDefinitionParser {
      * @param builder
      * @return
      */
-    protected String specialDoIdentifierAttribute(Element element, BeanDefinitionBuilder builder) {
+    protected String doSpecialIDAttribute(Element element, BeanDefinitionBuilder builder) {
         String id = element.getAttribute("id");
         if (id == null || id.length() == 0) {
             id = _class.getName();
@@ -57,23 +58,25 @@ public class MQApplicationParser extends AbstractSingleBeanDefinitionParser {
     }
 
     protected void doParseChildren(Element root, BeanDefinitionBuilder builder) {
-        String[] storeComponents = new String[]{
+        String[] elementNames = new String[]{
                 "conf-pipleline", "conf-loopline",
-                "service-redis", "service-zookeeper"};
+                "provider-redis", "provider-zookeeper", "provider-jdbc"};
         Class<?>[] configClasses = new Class<?>[]{
                 PiplelineConfigParser.class,
                 LooplineConfigParser.class,
                 RedisLineManagerProviderParser.class,
-                ZookeeperLineManagerParser.class
+                ZookeeperLineManagerProviderParser.class,
+                JdbcLineManagerProviderParser.class
         };
-        for (int i = 0; i < storeComponents.length; i++) {
-            Element element = getElementByName(root, storeComponents[i]);
+        for (int i = 0; i < elementNames.length; i++) {
+            Element element = getElementByName(root, elementNames[i]);
             if (element != null) {
                 try {
                     ConfigParser parser = (ConfigParser) configClasses[i].getConstructor(
                             Element.class, BeanDefinitionBuilder.class).newInstance(element, builder);
                     parser.doParser();
                 } catch (Exception e) {
+                    Log.error("解析配置出错：" + elementNames[i], e);
                     // pass
                 }
             }
@@ -87,7 +90,7 @@ public class MQApplicationParser extends AbstractSingleBeanDefinitionParser {
 
     @Override
     protected void doParse(Element root, BeanDefinitionBuilder builder) {
-        specialDoIdentifierAttribute(root, builder);
+        doSpecialIDAttribute(root, builder);
         doParseChildren(root, builder);
         doParseApplicationConfig(root, builder);
     }
@@ -105,6 +108,9 @@ abstract class ConfigParser {
     public abstract void doParser();
 }
 
+/**
+ * 应用程序配置解析器
+ */
 class ApplicationConfigParser extends ConfigParser {
 
     public ApplicationConfigParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
@@ -113,12 +119,15 @@ class ApplicationConfigParser extends ConfigParser {
 
     @Override
     public void doParser() {
-        ElementBeanDefinitionParser configParser = new ElementBeanDefinitionParser(element, ApplicationConfig.class);
+        ElementToBeanDefinitionParser configParser = new ElementToBeanDefinitionParser(element, ApplicationConfig.class);
         configParser.parseStringPropertyFromAttr("basePackage");
         this.beanDefinitionBuilder.addPropertyValue("applicationConfig", configParser.getBeanDefinition());
     }
 }
 
+/**
+ * Pipleline配置解析器
+ */
 class PiplelineConfigParser extends ConfigParser {
 
     public PiplelineConfigParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
@@ -127,14 +136,16 @@ class PiplelineConfigParser extends ConfigParser {
 
     @Override
     public void doParser() {
-        ElementBeanDefinitionParser piplelineParser = new ElementBeanDefinitionParser(element, PiplelineConfig.class);
+        ElementToBeanDefinitionParser piplelineParser = new ElementToBeanDefinitionParser(element, PiplelineConfig.class);
         piplelineParser.parseStringPropertyFromAttr("idleInterval");
         piplelineParser.parseStringPropertyFromAttr("sleepInterval");
         this.beanDefinitionBuilder.addPropertyValue("piplelineConfig", piplelineParser.getBeanDefinition());
     }
 }
 
-
+/**
+ * loopline配置解析器
+ */
 class LooplineConfigParser extends ConfigParser {
 
     public LooplineConfigParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
@@ -143,13 +154,16 @@ class LooplineConfigParser extends ConfigParser {
 
     @Override
     public void doParser() {
-        ElementBeanDefinitionParser piplelineParser = new ElementBeanDefinitionParser(element, LooplineConfig.class);
+        ElementToBeanDefinitionParser piplelineParser = new ElementToBeanDefinitionParser(element, LooplineConfig.class);
         piplelineParser.parseStringPropertyFromAttr("idleInterval");
         piplelineParser.parseStringPropertyFromAttr("sleepInterval");
         this.beanDefinitionBuilder.addPropertyValue("looplineConfig", piplelineParser.getBeanDefinition());
     }
 }
 
+/**
+ * redis 提供者解析器
+ */
 class RedisLineManagerProviderParser extends ConfigParser {
 
     public RedisLineManagerProviderParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
@@ -173,10 +187,10 @@ class RedisLineManagerProviderParser extends ConfigParser {
     }
 
     protected void doJedisPoolConfigParser(String jedisPoolConfigRef) {
-        ElementBeanDefinitionParser jedisPoolParser = new ElementBeanDefinitionParser(element, JedisPool.class);
+        ElementToBeanDefinitionParser jedisPoolParser = new ElementToBeanDefinitionParser(element, JedisPool.class);
         // public JedisPool(GenericObjectPoolConfig poolConfig, String host, int port, int timeout, String password, int database)
         jedisPoolParser.addConstructorArgReference(jedisPoolConfigRef);
-        jedisPoolParser.parseStringConstructorFromAttr("hostName");
+        jedisPoolParser.parseStringConstructorFromAttr("host");
         jedisPoolParser.parseIntConstructorFromAttr("port");
         jedisPoolParser.parseIntConstructorFromAttr("timeout");
         jedisPoolParser.parseIntConstructorFromAttr("password");
@@ -186,10 +200,10 @@ class RedisLineManagerProviderParser extends ConfigParser {
 
     protected void doHostPortParser() {
         BeanDefinitionBuilder jedisPoolConfigBuilder = BeanDefinitionBuilder.genericBeanDefinition(JedisPoolConfig.class);
-        ElementBeanDefinitionParser jedisPoolParser = new ElementBeanDefinitionParser(element, JedisPool.class);
+        ElementToBeanDefinitionParser jedisPoolParser = new ElementToBeanDefinitionParser(element, JedisPool.class);
         // public JedisPool(GenericObjectPoolConfig poolConfig, String host, int port, int timeout, String password, int database)
         jedisPoolParser.addConstructorArgValue(jedisPoolConfigBuilder.getBeanDefinition());
-        jedisPoolParser.parseStringConstructorFromAttr("hostName");
+        jedisPoolParser.parseStringConstructorFromAttr("host");
         jedisPoolParser.parseIntConstructorFromAttr("port");
         jedisPoolParser.parseIntConstructorFromAttr("timeout");
         jedisPoolParser.parseIntConstructorFromAttr("password");
@@ -207,7 +221,7 @@ class RedisLineManagerProviderParser extends ConfigParser {
 
     protected void registerLineManagerProvider(BeanDefinitionBuilder connectionFactoryBuilder) {
         // bean RedisLineManagerProvider
-        ElementBeanDefinitionParser redisLineManagerProviderParser = new ElementBeanDefinitionParser(element, RedisLineManagerProvider.class);
+        ElementToBeanDefinitionParser redisLineManagerProviderParser = new ElementToBeanDefinitionParser(element, RedisLineManagerProvider.class);
         redisLineManagerProviderParser.addPropertyValue("connectionFactory", connectionFactoryBuilder.getBeanDefinition());
         redisLineManagerProviderParser.parseStringPropertyFromAttr("rootPath");
         this.beanDefinitionBuilder.addPropertyValue("lineManagerProvider", redisLineManagerProviderParser.getBeanDefinition());
@@ -235,18 +249,37 @@ class RedisLineManagerProviderParser extends ConfigParser {
     }
 }
 
-class ZookeeperLineManagerParser extends ConfigParser {
+/**
+ * Zookeeper提供者解析器
+ */
+class ZookeeperLineManagerProviderParser extends ConfigParser {
 
-    public ZookeeperLineManagerParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
+    public ZookeeperLineManagerProviderParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
         super(element, beanDefinitionBuilder);
     }
 
     @Override
     public void doParser() {
         // bean ZookeeperLineManagerProvider
-        ElementBeanDefinitionParser elementBeanDefinitionParser = new ElementBeanDefinitionParser(element, ZookeeperLineManagerProvider.class);
+        ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, ZookeeperLineManagerProvider.class);
         elementBeanDefinitionParser.parseStringPropertyFromAttr("connectString");
         elementBeanDefinitionParser.parseStringPropertyFromAttr("rootPath");
+        this.beanDefinitionBuilder.addPropertyValue("lineManagerProvider", elementBeanDefinitionParser.getBeanDefinition());
+    }
+}
+
+class JdbcLineManagerProviderParser extends ConfigParser {
+
+    public JdbcLineManagerProviderParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
+        super(element, beanDefinitionBuilder);
+    }
+
+    @Override
+    public void doParser() {
+// bean ZookeeperLineManagerProvider
+        ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, DataSourceLineManagerProvider.class);
+        elementBeanDefinitionParser.parseStringPropertyFromAttr("table");
+        elementBeanDefinitionParser.parseReferencePropertyFromAttr("dataSource");
         this.beanDefinitionBuilder.addPropertyValue("lineManagerProvider", elementBeanDefinitionParser.getBeanDefinition());
     }
 }

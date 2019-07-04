@@ -1,7 +1,6 @@
 package cn.mzhong.janymq.executor;
 
 import cn.mzhong.janymq.core.MQContext;
-import cn.mzhong.janymq.line.LineManager;
 import cn.mzhong.janymq.line.LooplineInfo;
 import cn.mzhong.janymq.line.Message;
 import cn.mzhong.janymq.util.ValueUtils;
@@ -30,7 +29,7 @@ public class MQLooplineExecutor extends MQLineExecutor {
     @Override
     void invoke(Message message) {
         try {
-            boolean res = (boolean) method.invoke(consumer, (Object[]) message.getData());
+            boolean res = (boolean) method.invoke(consumer, message.getContent());
             if (res) {
                 lineManager.done(message);
             } else {

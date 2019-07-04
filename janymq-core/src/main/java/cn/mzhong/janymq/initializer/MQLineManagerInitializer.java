@@ -16,6 +16,7 @@ public class MQLineManagerInitializer implements MQComponentInitializer {
     @Override
     public void init(MQContext context) {
         LineManagerProvider provider = context.getLineManagerProvider();
+        provider.init(context);
         Map<Method, LineManager> methodLineManagerMap = context.getMethodLineManagerMap();
         for (Class<?> producerClass : context.getProducerClassSet()) {
             for (Method method : producerClass.getMethods()) {
@@ -29,7 +30,7 @@ public class MQLineManagerInitializer implements MQComponentInitializer {
                     if (method.getReturnType() != Void.TYPE) {
                         throw new RuntimeException("流水线" + piplelineInfo.ID() + "对应的方法" + method.getName() + "返回值应为void");
                     }
-                    methodLineManagerMap.put(method, provider.getPiplelineManager(context, piplelineInfo));
+                    methodLineManagerMap.put(method, provider.getPiplelineManager(piplelineInfo));
                     continue;
                 }
                 // 扫描环线队列
@@ -43,7 +44,7 @@ public class MQLineManagerInitializer implements MQComponentInitializer {
                     if (returnType != Boolean.class && returnType != boolean.class) {
                         throw new RuntimeException("环线" + looplineInfo.ID() + "对应的方法" + method.getName() + "返回值应为Boolean");
                     }
-                    methodLineManagerMap.put(method, provider.getlooplinemanager(context, looplineInfo));
+                    methodLineManagerMap.put(method, provider.getlooplinemanager(looplineInfo));
                     continue;
                 }
             }

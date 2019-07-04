@@ -14,6 +14,7 @@ public class RedisLineManagerProvider implements LineManagerProvider {
     protected String rootPath = "janymq";
     // redis连接工厂
     protected RedisConnectionFactory connectionFactory;
+    protected MQContext context;
 
     public String getRootPath() {
         return rootPath;
@@ -32,20 +33,21 @@ public class RedisLineManagerProvider implements LineManagerProvider {
     }
 
     @Override
-    public void init() {
+    public void init(MQContext context) {
+        this.context = context;
         if (this.connectionFactory == null) {
             throw new RuntimeException("无Redis连接工厂，请先指定Redis连接工厂！");
         }
     }
 
     @Override
-    public LineManager getPiplelineManager(MQContext context, PiplelineInfo pipleline) {
+    public LineManager getPiplelineManager(PiplelineInfo pipleline) {
         RedisPiplelineManager redisPiplelineManager = new RedisPiplelineManager(context, this, pipleline);
         return redisPiplelineManager;
     }
 
     @Override
-    public LineManager getlooplinemanager(MQContext context, LooplineInfo loopLine) {
+    public LineManager getlooplinemanager(LooplineInfo loopLine) {
         RedisLooplineManager looplineManager = new RedisLooplineManager(context, this, loopLine);
         return looplineManager;
     }

@@ -5,83 +5,65 @@ import cn.mzhong.janymq.line.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.sql.DataSource;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+import java.util.LinkedList;
 
 public class DataSourceLineManager implements LineManager {
 
     final static Logger Log = LoggerFactory.getLogger(DataSourceLineManager.class);
 
-    DataSource dataSource;
-    protected String table;
+    protected MessageMapper messageMapper;
+    protected String ID;
+    protected LinkedList<String> cacheKeys = new LinkedList<>();
 
-    protected ResultSet query(String sql, String... args) {
-        try {
-            Statement statement = dataSource.getConnection().createStatement();
-            PreparedStatement preparedStatement = dataSource.getConnection().prepareStatement(sql);
-            for (int i = 0; i < args.length; i++) {
-                preparedStatement.setString(i, args[i]);
-            }
-            return statement.executeQuery(sql);
-        } catch (Exception e) {
-            Log.error(e.getMessage(), e);
-            throw new RuntimeException("执行SQL出错：" + sql, e);
-        }
-    }
-
-    protected List<Message> queryMessageList() {
-        String sql = "select key,push_time,done_time,error_time,throwable,data from ? where status = ?";
-        ResultSet resultSet = query(sql, table, "W");
-        List<Message> list = new ArrayList<>();
-        try {
-            while (!resultSet.isLast()) {
-                Message message = new Message();
-                message.setKey(resultSet.getString(0));
-                list.add(message);
-                resultSet.next();
-            }
-        } catch (Exception e) {
-            Log.error(e.getMessage(), e);
-            throw new RuntimeException("SQL执行结果转换为Message对象出错", e);
-        }
-        return list;
+    public DataSourceLineManager(MessageMapper messageMapper, String ID) {
+        this.messageMapper = messageMapper;
+        this.ID = ID;
     }
 
     @Override
     public String ID() {
-        return null;
+        return ID;
     }
 
     @Override
     public void push(Message message) {
+        message.setPushTime(new Date());
+        message.setLineID(ID);
+        this.messageMapper.save(message);
     }
 
     @Override
     public Message poll() {
+        if (cacheKeys.isEmpty()) {
+            cacheKeys = this.messageMapper.keys();
+        }
+        while (!cacheKeys.isEmpty()) {
+            String key = cacheKeys.poll();
+            if (this.messageMapper.lock(key)) {
+                return this.messageMapper.get(key);
+            }
+        }
         return null;
     }
 
     @Override
     public void back(Message message) {
-
+        this.messageMapper.unLock(message.getKey());
     }
 
     @Override
     public void done(Message message) {
-
+        this.messageMapper.done(message);
     }
 
     @Override
     public void error(Message message) {
-
+        this.messageMapper.error(message);
     }
 
     @Override
     public long length() {
-        return 0;
+        return this.messageMapper.length(ID);
     }
 }

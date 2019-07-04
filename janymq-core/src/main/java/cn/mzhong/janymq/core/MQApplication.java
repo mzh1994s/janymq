@@ -51,7 +51,7 @@ public class MQApplication extends MQContext {
             piplelineConfig = new PiplelineConfig();
         }
         if (lineManagerProvider == null) {
-            throw new MQInitExcepition("StoreManagerBuilder不存在，请先指定StoreManagerBuilder");
+            throw new MQInitExcepition("LineManagerBuilder不存在，请先指定LineManagerBuilder");
         }
         if (dataSerializer == null) {
             dataSerializer = new DataSerializer();

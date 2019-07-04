@@ -1,22 +1,23 @@
 package cn.mzhong.janymq.line;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
-import java.util.Random;
-import java.util.UUID;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = -2043879152912282934L;
     protected String key;
+    protected String lineID;
     protected Date pushTime;
     protected Date doneTime;
     protected Date errorTime;
     protected Throwable throwable;
-    protected Object data;
+    protected Object[] content;
 
     public Message() {
-        key = System.nanoTime() + "-R" + Math.round(Math.random() * 10000);
+        // 生成22位key 就像：31814797796271-R795801
+        key = System.currentTimeMillis() + "-R" + Math.round((Math.random() * 9 + 1) * 1000000);
     }
 
     public String getKey() {
@@ -25,6 +26,14 @@ public class Message implements Serializable {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getLineID() {
+        return lineID;
+    }
+
+    public void setLineID(String lineID) {
+        this.lineID = lineID;
     }
 
     public Date getPushTime() {
@@ -59,12 +68,12 @@ public class Message implements Serializable {
         this.throwable = throwable;
     }
 
-    public Object getData() {
-        return data;
+    public Object[] getContent() {
+        return content;
     }
 
-    public void setData(Object data) {
-        this.data = data;
+    public void setContent(Object[] content) {
+        this.content = content;
     }
 
     @Override
@@ -84,11 +93,12 @@ public class Message implements Serializable {
     public String toString() {
         return "Message{" +
                 "key='" + key + '\'' +
+                ", lineID='" + lineID + '\'' +
                 ", pushTime=" + pushTime +
                 ", doneTime=" + doneTime +
                 ", errorTime=" + errorTime +
                 ", throwable=" + throwable +
-                ", data=" + data +
+                ", content=" + Arrays.toString(content) +
                 '}';
     }
 }

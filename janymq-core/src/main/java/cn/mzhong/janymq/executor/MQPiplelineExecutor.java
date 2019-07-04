@@ -24,8 +24,7 @@ public class MQPiplelineExecutor extends MQLineExecutor {
     @Override
     public void invoke(Message message) {
         try {
-            Object[] args = (Object[]) message.getData();
-            method.invoke(consumer, args);
+            method.invoke(consumer, message.getContent());
             lineManager.done(message);
         } catch (Exception e) {
             Log.error(e.getLocalizedMessage(), e);

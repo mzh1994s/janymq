@@ -10,6 +10,7 @@ public class ZookeeperLineManagerProvider implements LineManagerProvider {
 
     protected String connectString;
     protected String root = "janymq";
+    protected MQContext context;
 
     public String getConnectString() {
         return connectString;
@@ -20,17 +21,17 @@ public class ZookeeperLineManagerProvider implements LineManagerProvider {
     }
 
     @Override
-    public LineManager getPiplelineManager(MQContext context, PiplelineInfo pipleline) {
+    public LineManager getPiplelineManager(PiplelineInfo pipleline) {
         return new ZookeeperPiplelineManager(context, pipleline, connectString, root);
     }
 
     @Override
-    public LineManager getlooplinemanager(MQContext context, LooplineInfo loopLine) {
+    public LineManager getlooplinemanager(LooplineInfo loopLine) {
         return new ZookeeperLooplineManager(context, loopLine, connectString, root);
     }
 
     @Override
-    public void init() {
-
+    public void init(MQContext context) {
+        this.context = context;
     }
 }
