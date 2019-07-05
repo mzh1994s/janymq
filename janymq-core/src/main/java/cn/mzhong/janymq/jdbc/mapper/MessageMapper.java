@@ -1,4 +1,6 @@
-package cn.mzhong.janymq.jdbc;
+package cn.mzhong.janymq.jdbc.mapper;
+
+import cn.mzhong.janymq.jdbc.BytesMessage;
 
 import java.util.LinkedList;
 

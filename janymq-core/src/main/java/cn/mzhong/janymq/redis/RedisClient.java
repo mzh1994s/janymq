@@ -1,6 +1,6 @@
 package cn.mzhong.janymq.redis;
 
-import cn.mzhong.janymq.util.PRInvoker;
+import cn.mzhong.janymq.tool.PRInvoker;
 import redis.clients.jedis.Jedis;
 
 public class RedisClient {

@@ -1,6 +1,7 @@
 package cn.mzhong.janymq.jdbc;
 
 import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.jdbc.mapper.MessageMapper;
 import cn.mzhong.janymq.line.*;
 
 import java.util.Date;
@@ -20,7 +21,7 @@ public class JdbcLineManager extends LockedLineManager {
         BytesMessage jdbcMessage = new BytesMessage(message);
         jdbcMessage.setContentBytes(this.dataSerializer.serialize(message.getContent()));
         jdbcMessage.setPushTime(new Date());
-        jdbcMessage.setLineID(ID);
+        jdbcMessage.setLineId(ID);
         this.messageMapper.save(jdbcMessage);
     }
 
@@ -41,25 +42,25 @@ public class JdbcLineManager extends LockedLineManager {
     }
 
     @Override
-    protected LinkedList<String> keys() {
+    protected LinkedList<String> idList() {
         return this.messageMapper.keys();
     }
 
     @Override
-    protected Message get(String key) {
-        BytesMessage jdbcMessage = this.messageMapper.get(key);
+    protected Message get(String id) {
+        BytesMessage jdbcMessage = this.messageMapper.get(id);
         Object[] content = (Object[]) this.dataSerializer.deserialize(jdbcMessage.getContentBytes());
         jdbcMessage.setContent(content);
         return jdbcMessage;
     }
 
     @Override
-    protected boolean lock(String key) {
-        return this.messageMapper.lock(key);
+    protected boolean lock(String id) {
+        return this.messageMapper.lock(id);
     }
 
     @Override
-    protected boolean unLock(String key) {
-        return this.messageMapper.unLock(key);
+    protected boolean unLock(String id) {
+        return this.messageMapper.unLock(id);
     }
 }

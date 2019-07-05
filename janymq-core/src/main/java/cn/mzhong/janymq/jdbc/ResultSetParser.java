@@ -1,6 +1,6 @@
 package cn.mzhong.janymq.jdbc;
 
-import cn.mzhong.janymq.util.PRInvoker;
+import cn.mzhong.janymq.tool.PRInvoker;
 
 import java.sql.ResultSet;
 import java.util.LinkedList;

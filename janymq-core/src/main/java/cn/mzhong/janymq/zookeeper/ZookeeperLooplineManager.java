@@ -11,7 +11,7 @@ public class ZookeeperLooplineManager extends ZookeeperLineManager {
     }
 
     @Override
-    public LinkedList<String> keys() {
+    public LinkedList<String> idList() {
         LinkedList<String> list = new LinkedList<String>();
         list.addAll(zkClient.getChildren(waitPath));
         return list;

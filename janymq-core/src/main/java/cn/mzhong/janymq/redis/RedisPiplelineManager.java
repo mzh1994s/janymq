@@ -2,7 +2,7 @@ package cn.mzhong.janymq.redis;
 
 import cn.mzhong.janymq.core.MQContext;
 import cn.mzhong.janymq.line.PiplelineInfo;
-import cn.mzhong.janymq.util.PRInvoker;
+import cn.mzhong.janymq.tool.PRInvoker;
 import redis.clients.jedis.Jedis;
 
 import java.util.Collections;
@@ -21,7 +21,7 @@ public class RedisPiplelineManager extends RedisLineManager {
     }
 
     @Override
-    protected LinkedList<String> keys() {
+    protected LinkedList<String> idList() {
         return this.redisClient.execute(new PRInvoker<Jedis, LinkedList<String>>() {
             public LinkedList<String> invoke(Jedis jedis) throws Exception {
                 LinkedList<String> list = new LinkedList<String>();

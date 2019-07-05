@@ -4,7 +4,7 @@ import cn.mzhong.janymq.core.MQContext;
 import cn.mzhong.janymq.line.LineInfo;
 import cn.mzhong.janymq.line.LockedLineManager;
 import cn.mzhong.janymq.line.Message;
-import cn.mzhong.janymq.util.PRInvoker;
+import cn.mzhong.janymq.tool.PRInvoker;
 import redis.clients.jedis.Jedis;
 
 public abstract class RedisLineManager extends LockedLineManager {
@@ -27,16 +27,16 @@ public abstract class RedisLineManager extends LockedLineManager {
         this.redisClient.execute(new PRInvoker<Jedis, Long>() {
             public Long invoke(Jedis jedis) throws Exception {
                 byte[] data = dataSerializer.serialize(message);
-                return jedis.hset(waitKey, message.getKey().getBytes(), data);
+                return jedis.hset(waitKey, message.getId().getBytes(), data);
             }
         });
     }
 
     @Override
-    protected Message get(final String key) {
+    protected Message get(final String id) {
         return this.redisClient.execute(new PRInvoker<Jedis, Message>() {
             public Message invoke(Jedis jedis) throws Exception {
-                byte[] messageByes = jedis.hget(waitKey, key.getBytes());
+                byte[] messageByes = jedis.hget(waitKey, id.getBytes());
                 return (Message) dataSerializer.deserialize(messageByes);
             }
         });
@@ -46,8 +46,8 @@ public abstract class RedisLineManager extends LockedLineManager {
         this.redisClient.execute(new PRInvoker<Jedis, Boolean>() {
             public Boolean invoke(Jedis jedis) throws Exception {
                 byte[] data = dataSerializer.serialize(message);
-                String field = message.getKey();
-                byte[] fieldBytes = message.getKey().getBytes();
+                String field = message.getId();
+                byte[] fieldBytes = message.getId().getBytes();
                 // 转入新表
                 jedis.hset(key, fieldBytes, data);
                 // 删除旧表数据
@@ -75,21 +75,21 @@ public abstract class RedisLineManager extends LockedLineManager {
     }
 
     @Override
-    protected boolean lock(final String key) {
+    protected boolean lock(final String id) {
         return redisClient.execute(new PRInvoker<Jedis, Boolean>() {
             public Boolean invoke(Jedis jedis) throws Exception {
                 byte[] value = (System.currentTimeMillis() + "").getBytes();
-                return jedis.hsetnx(lockKey, key.getBytes(), value) == 1;
+                return jedis.hsetnx(lockKey, id.getBytes(), value) == 1;
             }
         });
     }
 
     @Override
-    protected boolean unLock(final String key) {
+    protected boolean unLock(final String id) {
         return redisClient.execute(new PRInvoker<Jedis, Boolean>() {
             public Boolean invoke(Jedis jedis) throws Exception {
                 byte[] value = (System.currentTimeMillis() + "").getBytes();
-                return jedis.hdel(lockKey, key.getBytes()) == 1;
+                return jedis.hdel(lockKey, id.getBytes()) == 1;
             }
         });
     }

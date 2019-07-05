@@ -31,13 +31,16 @@ public class ZookeeperClient implements Watcher {
         try {
             this.zookeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, createMode);
             return true;
-        } catch (KeeperException.NodeExistsException e) {
-            return false;
-        } catch (KeeperException.NoNodeException e) {
-            // 创建父级目录
-            String parentPath = path.substring(0, path.lastIndexOf('/'));
-            create(parentPath, null, CreateMode.PERSISTENT);
-            return create(path, data, createMode);
+        } catch (KeeperException e) {
+            if (e.code() == KeeperException.Code.NODEEXISTS) {
+                return false;
+            } else if (e.code() == KeeperException.Code.NONODE) {
+                // 创建父级目录
+                String parentPath = path.substring(0, path.lastIndexOf('/'));
+                create(parentPath, null, CreateMode.PERSISTENT);
+                return create(path, data, createMode);
+            }
+            throw new RuntimeException(e);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

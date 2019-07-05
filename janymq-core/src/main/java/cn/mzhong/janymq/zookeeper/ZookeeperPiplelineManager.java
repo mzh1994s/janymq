@@ -13,7 +13,7 @@ public class ZookeeperPiplelineManager extends ZookeeperLineManager {
     }
 
     @Override
-    public LinkedList<String> keys() {
+    public LinkedList<String> idList() {
         LinkedList<String> list = new LinkedList<String>();
         list.addAll(zkClient.getChildren(waitPath));
         Collections.sort(list);

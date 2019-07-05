@@ -1,4 +1,4 @@
-package cn.mzhong.janymq.util;
+package cn.mzhong.janymq.tool;
 
 public interface PRInvoker<P, R> {
 

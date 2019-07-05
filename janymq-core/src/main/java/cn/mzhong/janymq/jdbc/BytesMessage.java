@@ -2,8 +2,6 @@ package cn.mzhong.janymq.jdbc;
 
 import cn.mzhong.janymq.line.Message;
 
-import java.util.Date;
-
 /**
  * 各数据库软件之间与jdbc对接存在序列化兼容性问题，这里所以有序列化操作使用手工方式。
  * 在从数据库获取throwable、content两个字段时，首先使用{@link java.sql.ResultSet#getBytes(int)}方法得到byte数组。
@@ -15,8 +13,8 @@ public class BytesMessage extends Message {
 
     }
     public BytesMessage(Message message) {
-        this.key = message.getKey();
-        this.lineID = message.getLineID();
+        this.id = message.getId();
+        this.lineId = message.getLineId();
         this.pushTime = message.getPushTime();
         this.doneTime = message.getDoneTime();
         this.errorTime = message.getErrorTime();

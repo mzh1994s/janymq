@@ -1,6 +1,9 @@
 package cn.mzhong.janymq.jdbc;
 
 import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.jdbc.mapper.MessageMapper;
+import cn.mzhong.janymq.jdbc.mapper.MysqlMessageMapper;
+import cn.mzhong.janymq.jdbc.mapper.OracleMessageMapper;
 import cn.mzhong.janymq.line.LineManager;
 import cn.mzhong.janymq.line.LineManagerProvider;
 import cn.mzhong.janymq.line.LooplineInfo;
@@ -17,7 +20,7 @@ public class JdbcLineManagerProvider implements LineManagerProvider {
     final static Logger Log = LoggerFactory.getLogger(JdbcLineManagerProvider.class);
 
     protected DataSource dataSource;
-    protected String table = "janymq_message";
+    protected String table = "JANYMQ_MESSAGE";
     protected SqlExecutor sqlExecutor;
     protected MessageMapper messageMapper;
     protected MQContext context;
@@ -38,12 +41,10 @@ public class JdbcLineManagerProvider implements LineManagerProvider {
         this.table = table;
     }
 
-    @Override
     public LineManager getPiplelineManager(PiplelineInfo pipleline) {
         return new JdbcLineManager(context, messageMapper, pipleline);
     }
 
-    @Override
     public LineManager getlooplinemanager(LooplineInfo loopLine) {
         return new JdbcLineManager(context, messageMapper, loopLine);
     }
@@ -68,9 +69,10 @@ public class JdbcLineManagerProvider implements LineManagerProvider {
         return jdbcDriverClassName;
     }
 
-    @Override
     public void init(MQContext context) {
         this.context = context;
+        // 表名大写
+        this.table = this.table.toUpperCase();
         this.sqlExecutor = new SqlExecutor(this.dataSource);
         Log.debug(this.toString());
         String jdbcDriverClassName = this.getJdbcDriverClassName();
@@ -83,6 +85,7 @@ public class JdbcLineManagerProvider implements LineManagerProvider {
         // Oracle 数据库
         else if ("oracle.jdbc.OracleDriver".equals(jdbcDriverClassName)) {
             Log.debug("数据库类型：Oracle");
+            messageMapper = new OracleMessageMapper(this.context, this.sqlExecutor, this.table);
         }
         if (messageMapper == null) {
             throw new RuntimeException("不支持的数据库类型！");

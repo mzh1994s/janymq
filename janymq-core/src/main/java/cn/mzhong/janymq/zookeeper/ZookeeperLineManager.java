@@ -49,18 +49,18 @@ public abstract class ZookeeperLineManager extends LockedLineManager {
         this.initParentPath();
     }
 
-    protected void push(String key, Message message) {
+    protected void push(String parent, Message message) {
         try {
             byte[] data = dataSerializer.serialize(message);
-            String path = key + "/" + message.getKey();
+            String path = parent + "/" + message.getId();
             zkClient.create(path, data, CreateMode.PERSISTENT);
         } catch (Exception e) {
             throw new RuntimeException("推送消息出错！", e);
         }
     }
 
-    protected void delete(String key, Message message) {
-        zkClient.delete(key + "/" + message.getKey());
+    protected void delete(String parent, Message message) {
+        zkClient.delete(parent + "/" + message.getId());
     }
 
     public void push(Message message) {
@@ -68,39 +68,37 @@ public abstract class ZookeeperLineManager extends LockedLineManager {
     }
 
     public void done(Message message) {
-        String key = message.getKey();
         push(donePath, message);
         delete(waitPath, message);
-        unLock(key);
+        unLock(message.getId());
     }
 
     public void error(Message message) {
-        String key = message.getKey();
         push(errorPath, message);
         delete(waitPath, message);
-        unLock(key);
+        unLock(message.getId());
     }
 
     public long length() {
         return zkClient.getChildren(waitPath).size();
     }
 
-    protected boolean lock(String key) {
-        return zkClient.create(lockPath + "/" + key, null, CreateMode.EPHEMERAL);
+    protected boolean lock(String id) {
+        return zkClient.create(lockPath + "/" + id, null, CreateMode.EPHEMERAL);
     }
 
-    protected boolean unLock(String key) {
-        zkClient.delete(lockPath + "/" + key);
+    protected boolean unLock(String id) {
+        zkClient.delete(lockPath + "/" + id);
         return true;
     }
 
     @Override
-    protected Message get(String key) {
-        byte[] data = zkClient.getData(waitPath + "/" + key);
+    protected Message get(String id) {
+        byte[] data = zkClient.getData(waitPath + "/" + id);
         try {
             return (Message) dataSerializer.deserialize(data);
         } catch (Exception e) {
-            Log.error("消息反序列化出错，消息已被忽略！消息ID:" + key, e);
+            Log.error("消息反序列化出错，消息已被忽略！消息ID:" + id, e);
         }
         return null;
     }

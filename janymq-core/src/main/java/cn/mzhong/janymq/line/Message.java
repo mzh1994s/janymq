@@ -3,12 +3,11 @@ package cn.mzhong.janymq.line;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Objects;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = -2043879152912282934L;
-    protected String key;
-    protected String lineID;
+    protected String id;
+    protected String lineId;
     protected Date pushTime;
     protected Date doneTime;
     protected Date errorTime;
@@ -17,23 +16,23 @@ public class Message implements Serializable {
 
     public Message() {
         // 生成22位key 就像：31814797796271-R795801
-        key = System.currentTimeMillis() + "-R" + Math.round((Math.random() * 9 + 1) * 1000000);
+        id = System.currentTimeMillis() + "-R" + Math.round((Math.random() * 9 + 1) * 1000000);
     }
 
-    public String getKey() {
-        return key;
+    public String getId() {
+        return id;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getLineID() {
-        return lineID;
+    public String getLineId() {
+        return lineId;
     }
 
-    public void setLineID(String lineID) {
-        this.lineID = lineID;
+    public void setLineId(String lineId) {
+        this.lineId = lineId;
     }
 
     public Date getPushTime() {
@@ -80,20 +79,22 @@ public class Message implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         Message message = (Message) o;
-        return Objects.equals(key, message.key);
+
+        return id != null ? id.equals(message.id) : message.id == null;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key);
+        return id != null ? id.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return "Message{" +
-                "key='" + key + '\'' +
-                ", lineID='" + lineID + '\'' +
+                "id='" + id + '\'' +
+                ", lineId='" + lineId + '\'' +
                 ", pushTime=" + pushTime +
                 ", doneTime=" + doneTime +
                 ", errorTime=" + errorTime +

@@ -14,7 +14,7 @@ public abstract class LockedLineManager extends AbstractLineManager {
 
     public Message poll() {
         if (cacheKeys.isEmpty()) {
-            cacheKeys = this.keys();
+            cacheKeys = this.idList();
         }
         while (!cacheKeys.isEmpty()) {
             // ShutdownBreak;
@@ -30,14 +30,14 @@ public abstract class LockedLineManager extends AbstractLineManager {
     }
 
     public void back(Message message) {
-        this.unLock(message.getKey());
+        this.unLock(message.getId());
     }
 
-    protected abstract LinkedList<String> keys();
+    protected abstract LinkedList<String> idList();
 
-    protected abstract Message get(String key);
+    protected abstract Message get(String id);
 
-    protected abstract boolean lock(String key);
+    protected abstract boolean lock(String id);
 
-    protected abstract boolean unLock(String key);
+    protected abstract boolean unLock(String id);
 }

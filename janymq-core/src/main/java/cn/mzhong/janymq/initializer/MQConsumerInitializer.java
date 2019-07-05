@@ -29,7 +29,7 @@ public class MQConsumerInitializer implements MQComponentInitializer {
      * @param method
      * @return
      */
-    protected static <A extends Annotation> MethodInfo<A> findLineInfo(Class<?> consumerClass, Method method, Class<A> annotationType) {
+    private static <A extends Annotation> MethodInfo<A> findLineInfo(Class<?> consumerClass, Method method, Class<A> annotationType) {
         Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
         MethodInfo lineInfo = null;
         for (Class<?> _interface : interfaces) {
@@ -49,7 +49,7 @@ public class MQConsumerInitializer implements MQComponentInitializer {
         return lineInfo;
     }
 
-    protected static PiplelineInfo findPipleline(Class<?> consumerClass, Method method) {
+    private static PiplelineInfo findPipleline(Class<?> consumerClass, Method method) {
         MethodInfo<Pipleline> lineInfo =
                 findLineInfo(consumerClass, method, Pipleline.class);
         if (lineInfo != null) {
@@ -59,7 +59,7 @@ public class MQConsumerInitializer implements MQComponentInitializer {
         return null;
     }
 
-    protected static LooplineInfo findLoopline(Class<?> consumerClass, Method method) {
+    private static LooplineInfo findLoopline(Class<?> consumerClass, Method method) {
         MethodInfo<Loopline> lineInfo =
                 findLineInfo(consumerClass, method, Loopline.class);
         if (lineInfo != null) {

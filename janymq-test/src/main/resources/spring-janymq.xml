@@ -7,7 +7,7 @@
             http://www.mzhong.cn/schema/janymq http://www.mzhong.cn/schema/janymq.xsd
             http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
 
-    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+    <bean id="mysqlDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
         <property name="jdbcUrl"
                   value="jdbc:mysql://mzhong.cn:3306/janymq?characterEncoding=utf8&amp;useSSL=false&amp;serverTimezone=UTC&amp;rewriteBatchedStatements=true"/>
         <property name="user" value="root"/>
@@ -15,16 +15,23 @@
         <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
     </bean>
 
+    <bean id="oracleDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="jdbcUrl" value="jdbc:oracle:thin:@91.12.67.116:10007/edrsdb"/>
+        <property name="user" value="wsbsfwt"/>
+        <property name="password" value="wsbsfwt"/>
+        <property name="driverClass" value="oracle.jdbc.OracleDriver"/>
+    </bean>
+
     <bean id="jdbc-provider" class="cn.mzhong.janymq.jdbc.JdbcLineManagerProvider">
-        <property name="dataSource" ref="dataSource"/>
+        <property name="dataSource" ref="mysqlDataSource"/>
     </bean>
 
     <!--redis 实现-->
     <janymq:application basePackage="cn.mzhong">
         <!--<janymq:provider-redis host="mzhong.cn" port="6379"/>-->
-        <janymq:provider-zookeeper connectString="mzhong.cn:2181"/>
-        <!--<janymq:provider-jdbc dataSource-ref="dataSource"/>-->
-        <!--<janymq:provider-any ref="jdbc-provider"/>-->
+        <!--<janymq:provider-zookeeper connectString="mzhong.cn:2181"/>-->
+        <!--<janymq:provider-jdbc dataSource-ref="oracleDataSource"/>-->
+        <janymq:provider-any ref="jdbc-provider"/>
         <janymq:conf-pipleline idleInterval="5000"/>
         <janymq:conf-loopline idleInterval="5000"/>
     </janymq:application>
