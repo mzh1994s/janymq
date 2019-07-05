@@ -1,28 +1,22 @@
 package cn.mzhong.janymq.jdbc;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ResultSetReader {
+public class ResultSetParser {
 
-    final static Logger Log = LoggerFactory.getLogger(ResultSetReader.class);
     protected ResultSet resultSet;
 
-    public ResultSetReader(ResultSet resultSet) {
+    public ResultSetParser(ResultSet resultSet) {
         this.resultSet = resultSet;
     }
 
-    public <T> List<T> readList(ResultSetIterator<T> iterator) {
+    public <T> List<T> parseList(ResultSetRowParser<T> iterator) {
         List<T> list = new ArrayList<>();
         try {
             while (resultSet.next()) {
-                list.add(iterator.read(resultSet));
+                list.add(iterator.parse(resultSet));
             }
             return list;
         } catch (Exception e) {
@@ -30,10 +24,10 @@ public class ResultSetReader {
         }
     }
 
-    public <T> T readOne(ResultSetIterator<T> iterator) {
+    public <T> T parseOne(ResultSetRowParser<T> parser) {
         try {
-            if(resultSet.next()){
-                return iterator.read(resultSet);
+            if (resultSet.next()) {
+                return parser.parse(resultSet);
             }
             return null;
         } catch (Exception e) {

@@ -63,7 +63,7 @@ public class SqlExecutor {
         }
     }
 
-    public <T> List<T> queryList(String sql, Object[] parameters, ResultSetIterator<T> iterator) {
+    public <T> List<T> queryList(String sql, Object[] parameters, ResultSetRowParser<T> iterator) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -72,7 +72,7 @@ public class SqlExecutor {
             statement = connection.prepareStatement(sql);
             loadParameters(statement, parameters);
             resultSet = statement.executeQuery();
-            return new ResultSetReader(resultSet).readList(iterator);
+            return new ResultSetParser(resultSet).parseList(iterator);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
@@ -82,7 +82,7 @@ public class SqlExecutor {
         }
     }
 
-    public <T> T query(String sql, Object[] parameters, ResultSetIterator<T> iterator) {
+    public <T> T query(String sql, Object[] parameters, ResultSetRowParser<T> iterator) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -91,7 +91,7 @@ public class SqlExecutor {
             statement = connection.prepareStatement(sql);
             loadParameters(statement, parameters);
             resultSet = statement.executeQuery();
-            return new ResultSetReader(resultSet).readOne(iterator);
+            return new ResultSetParser(resultSet).parseOne(iterator);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
@@ -99,6 +99,25 @@ public class SqlExecutor {
             closeStatement(statement);
             closeResultSet(resultSet);
         }
+    }
+
+    public long queryLong(String sql, Object[] parameters) {
+        Long resultInt = this.query(sql, parameters, new ResultSetRowParser<Long>() {
+            @Override
+            public Long parse(ResultSet resultSet) throws Exception {
+                return resultSet.getLong(1);
+            }
+        });
+        return resultInt == null ? 0 : resultInt;
+    }
+
+    public String queryString(String sql, Object[] parameters) {
+        return this.query(sql, parameters, new ResultSetRowParser<String>() {
+            @Override
+            public String parse(ResultSet resultSet) throws Exception {
+                return resultSet.getString(1);
+            }
+        });
     }
 
     public int update(String sql, Object... parameters) {
