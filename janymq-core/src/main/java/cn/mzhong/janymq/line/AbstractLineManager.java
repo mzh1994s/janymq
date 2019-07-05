@@ -5,8 +5,9 @@ import cn.mzhong.janymq.core.MQContext;
 public abstract class AbstractLineManager implements LineManager {
     protected String ID;
     protected MQContext context;
-    protected DataSerializer dataSerializer;
     protected LineInfo lineInfo;
+
+    protected JdkDataSerializer dataSerializer;
 
     @Override
     public String ID() {

@@ -2,16 +2,15 @@ package cn.mzhong.janymq.redis;
 
 import cn.mzhong.janymq.core.MQContext;
 import cn.mzhong.janymq.line.LooplineInfo;
+import cn.mzhong.janymq.util.PRInvoker;
+import redis.clients.jedis.Jedis;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Key Such as JSimpleMQ:LooplineInfo:LoopLineID:[wait|done|error:lock]
  */
 public class RedisLooplineManager extends RedisLineManager {
-
-    protected String ID;
 
     private static String key(String rootPath, LooplineInfo loopLine) {
         RedisKeyGenerator generator = new RedisKeyGenerator(loopLine);
@@ -19,18 +18,21 @@ public class RedisLooplineManager extends RedisLineManager {
     }
 
     public RedisLooplineManager(MQContext context, RedisLineManagerProvider provider, LooplineInfo loopLine) {
-        super(key(provider.rootPath, loopLine), provider.getConnectionFactory(), context);
+        super(context, provider.getConnectionFactory(), loopLine, key(provider.rootPath, loopLine));
         this.ID = loopLine.ID();
     }
 
     @Override
-    protected void keyFilter(List<byte[]> keys) {
-        // 打乱顺序
-        Collections.shuffle(keys);
-    }
-
-    @Override
-    public String ID() {
-        return ID;
+    protected LinkedList<String> keys() {
+        return this.redisClient.execute(new PRInvoker<Jedis, LinkedList<String>>() {
+            public LinkedList<String> invoke(Jedis jedis) throws Exception {
+                LinkedList<String> list = new LinkedList<String>();
+                Iterator<byte[]> iterator = jedis.hkeys(waitKey).iterator();
+                while (iterator.hasNext()) {
+                    list.add(new String(iterator.next()));
+                }
+                return list;
+            }
+        });
     }
 }

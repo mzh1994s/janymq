@@ -1,9 +1,10 @@
 package cn.mzhong.janymq.jdbc;
 
 import cn.mzhong.janymq.core.MQContext;
+import cn.mzhong.janymq.util.PRInvoker;
 
 import java.sql.ResultSet;
-import java.util.List;
+import java.util.LinkedList;
 
 public class MysqlMessageMapper extends AbstractMessageMapper {
 
@@ -11,12 +12,10 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
         super(context, sqlExecutor, table);
     }
 
-    @Override
     public boolean isTableExists() {
         return this.sqlExecutor.queryString("show tables like ?", new Object[]{table}) != null;
     }
 
-    @Override
     public void createTable() {
         this.sqlExecutor.execute(
                 "CREATE TABLE `" + table + "` " +
@@ -33,8 +32,7 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
                         ")");
     }
 
-    @Override
-    public void save(JdbcMessage message) {
+    public void save(BytesMessage message) {
         this.sqlExecutor.update("INSERT INTO `" + table + "`" +
                         "(`key`,`line_id`,`push_time`,`content`,`status`) VALUES (?,?,?,?,?)",
                 message.getKey(),
@@ -44,42 +42,36 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
                 MESSAGE_STATUS_WAIT);
     }
 
-    @Override
-    public List<String> keys() {
+    public LinkedList<String> keys() {
         return this.sqlExecutor.queryList(
                 "SELECT `KEY` FROM `" + table + "` WHERE `status`=?",
                 new Object[]{MESSAGE_STATUS_WAIT},
-                new ResultSetRowParser<String>() {
-                    @Override
-                    public String parse(ResultSet resultSet) throws Exception {
+                new PRInvoker<ResultSet, String>() {
+                    public String invoke(ResultSet resultSet) throws Exception {
                         return resultSet.getString(1);
                     }
                 });
     }
 
-    @Override
     public boolean lock(String key) {
         return 1 == this.sqlExecutor.update(
                 "UPDATE `" + table + "` SET `status`=? WHERE `key`=? AND `status`=?",
                 MESSAGE_STATUS_LOCK, key, MESSAGE_STATUS_WAIT);
     }
 
-    @Override
     public boolean unLock(String key) {
         return 1 == this.sqlExecutor.update(
                 "UPDATE `" + table + "` SET `status`=? WHERE `key`=? AND `status`=?",
                 MESSAGE_STATUS_WAIT, key, MESSAGE_STATUS_LOCK);
     }
 
-    @Override
-    public JdbcMessage get(String key) {
+    public BytesMessage get(final String key) {
         return this.sqlExecutor.query(
                 "SELECT `content` FROM `" + table + "` WHERE `key`=?",
                 new Object[]{key},
-                new ResultSetRowParser<JdbcMessage>() {
-                    @Override
-                    public JdbcMessage parse(ResultSet resultSet) throws Exception {
-                        JdbcMessage message = new JdbcMessage();
+                new PRInvoker<ResultSet, BytesMessage>() {
+                    public BytesMessage invoke(ResultSet resultSet) throws Exception {
+                        BytesMessage message = new BytesMessage();
                         message.setKey(key);
                         message.setContentBytes(resultSet.getBytes(1));
                         return message;
@@ -87,8 +79,7 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
                 });
     }
 
-    @Override
-    public void done(JdbcMessage message) {
+    public void done(BytesMessage message) {
         this.sqlExecutor.update(
                 "UPDATE FROM `" + table + "` SET " +
                         "`status`=?, " +
@@ -99,8 +90,7 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
                 message.getKey());
     }
 
-    @Override
-    public void error(JdbcMessage message) {
+    public void error(BytesMessage message) {
         this.sqlExecutor.update(
                 "UPDATE FROM `" + table + "` SET " +
                         "`status`=?, " +
@@ -113,7 +103,6 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
                 message.getKey());
     }
 
-    @Override
     public long length(String lineID) {
         return this.sqlExecutor.queryLong(
                 "SELECT COUNT(*) FROM `" + table + "` WHERE `line_id`=? AND `status`=?",

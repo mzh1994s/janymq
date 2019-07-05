@@ -10,7 +10,7 @@ public class FieldUtils {
     }
 
     public static List<Field> getAllFields(Class<?> _class) {
-        List<Field> fieldList = new ArrayList<>();
+        List<Field> fieldList = new ArrayList<Field>();
         Class<?> _loopClass = _class;
         do {
             for (Field field : _loopClass.getDeclaredFields()) {

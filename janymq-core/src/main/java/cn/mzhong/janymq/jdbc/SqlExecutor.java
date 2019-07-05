@@ -1,9 +1,14 @@
 package cn.mzhong.janymq.jdbc;
 
+import cn.mzhong.janymq.util.PRInvoker;
+
 import javax.sql.DataSource;
 import java.sql.*;
-import java.util.List;
+import java.util.LinkedList;
 
+/**
+ * SQL执行器
+ */
 public class SqlExecutor {
     protected DataSource dataSource;
 
@@ -58,12 +63,12 @@ public class SqlExecutor {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            closeConnection(connection);
             closeStatement(statement);
+            closeConnection(connection);
         }
     }
 
-    public <T> List<T> queryList(String sql, Object[] parameters, ResultSetRowParser<T> iterator) {
+    public <T> LinkedList<T> queryList(String sql, Object[] parameters, PRInvoker<ResultSet, T> invoker) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -72,17 +77,17 @@ public class SqlExecutor {
             statement = connection.prepareStatement(sql);
             loadParameters(statement, parameters);
             resultSet = statement.executeQuery();
-            return new ResultSetParser(resultSet).parseList(iterator);
+            return new ResultSetParser(resultSet).parseList(invoker);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            closeConnection(connection);
-            closeStatement(statement);
             closeResultSet(resultSet);
+            closeStatement(statement);
+            closeConnection(connection);
         }
     }
 
-    public <T> T query(String sql, Object[] parameters, ResultSetRowParser<T> iterator) {
+    public <T> T query(String sql, Object[] parameters, PRInvoker<ResultSet, T> invoker) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet resultSet = null;
@@ -91,20 +96,19 @@ public class SqlExecutor {
             statement = connection.prepareStatement(sql);
             loadParameters(statement, parameters);
             resultSet = statement.executeQuery();
-            return new ResultSetParser(resultSet).parseOne(iterator);
+            return new ResultSetParser(resultSet).parseOne(invoker);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            closeConnection(connection);
-            closeStatement(statement);
             closeResultSet(resultSet);
+            closeStatement(statement);
+            closeConnection(connection);
         }
     }
 
     public long queryLong(String sql, Object[] parameters) {
-        Long resultInt = this.query(sql, parameters, new ResultSetRowParser<Long>() {
-            @Override
-            public Long parse(ResultSet resultSet) throws Exception {
+        Long resultInt = this.query(sql, parameters, new PRInvoker<ResultSet, Long>() {
+            public Long invoke(ResultSet resultSet) throws Exception {
                 return resultSet.getLong(1);
             }
         });
@@ -112,9 +116,8 @@ public class SqlExecutor {
     }
 
     public String queryString(String sql, Object[] parameters) {
-        return this.query(sql, parameters, new ResultSetRowParser<String>() {
-            @Override
-            public String parse(ResultSet resultSet) throws Exception {
+        return this.query(sql, parameters, new PRInvoker<ResultSet, String>() {
+            public String invoke(ResultSet resultSet) throws Exception {
                 return resultSet.getString(1);
             }
         });
@@ -131,8 +134,8 @@ public class SqlExecutor {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            closeConnection(connection);
             closeStatement(statement);
+            closeConnection(connection);
         }
     }
 }

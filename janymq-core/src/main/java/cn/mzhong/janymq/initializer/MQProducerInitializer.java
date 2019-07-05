@@ -12,9 +12,8 @@ public class MQProducerInitializer implements MQComponentInitializer {
 
     final static Logger Log = LoggerFactory.getLogger(MQProducerInitializer.class);
 
-    @Override
     public void init(MQContext context) {
-        Map<Class<?>, Object> producers = new HashMap<>();
+        Map<Class<?>, Object> producers = new HashMap<Class<?>, Object>();
         try {
             for (Class<?> producerClass : context.getProducerClassSet()) {
                 Object producer = MQProducerFactory.newInstance(context, producerClass);

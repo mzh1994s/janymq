@@ -2,12 +2,14 @@ package cn.mzhong.janymq.redis;
 
 import cn.mzhong.janymq.core.MQContext;
 import cn.mzhong.janymq.line.PiplelineInfo;
+import cn.mzhong.janymq.util.PRInvoker;
+import redis.clients.jedis.Jedis;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 public class RedisPiplelineManager extends RedisLineManager {
-
-    protected String ID;
 
     private static String key(String rootPath, PiplelineInfo pipleline) {
         RedisKeyGenerator keyGenerator = new RedisKeyGenerator(pipleline);
@@ -15,17 +17,21 @@ public class RedisPiplelineManager extends RedisLineManager {
     }
 
     public RedisPiplelineManager(MQContext context, RedisLineManagerProvider provider, PiplelineInfo pipleline) {
-        super(key(provider.rootPath, pipleline), provider.getConnectionFactory(), context);
-        this.ID = pipleline.ID();
+        super(context, provider.getConnectionFactory(), pipleline, key(provider.rootPath, pipleline));
     }
 
     @Override
-    protected void keyFilter(List<byte[]> keys) {
-        // 忽略;
-    }
-
-    @Override
-    public String ID() {
-        return this.ID;
+    protected LinkedList<String> keys() {
+        return this.redisClient.execute(new PRInvoker<Jedis, LinkedList<String>>() {
+            public LinkedList<String> invoke(Jedis jedis) throws Exception {
+                LinkedList<String> list = new LinkedList<String>();
+                Iterator<byte[]> iterator = jedis.hkeys(waitKey).iterator();
+                while (iterator.hasNext()) {
+                    list.add(new String(iterator.next()));
+                }
+                Collections.sort(list);
+                return list;
+            }
+        });
     }
 }

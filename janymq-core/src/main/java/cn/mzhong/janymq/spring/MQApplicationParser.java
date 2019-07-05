@@ -3,7 +3,7 @@ package cn.mzhong.janymq.spring;
 import cn.mzhong.janymq.config.ApplicationConfig;
 import cn.mzhong.janymq.config.LooplineConfig;
 import cn.mzhong.janymq.config.PiplelineConfig;
-import cn.mzhong.janymq.jdbc.DataSourceLineManagerProvider;
+import cn.mzhong.janymq.jdbc.JdbcLineManagerProvider;
 import cn.mzhong.janymq.redis.GenericRedisConnectionFactory;
 import cn.mzhong.janymq.redis.RedisLineManagerProvider;
 import cn.mzhong.janymq.redis.SpringRedisConnectionFactory;
@@ -60,10 +60,11 @@ public class MQApplicationParser extends AbstractSingleBeanDefinitionParser {
     protected void doParseChildren(Element root, BeanDefinitionBuilder builder) {
         String[] elementNames = new String[]{
                 "conf-pipleline", "conf-loopline",
-                "provider-redis", "provider-zookeeper", "provider-jdbc"};
+                "provider-any", "provider-redis", "provider-zookeeper", "provider-jdbc"};
         Class<?>[] configClasses = new Class<?>[]{
                 PiplelineConfigParser.class,
                 LooplineConfigParser.class,
+                AnyLineManagerProviderParser.class,
                 RedisLineManagerProviderParser.class,
                 ZookeeperLineManagerProviderParser.class,
                 JdbcLineManagerProviderParser.class
@@ -158,6 +159,21 @@ class LooplineConfigParser extends ConfigParser {
         piplelineParser.parseStringPropertyFromAttr("idleInterval");
         piplelineParser.parseStringPropertyFromAttr("sleepInterval");
         this.beanDefinitionBuilder.addPropertyValue("looplineConfig", piplelineParser.getBeanDefinition());
+    }
+}
+
+/**
+ * 自定义提供者解析器
+ */
+class AnyLineManagerProviderParser extends ConfigParser {
+
+    public AnyLineManagerProviderParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
+        super(element, beanDefinitionBuilder);
+    }
+
+    @Override
+    public void doParser() {
+        this.beanDefinitionBuilder.addPropertyReference("lineManagerProvider", element.getAttribute("ref"));
     }
 }
 
@@ -276,8 +292,8 @@ class JdbcLineManagerProviderParser extends ConfigParser {
 
     @Override
     public void doParser() {
-// bean ZookeeperLineManagerProvider
-        ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, DataSourceLineManagerProvider.class);
+        // bean JdbcLineManagerProvider
+        ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, JdbcLineManagerProvider.class);
         elementBeanDefinitionParser.parseStringPropertyFromAttr("table");
         elementBeanDefinitionParser.parseReferencePropertyFromAttr("dataSource");
         this.beanDefinitionBuilder.addPropertyValue("lineManagerProvider", elementBeanDefinitionParser.getBeanDefinition());

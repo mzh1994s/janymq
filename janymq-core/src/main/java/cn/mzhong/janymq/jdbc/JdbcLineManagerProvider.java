@@ -12,9 +12,9 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.lang.reflect.Method;
 
-public class DataSourceLineManagerProvider implements LineManagerProvider {
+public class JdbcLineManagerProvider implements LineManagerProvider {
 
-    final static Logger Log = LoggerFactory.getLogger(DataSourceLineManagerProvider.class);
+    final static Logger Log = LoggerFactory.getLogger(JdbcLineManagerProvider.class);
 
     protected DataSource dataSource;
     protected String table = "janymq_message";
@@ -40,12 +40,12 @@ public class DataSourceLineManagerProvider implements LineManagerProvider {
 
     @Override
     public LineManager getPiplelineManager(PiplelineInfo pipleline) {
-        return new DataSourceLineManager(context, messageMapper, pipleline.ID());
+        return new JdbcLineManager(context, messageMapper, pipleline);
     }
 
     @Override
     public LineManager getlooplinemanager(LooplineInfo loopLine) {
-        return new DataSourceLineManager(context, messageMapper, loopLine.ID());
+        return new JdbcLineManager(context, messageMapper, loopLine);
     }
 
     protected String getJdbcDriverClassName() {
@@ -92,7 +92,7 @@ public class DataSourceLineManagerProvider implements LineManagerProvider {
 
     @Override
     public String toString() {
-        return "DataSourceLineManagerProvider{" +
+        return "JdbcLineManagerProvider{" +
                 "dataSource=" + dataSource +
                 ", table='" + table + '\'' +
                 '}';

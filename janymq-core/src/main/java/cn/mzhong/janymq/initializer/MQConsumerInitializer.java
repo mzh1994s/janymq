@@ -29,16 +29,16 @@ public class MQConsumerInitializer implements MQComponentInitializer {
      * @param method
      * @return
      */
-    protected static <A extends Annotation> FindInfo<A> findLineInfo(Class<?> consumerClass, Method method, Class<A> annotationType) {
+    protected static <A extends Annotation> MethodInfo<A> findLineInfo(Class<?> consumerClass, Method method, Class<A> annotationType) {
         Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
-        FindInfo lineInfo = null;
+        MethodInfo lineInfo = null;
         for (Class<?> _interface : interfaces) {
             try {
                 Method pMethod = _interface.getMethod(method.getName(), method.getParameterTypes());
                 if (pMethod != null) {
                     A annotation = pMethod.getAnnotation(annotationType);
                     if (annotation != null) {
-                        lineInfo = new FindInfo<A>(_interface, pMethod, annotation);
+                        lineInfo = new MethodInfo<A>(_interface, pMethod, annotation);
                         break;
                     }
                 }
@@ -50,7 +50,7 @@ public class MQConsumerInitializer implements MQComponentInitializer {
     }
 
     protected static PiplelineInfo findPipleline(Class<?> consumerClass, Method method) {
-        FindInfo<Pipleline> lineInfo =
+        MethodInfo<Pipleline> lineInfo =
                 findLineInfo(consumerClass, method, Pipleline.class);
         if (lineInfo != null) {
             Pipleline piplelineAnnotation = lineInfo.annotation;
@@ -60,7 +60,7 @@ public class MQConsumerInitializer implements MQComponentInitializer {
     }
 
     protected static LooplineInfo findLoopline(Class<?> consumerClass, Method method) {
-        FindInfo<Loopline> lineInfo =
+        MethodInfo<Loopline> lineInfo =
                 findLineInfo(consumerClass, method, Loopline.class);
         if (lineInfo != null) {
             Loopline looplineAnnotation = lineInfo.annotation;
@@ -70,7 +70,7 @@ public class MQConsumerInitializer implements MQComponentInitializer {
     }
 
     protected void initExecutor(MQContext context, Collection<Object> consumerSet) {
-        ExecutorService consumerExecutor = new MQExecutorService("JSimpleMQ-Executor");
+        ExecutorService consumerExecutor = new MQExecutorService("JAnyMQ-Executor");
         for (Object consumer : consumerSet) {
             Class<?> consumerClass = consumer.getClass();
             for (Method method : consumerClass.getMethods()) {
@@ -88,28 +88,27 @@ public class MQConsumerInitializer implements MQComponentInitializer {
         context.setConsumerExecutorService(consumerExecutor);
     }
 
-    @Override
     public void init(MQContext context) {
-        Map<Class<?>, Object> consumerMap = new HashMap<>();
+        Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
         try {
             for (Class<?> consumerClass : context.getConsumerClassSet()) {
                 Object consumer = consumerClass.getDeclaredConstructor().newInstance();
                 consumerMap.put(consumerClass, consumer);
             }
         } catch (Exception e) {
-            Log.error("消费者初始化异常", e);
+            throw new RuntimeException(e);
         }
         context.setConsumerMap(consumerMap);
         initExecutor(context, consumerMap.values());
     }
 }
 
-class FindInfo<A extends Annotation> {
+class MethodInfo<A extends Annotation> {
     Class<?> _interface;
     Method method;
     A annotation;
 
-    public FindInfo(Class<?> _class, Method method, A annotation) {
+    public MethodInfo(Class<?> _class, Method method, A annotation) {
         this._interface = _class;
         this.method = method;
         this.annotation = annotation;

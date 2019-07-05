@@ -7,7 +7,7 @@
         <xsd:documentation><![CDATA[ JSimpleMQ 配置文件 ]]></xsd:documentation>
     </xsd:annotation>
 
-    <xsd:complexType name="redisType">
+    <xsd:complexType name="redisProviderType">
         <xsd:attribute name="host" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ redis Host ]]></xsd:documentation>
@@ -55,7 +55,7 @@
         </xsd:attribute>
     </xsd:complexType>
 
-    <xsd:complexType name="zookeeperType">
+    <xsd:complexType name="zookeeperProviderType">
         <xsd:attribute name="connectString" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ zookeeper连接字符串 ]]></xsd:documentation>
@@ -67,7 +67,7 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
-    <xsd:complexType name="jdbcType">
+    <xsd:complexType name="jdbcProviderType">
         <xsd:attribute name="dataSource-ref" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ 数据源引用 ]]></xsd:documentation>
@@ -76,6 +76,14 @@
         <xsd:attribute name="table" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ 表名 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:complexType name="anyProviderType">
+        <xsd:attribute name="ref" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 自定义Provider引用 ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
@@ -111,6 +119,7 @@
     <xsd:complexType name="applicationType">
         <xsd:sequence>
             <xsd:choice minOccurs="1">
+                <xsd:element ref="provider-any"/>
                 <xsd:element ref="provider-redis"/>
                 <xsd:element ref="provider-zookeeper"/>
                 <xsd:element ref="provider-jdbc"/>
@@ -136,19 +145,24 @@
             <xsd:documentation><![CDATA[ JSimpleMQ应用程序配置 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="provider-redis" type="redisType">
+    <xsd:element name="provider-redis" type="redisProviderType">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ Redis配置 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="provider-zookeeper" type="zookeeperType">
+    <xsd:element name="provider-zookeeper" type="zookeeperProviderType">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ Zookeeper配置 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="provider-jdbc" type="jdbcType">
+    <xsd:element name="provider-jdbc" type="jdbcProviderType">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ 数据库配置 ]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+    <xsd:element name="provider-any" type="anyProviderType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[ 自定义Provider ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="conf-pipleline" type="piplelineConfigType">

@@ -3,8 +3,7 @@ package cn.mzhong.janymq.zookeeper;
 import cn.mzhong.janymq.core.MQContext;
 import cn.mzhong.janymq.line.LooplineInfo;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
 
 public class ZookeeperLooplineManager extends ZookeeperLineManager {
     ZookeeperLooplineManager(MQContext context, LooplineInfo loopline, String connectString, String root) {
@@ -12,10 +11,10 @@ public class ZookeeperLooplineManager extends ZookeeperLineManager {
     }
 
     @Override
-    public List<String> keys() {
-        // loopline打乱key顺序
-        List<String> keys = zkClient.getChildren(waitPath);
-        Collections.shuffle(keys);
-        return keys;
+    public LinkedList<String> keys() {
+        LinkedList<String> list = new LinkedList<String>();
+        list.addAll(zkClient.getChildren(waitPath));
+        return list;
     }
+
 }

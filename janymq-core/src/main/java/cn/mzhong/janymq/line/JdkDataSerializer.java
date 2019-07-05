@@ -2,7 +2,7 @@ package cn.mzhong.janymq.line;
 
 import java.io.*;
 
-public class DataSerializer {
+public class JdkDataSerializer {
 
     public byte[] serialize(Object data) {
         try {

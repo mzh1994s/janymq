@@ -1,8 +1,9 @@
 package cn.mzhong.janymq.jdbc;
 
+import cn.mzhong.janymq.util.PRInvoker;
+
 import java.sql.ResultSet;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
 public class ResultSetParser {
 
@@ -12,11 +13,11 @@ public class ResultSetParser {
         this.resultSet = resultSet;
     }
 
-    public <T> List<T> parseList(ResultSetRowParser<T> iterator) {
-        List<T> list = new ArrayList<>();
+    public <T> LinkedList<T> parseList(PRInvoker<ResultSet, T> iterator) {
+        LinkedList<T> list = new LinkedList<T>();
         try {
             while (resultSet.next()) {
-                list.add(iterator.parse(resultSet));
+                list.add(iterator.invoke(resultSet));
             }
             return list;
         } catch (Exception e) {
@@ -24,10 +25,10 @@ public class ResultSetParser {
         }
     }
 
-    public <T> T parseOne(ResultSetRowParser<T> parser) {
+    public <T> T parseOne(PRInvoker<ResultSet, T> parser) {
         try {
             if (resultSet.next()) {
-                return parser.parse(resultSet);
+                return parser.invoke(resultSet);
             }
             return null;
         } catch (Exception e) {

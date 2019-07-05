@@ -29,7 +29,7 @@ public class MQSpringCosumerInitializer extends MQConsumerInitializer {
 
     @Override
     public void init(MQContext context) {
-        Map<Class<?>, Object> consumerMap = new HashMap<>();
+        Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
         int index = 0;
         Iterator<Class<?>> iterator = context.getConsumerClassSet().iterator();
         while (iterator.hasNext()) {

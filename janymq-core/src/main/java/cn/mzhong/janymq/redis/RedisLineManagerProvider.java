@@ -5,10 +5,14 @@ import cn.mzhong.janymq.line.LineManager;
 import cn.mzhong.janymq.line.LineManagerProvider;
 import cn.mzhong.janymq.line.LooplineInfo;
 import cn.mzhong.janymq.line.PiplelineInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 public class RedisLineManagerProvider implements LineManagerProvider {
+
+    final static Logger Log = LoggerFactory.getLogger(RedisLineManagerProvider.class);
 
     // 根目录
     protected String rootPath = "janymq";
@@ -38,6 +42,9 @@ public class RedisLineManagerProvider implements LineManagerProvider {
         if (this.connectionFactory == null) {
             throw new RuntimeException("无Redis连接工厂，请先指定Redis连接工厂！");
         }
+        if (Log.isDebugEnabled()) {
+            Log.debug(this.toString());
+        }
     }
 
     @Override
@@ -50,6 +57,13 @@ public class RedisLineManagerProvider implements LineManagerProvider {
     public LineManager getlooplinemanager(LooplineInfo loopLine) {
         RedisLooplineManager looplineManager = new RedisLooplineManager(context, this, loopLine);
         return looplineManager;
+    }
+
+    @Override
+    public String toString() {
+        return "RedisLineManagerProvider{" +
+                "rootPath='" + rootPath + '\'' +
+                '}';
     }
 
     public static RedisLineManagerProvider create(

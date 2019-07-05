@@ -4,7 +4,7 @@ import cn.mzhong.janymq.core.MQContext;
 import cn.mzhong.janymq.line.PiplelineInfo;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.LinkedList;
 
 public class ZookeeperPiplelineManager extends ZookeeperLineManager {
 
@@ -13,10 +13,10 @@ public class ZookeeperPiplelineManager extends ZookeeperLineManager {
     }
 
     @Override
-    public List<String> keys() {
-        // loopline打乱key顺序
-        List<String> keys = zkClient.getChildren(waitPath);
-        Collections.sort(keys);
-        return keys;
+    public LinkedList<String> keys() {
+        LinkedList<String> list = new LinkedList<String>();
+        list.addAll(zkClient.getChildren(waitPath));
+        Collections.sort(list);
+        return list;
     }
 }

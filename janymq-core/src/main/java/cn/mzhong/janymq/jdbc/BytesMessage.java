@@ -9,12 +9,12 @@ import java.util.Date;
  * 在从数据库获取throwable、content两个字段时，首先使用{@link java.sql.ResultSet#getBytes(int)}方法得到byte数组。
  * 再分别赋值给throwableBytes、contentBytes两个字段并返回，框架会自动将byte数组反序列化，并赋值给throwable、content字段
  */
-public class JdbcMessage extends Message {
+public class BytesMessage extends Message {
     private static final long serialVersionUID = -744128535422190869L;
-    public JdbcMessage() {
+    public BytesMessage() {
 
     }
-    public JdbcMessage(Message message) {
+    public BytesMessage(Message message) {
         this.key = message.getKey();
         this.lineID = message.getLineID();
         this.pushTime = message.getPushTime();

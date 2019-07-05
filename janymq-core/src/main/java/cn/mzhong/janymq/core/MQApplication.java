@@ -10,7 +10,7 @@ import cn.mzhong.janymq.exception.MQNotFoundException;
 import cn.mzhong.janymq.initializer.MQConsumerInitializer;
 import cn.mzhong.janymq.initializer.MQProducerInitializer;
 import cn.mzhong.janymq.initializer.MQLineManagerInitializer;
-import cn.mzhong.janymq.line.DataSerializer;
+import cn.mzhong.janymq.line.JdkDataSerializer;
 import cn.mzhong.janymq.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class MQApplication extends MQContext {
             throw new MQInitExcepition("LineManagerBuilder不存在，请先指定LineManagerBuilder");
         }
         if (dataSerializer == null) {
-            dataSerializer = new DataSerializer();
+            dataSerializer = new JdkDataSerializer();
         }
         if (LineManagerInitializer == null) {
             LineManagerInitializer = new MQLineManagerInitializer();

@@ -89,7 +89,7 @@ public class ClassUtils {
      * @return
      */
     public static Set<Class<?>> getInterfaces(Class<?> _class) {
-        Set<Class<?>> interfaces = new HashSet<>();
+        Set<Class<?>> interfaces = new HashSet<Class<?>>();
         Class<?> superclass = _class.getSuperclass();
         if (superclass != null) {
             interfaces.addAll(getInterfaces(superclass));

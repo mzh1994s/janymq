@@ -1,173 +1,96 @@
 package cn.mzhong.janymq.redis;
 
 import cn.mzhong.janymq.core.MQContext;
-import cn.mzhong.janymq.line.DataSerializer;
-import cn.mzhong.janymq.line.LineManager;
+import cn.mzhong.janymq.line.LineInfo;
+import cn.mzhong.janymq.line.LockedLineManager;
 import cn.mzhong.janymq.line.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import cn.mzhong.janymq.util.PRInvoker;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 
-import java.util.LinkedList;
-import java.util.List;
-
-public abstract class RedisLineManager implements LineManager {
-    final static Logger Log = LoggerFactory.getLogger(RedisLooplineManager.class);
-
+public abstract class RedisLineManager extends LockedLineManager {
     protected byte[] waitKey;
     protected byte[] doneKey;
     protected byte[] errorKey;
     protected byte[] lockKey;
-    protected RedisConnectionFactory connectionFactory;
-    protected DataSerializer serializer;
-    protected LinkedList<byte[]> cacheKeys = new LinkedList<>();
-    protected MQContext context;
+    protected RedisClient redisClient;
 
-    public RedisLineManager(String keyPrefix, RedisConnectionFactory connectionFactory, MQContext context) {
+    public RedisLineManager(MQContext context, RedisConnectionFactory connectionFactory, LineInfo lineInfo, String keyPrefix) {
+        super(context, lineInfo);
+        this.redisClient = new RedisClient(connectionFactory);
         this.waitKey = (keyPrefix + ":wait").getBytes();
         this.doneKey = (keyPrefix + ":done").getBytes();
         this.errorKey = (keyPrefix + ":error").getBytes();
         this.lockKey = (keyPrefix + ":lock").getBytes();
-        this.connectionFactory = connectionFactory;
-        this.serializer = context.getDataSerializer();
-        this.context = context;
     }
 
-    /**
-     * 数据加锁
-     *
-     * @param key
-     * @return
-     */
-    protected boolean lock(Jedis jedis, byte[] key) {
-        byte[] value = (System.currentTimeMillis() + "").getBytes();
-        return jedis.hsetnx(lockKey, key, value) == 1;
-    }
-
-    /**
-     * 数据解锁
-     *
-     * @param key
-     * @return
-     */
-    protected boolean unlock(Jedis jedis, byte[] key) {
-        return jedis.hdel(lockKey, key) == 1;
-    }
-
-    /**
-     * 重新加载key
-     *
-     * @param jedis
-     */
-    protected void reloadKeys(Jedis jedis) {
-        cacheKeys.addAll(jedis.hkeys(waitKey));
-        keyFilter(cacheKeys);
-    }
-
-    protected abstract void keyFilter(List<byte[]> keys);
-
-    @Override
-    public Message poll() {
-        Message message = null;
-        Jedis jedis = connectionFactory.getConnection();
-        try {
-            if (cacheKeys.isEmpty()) {
-                reloadKeys(jedis);
+    public void push(final Message message) {
+        this.redisClient.execute(new PRInvoker<Jedis, Long>() {
+            public Long invoke(Jedis jedis) throws Exception {
+                byte[] data = dataSerializer.serialize(message);
+                return jedis.hset(waitKey, message.getKey().getBytes(), data);
             }
-            // 可能当前缓存的key中某些已经被处理了。
-            // 所以遍历列表，查找能被处理的key
-            while (!cacheKeys.isEmpty()) {
-                // ShutdownBreak;
-                if (context.isShutdown()) {
-                    break;
-                }
-                byte[] key = cacheKeys.poll();
-                // 如果key能被加锁，证明可被处理
-                if (key != null && lock(jedis, key)) {
-                    byte[] data = jedis.hget(waitKey, key);
-                    if (data != null) {
-                        message = (Message) serializer.deserialize(data);
-                        break;
-                    } else {
-                        unlock(jedis, key);
-                    }
-                }
+        });
+    }
+
+    @Override
+    protected Message get(final String key) {
+        return this.redisClient.execute(new PRInvoker<Jedis, Message>() {
+            public Message invoke(Jedis jedis) throws Exception {
+                byte[] messageByes = jedis.hget(waitKey, key.getBytes());
+                return (Message) dataSerializer.deserialize(messageByes);
             }
-        } catch (Exception e) {
-            Log.error("拉取消息异常", e);
-        } finally {
-            jedis.close();
-        }
-        return message;
+        });
     }
 
-    @Override
-    public void push(Message message) {
-        Jedis jedis = connectionFactory.getConnection();
-        try {
-            byte[] data = serializer.serialize(message);
-            jedis.hset(waitKey, message.getKey().getBytes(), data);
-        } catch (Exception e) {
-            Log.error("推送消息异常", e);
-        } finally {
-            jedis.close();
-        }
+    private void complete(final byte[] key, final Message message) {
+        this.redisClient.execute(new PRInvoker<Jedis, Boolean>() {
+            public Boolean invoke(Jedis jedis) throws Exception {
+                byte[] data = dataSerializer.serialize(message);
+                String field = message.getKey();
+                byte[] fieldBytes = message.getKey().getBytes();
+                // 转入新表
+                jedis.hset(key, fieldBytes, data);
+                // 删除旧表数据
+                jedis.hdel(waitKey, fieldBytes);
+                // 将锁删除
+                return unLock(field);
+            }
+        });
     }
 
-    private void complete(byte[] key, Message message) {
-        Jedis jedis = connectionFactory.getConnection();
-        try {
-            byte[] data = serializer.serialize(message);
-            byte[] field = message.getKey().getBytes();
-            // 转入新表
-            jedis.hset(key, field, data);
-            // 删除旧表数据
-            jedis.hdel(waitKey, field);
-            // 将锁删除
-            unlock(jedis, field);
-        } catch (Exception e) {
-            Log.error("推送消息异常", e);
-        } finally {
-            jedis.close();
-        }
-    }
-
-    @Override
     public void done(Message message) {
         complete(doneKey, message);
     }
 
-    @Override
     public void error(Message message) {
         complete(errorKey, message);
     }
 
-    @Override
-    public void back(Message message) {
-        Jedis jedis = connectionFactory.getConnection();
-        try {
-            byte[] field = message.getKey().getBytes();
-            // 将锁删除
-            unlock(jedis, field);
-        } catch (Exception e) {
-            Log.error("归还消息异常", e);
-        } finally {
-            jedis.close();
-        }
+    public long length() {
+        return this.redisClient.execute(new PRInvoker<Jedis, Long>() {
+            public Long invoke(Jedis jedis) throws Exception {
+                return jedis.hlen(waitKey);
+            }
+        });
     }
 
     @Override
-    public long length() {
-        long len = 0;
-        Jedis jedis = connectionFactory.getConnection();
-        try {
-            len = jedis.hlen(waitKey);
-        } catch (Exception e) {
-            Log.error("归还消息异常", e);
-        } finally {
-            jedis.close();
-        }
-        return len;
+    protected boolean lock(final String key) {
+        return redisClient.execute(new PRInvoker<Jedis, Boolean>() {
+            public Boolean invoke(Jedis jedis) throws Exception {
+                byte[] value = (System.currentTimeMillis() + "").getBytes();
+                return jedis.hsetnx(lockKey, key.getBytes(), value) == 1;
+            }
+        });
+    }
+
+    @Override
+    protected boolean unLock(final String key) {
+        return redisClient.execute(new PRInvoker<Jedis, Boolean>() {
+            public Boolean invoke(Jedis jedis) throws Exception {
+                byte[] value = (System.currentTimeMillis() + "").getBytes();
+                return jedis.hdel(lockKey, key.getBytes()) == 1;
+            }
+        });
     }
 }

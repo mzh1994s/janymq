@@ -4,7 +4,7 @@ import cn.mzhong.janymq.config.ApplicationConfig;
 import cn.mzhong.janymq.config.LooplineConfig;
 import cn.mzhong.janymq.config.PiplelineConfig;
 import cn.mzhong.janymq.initializer.MQComponentInitializer;
-import cn.mzhong.janymq.line.DataSerializer;
+import cn.mzhong.janymq.line.JdkDataSerializer;
 import cn.mzhong.janymq.line.LineManager;
 import cn.mzhong.janymq.line.LineManagerProvider;
 
@@ -38,16 +38,16 @@ public abstract class MQContext {
     /**
      * 可以给定一个流水线管理器中的序列器，默认序列器为JDK序列器
      */
-    protected DataSerializer dataSerializer;
+    protected JdkDataSerializer dataSerializer;
     /**
      * 消费者map
      */
-    protected Map<Class<?>, Object> consumerMap = new HashMap<>();
-    protected Set<Class<?>> consumerClassSet = new HashSet<>();
+    protected Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
+    protected Set<Class<?>> consumerClassSet = new HashSet<Class<?>>();
     protected ExecutorService consumerExecutorService;
-    protected Map<Class<?>, Object> producerMap = new HashMap<>();
-    protected Set<Class<?>> producerClassSet = new HashSet<>();
-    protected Map<Method, LineManager> methodLineManagerMap = new HashMap<>();
+    protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
+    protected Set<Class<?>> producerClassSet = new HashSet<Class<?>>();
+    protected Map<Method, LineManager> methodLineManagerMap = new HashMap<Method, LineManager>();
 
     protected MQComponentInitializer LineManagerInitializer;
     protected MQComponentInitializer consumerInitializer;
@@ -89,11 +89,11 @@ public abstract class MQContext {
         this.lineManagerProvider = lineManagerProvider;
     }
 
-    public DataSerializer getDataSerializer() {
+    public JdkDataSerializer getDataSerializer() {
         return dataSerializer;
     }
 
-    public void setDataSerializer(DataSerializer dataSerializer) {
+    public void setDataSerializer(JdkDataSerializer dataSerializer) {
         this.dataSerializer = dataSerializer;
     }
 

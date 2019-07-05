@@ -30,7 +30,7 @@ public class MQSpringProducerInitializer extends MQProducerInitializer {
 
     @Override
     public void init(MQContext context) {
-        Map<Class<?>, Object> producers = new HashMap<>();
+        Map<Class<?>, Object> producers = new HashMap<Class<?>, Object>();
         int index = 0;
         // 遍历扫描到的所有生产者类
         Iterator<Class<?>> iterator = context.getProducerClassSet().iterator();

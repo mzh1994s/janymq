@@ -29,8 +29,8 @@ public class MQLooplineExecutor extends MQLineExecutor {
     @Override
     void invoke(Message message) {
         try {
-            boolean res = (boolean) method.invoke(consumer, message.getContent());
-            if (res) {
+            Boolean result = (Boolean) method.invoke(consumer, message.getContent());
+            if (result != null && result) {
                 lineManager.done(message);
             } else {
                 lineManager.back(message);
