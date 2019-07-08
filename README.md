@@ -67,10 +67,10 @@ TestMain.java
 <pre>
 package cn.mzhong.janymq.test;
 
-import cn.mzhong.janymq.core.MQApplication;
-import cn.mzhong.janymq.producer.TestMQ;
-import cn.mzhong.janymq.redis.RedisLineManagerProvider;
-import cn.mzhong.janymq.util.ThreadUtils;
+import MQApplication;
+import TestMQ;
+import RedisLineManagerProvider;
+import ThreadUtils;
 
 public class TestMain {
 
@@ -115,7 +115,7 @@ TestSpring.java
 <pre>
 package cn.mzhong.janymq.test;
 
-import cn.mzhong.janymq.consumer.TestBean;
+import TestBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
