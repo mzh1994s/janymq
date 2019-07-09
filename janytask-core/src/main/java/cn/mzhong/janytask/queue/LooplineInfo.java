@@ -1,7 +1,5 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.annotation.Loopline;
-
 import java.lang.reflect.Method;
 
 public class LooplineInfo extends QueueInfo {

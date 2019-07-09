@@ -1,4 +1,4 @@
-package cn.mzhong.janytask.annotation;
+package cn.mzhong.janytask.producer;
 
 import java.lang.annotation.*;
 

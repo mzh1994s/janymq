@@ -1,4 +1,4 @@
-package cn.mzhong.janytask.exception;
+package cn.mzhong.janytask.producer;
 
 public class TaskNotFoundException extends RuntimeException {
 

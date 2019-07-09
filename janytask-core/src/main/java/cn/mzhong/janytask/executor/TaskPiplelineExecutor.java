@@ -14,7 +14,7 @@ public class TaskPiplelineExecutor extends TaskExecutor {
 
     public TaskPiplelineExecutor(TaskContext context, Object consumer, Method method, PiplelineInfo piplelineInfo) {
         super(context,
-                context.getMethodLineManagerMap().get(piplelineInfo.getMethod()),
+                context.getMethodQueueManagerMap().get(piplelineInfo.getMethod()),
                 method,
                 consumer,
                 ValueUtils.uLong(piplelineInfo.getIdleInterval(), context.getPiplelineConfig().getIdleInterval()),

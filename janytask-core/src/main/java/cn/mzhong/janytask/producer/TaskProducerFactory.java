@@ -1,9 +1,8 @@
 package cn.mzhong.janytask.producer;
 
-import cn.mzhong.janytask.annotation.Loopline;
-import cn.mzhong.janytask.annotation.Pipleline;
+import cn.mzhong.janytask.queue.Loopline;
+import cn.mzhong.janytask.queue.Pipleline;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.exception.TaskNotFoundException;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.QueueManager;
 
@@ -34,7 +33,7 @@ class ProducerInvocationHandler implements InvocationHandler {
 
     ProducerInvocationHandler(TaskContext context) {
         this.context = context;
-        lineManagerMap = context.getMethodLineManagerMap();
+        lineManagerMap = context.getMethodQueueManagerMap();
     }
 
     /**

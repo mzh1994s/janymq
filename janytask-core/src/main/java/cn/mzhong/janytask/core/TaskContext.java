@@ -47,9 +47,9 @@ public abstract class TaskContext {
     protected ExecutorService consumerExecutorService;
     protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
     protected Set<Class<?>> producerClassSet = new HashSet<Class<?>>();
-    protected Map<Method, QueueManager> methodLineManagerMap = new HashMap<Method, QueueManager>();
+    protected Map<Method, QueueManager> methodQueueManagerMap = new HashMap<Method, QueueManager>();
 
-    protected TaskComponentInitializer providerInitializer;
+    protected TaskComponentInitializer queueInitializer;
     protected TaskComponentInitializer consumerInitializer;
     protected TaskComponentInitializer producerInitializer;
     /**
@@ -137,20 +137,20 @@ public abstract class TaskContext {
         this.producerClassSet = producerClassSet;
     }
 
-    public Map<Method, QueueManager> getMethodLineManagerMap() {
-        return methodLineManagerMap;
+    public Map<Method, QueueManager> getMethodQueueManagerMap() {
+        return methodQueueManagerMap;
     }
 
-    public void setMethodLineManagerMap(Map<Method, QueueManager> methodLineManagerMap) {
-        this.methodLineManagerMap = methodLineManagerMap;
+    public void setMethodQueueManagerMap(Map<Method, QueueManager> methodQueueManagerMap) {
+        this.methodQueueManagerMap = methodQueueManagerMap;
     }
 
-    public TaskComponentInitializer getProviderInitializer() {
-        return providerInitializer;
+    public TaskComponentInitializer getQueueInitializer() {
+        return queueInitializer;
     }
 
-    public void setProviderInitializer(TaskComponentInitializer providerInitializer) {
-        this.providerInitializer = providerInitializer;
+    public void setQueueInitializer(TaskComponentInitializer queueInitializer) {
+        this.queueInitializer = queueInitializer;
     }
 
     public TaskComponentInitializer getConsumerInitializer() {

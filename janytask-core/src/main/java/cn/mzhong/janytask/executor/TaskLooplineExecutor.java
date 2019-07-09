@@ -17,7 +17,7 @@ public class TaskLooplineExecutor extends TaskExecutor {
 
     public TaskLooplineExecutor(TaskContext context, Object consumer, Method method, LooplineInfo looplineInfo) {
         super(context,
-                context.getMethodLineManagerMap().get(looplineInfo.getMethod()),
+                context.getMethodQueueManagerMap().get(looplineInfo.getMethod()),
                 method,
                 consumer,
                 ValueUtils.uLong(looplineInfo.getIdleInterval(), context.getLooplineConfig().getIdleInterval()),

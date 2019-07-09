@@ -1,7 +1,5 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.annotation.Pipleline;
-
 import java.lang.reflect.Method;
 
 public class PiplelineInfo extends QueueInfo {

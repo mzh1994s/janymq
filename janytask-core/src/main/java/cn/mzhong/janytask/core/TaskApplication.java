@@ -1,15 +1,14 @@
 package cn.mzhong.janytask.core;
 
-import cn.mzhong.janytask.annotation.Consumer;
-import cn.mzhong.janytask.annotation.Producer;
+import cn.mzhong.janytask.consumer.Consumer;
+import cn.mzhong.janytask.producer.Producer;
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.LooplineConfig;
 import cn.mzhong.janytask.config.PiplelineConfig;
-import cn.mzhong.janytask.exception.TaskInitExcepition;
-import cn.mzhong.janytask.exception.TaskNotFoundException;
+import cn.mzhong.janytask.producer.TaskNotFoundException;
 import cn.mzhong.janytask.consumer.TaskConsumerInitializer;
 import cn.mzhong.janytask.producer.TaskProducerInitializer;
-import cn.mzhong.janytask.queue.TaskQueueManagerInitializer;
+import cn.mzhong.janytask.queue.TaskQueueInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
@@ -51,13 +50,13 @@ public class TaskApplication extends TaskContext {
             piplelineConfig = new PiplelineConfig();
         }
         if (queueProvider == null) {
-            throw new TaskInitExcepition("LineManagerBuilder不存在，请先指定LineManagerBuilder");
+            throw new TaskInitExcepition("queueProvider不存在，请先指定queueProvider");
         }
         if (dataSerializer == null) {
             dataSerializer = new JdkDataSerializer();
         }
-        if (providerInitializer == null) {
-            providerInitializer = new TaskQueueManagerInitializer();
+        if (queueInitializer == null) {
+            queueInitializer = new TaskQueueInitializer();
         }
         if (consumerInitializer == null) {
             consumerInitializer = new TaskConsumerInitializer();
@@ -70,7 +69,7 @@ public class TaskApplication extends TaskContext {
         setConsumerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
         // 扫描所有的生产者
         setProducerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
-        providerInitializer.init(this);
+        queueInitializer.init(this);
         producerInitializer.init(this);
         consumerInitializer.init(this);
         // 正常终结
