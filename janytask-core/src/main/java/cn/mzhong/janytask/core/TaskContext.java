@@ -5,8 +5,8 @@ import cn.mzhong.janytask.config.LooplineConfig;
 import cn.mzhong.janytask.config.PiplelineConfig;
 import cn.mzhong.janytask.initializer.TaskComponentInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
-import cn.mzhong.janytask.queue.LineManager;
-import cn.mzhong.janytask.queue.Provider;
+import cn.mzhong.janytask.queue.QueueManager;
+import cn.mzhong.janytask.queue.QueueProvider;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -30,10 +30,10 @@ public abstract class TaskContext {
     protected LooplineConfig looplineConfig;
 
     /**
-     * Redis、Zookeeper或者数据库都可以作为消息传播或者持久化介质，而StoreManager为这些介质的客服端
-     * StoreManagerProvider用于配置和提供StoreManager
+     * Redis、Zookeeper或者数据库都可以作为消息传播或者持久化介质，而queueProvider为这些介质的客服端
+     * queueProvider用于配置和提供queueManager
      */
-    protected Provider lineManagerProvider;
+    protected QueueProvider queueProvider;
 
     /**
      * 可以给定一个流水线管理器中的序列器，默认序列器为JDK序列器
@@ -47,9 +47,9 @@ public abstract class TaskContext {
     protected ExecutorService consumerExecutorService;
     protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
     protected Set<Class<?>> producerClassSet = new HashSet<Class<?>>();
-    protected Map<Method, LineManager> methodLineManagerMap = new HashMap<Method, LineManager>();
+    protected Map<Method, QueueManager> methodLineManagerMap = new HashMap<Method, QueueManager>();
 
-    protected TaskComponentInitializer LineManagerInitializer;
+    protected TaskComponentInitializer providerInitializer;
     protected TaskComponentInitializer consumerInitializer;
     protected TaskComponentInitializer producerInitializer;
     /**
@@ -81,12 +81,12 @@ public abstract class TaskContext {
         this.looplineConfig = looplineConfig;
     }
 
-    public Provider getLineManagerProvider() {
-        return lineManagerProvider;
+    public QueueProvider getQueueProvider() {
+        return queueProvider;
     }
 
-    public void setLineManagerProvider(Provider lineManagerProvider) {
-        this.lineManagerProvider = lineManagerProvider;
+    public void setQueueProvider(QueueProvider queueProvider) {
+        this.queueProvider = queueProvider;
     }
 
     public JdkDataSerializer getDataSerializer() {
@@ -137,20 +137,20 @@ public abstract class TaskContext {
         this.producerClassSet = producerClassSet;
     }
 
-    public Map<Method, LineManager> getMethodLineManagerMap() {
+    public Map<Method, QueueManager> getMethodLineManagerMap() {
         return methodLineManagerMap;
     }
 
-    public void setMethodLineManagerMap(Map<Method, LineManager> methodLineManagerMap) {
+    public void setMethodLineManagerMap(Map<Method, QueueManager> methodLineManagerMap) {
         this.methodLineManagerMap = methodLineManagerMap;
     }
 
-    public TaskComponentInitializer getLineManagerInitializer() {
-        return LineManagerInitializer;
+    public TaskComponentInitializer getProviderInitializer() {
+        return providerInitializer;
     }
 
-    public void setLineManagerInitializer(TaskComponentInitializer lineManagerInitializer) {
-        this.LineManagerInitializer = lineManagerInitializer;
+    public void setProviderInitializer(TaskComponentInitializer providerInitializer) {
+        this.providerInitializer = providerInitializer;
     }
 
     public TaskComponentInitializer getConsumerInitializer() {

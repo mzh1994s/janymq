@@ -1,7 +1,8 @@
-package cn.mzhong.janytask.initializer;
+package cn.mzhong.janytask.consumer;
 
 import cn.mzhong.janytask.annotation.Loopline;
 import cn.mzhong.janytask.annotation.Pipleline;
+import cn.mzhong.janytask.initializer.TaskComponentInitializer;
 import cn.mzhong.janytask.queue.LooplineInfo;
 import cn.mzhong.janytask.queue.PiplelineInfo;
 import cn.mzhong.janytask.core.TaskContext;

@@ -1,12 +1,12 @@
 package cn.mzhong.janytask.zookeeper;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.LineManager;
-import cn.mzhong.janytask.queue.Provider;
+import cn.mzhong.janytask.queue.QueueManager;
+import cn.mzhong.janytask.queue.QueueProvider;
 import cn.mzhong.janytask.queue.LooplineInfo;
 import cn.mzhong.janytask.queue.PiplelineInfo;
 
-public class ZookeeperLineManagerProvider implements Provider {
+public class ZookeeperLineManagerProvider implements QueueProvider {
 
     protected String connectString;
     protected String root = "janymq";
@@ -21,12 +21,12 @@ public class ZookeeperLineManagerProvider implements Provider {
     }
 
     @Override
-    public LineManager getPiplelineManager(PiplelineInfo pipleline) {
+    public QueueManager getPiplelineManager(PiplelineInfo pipleline) {
         return new ZookeeperPiplelineManager(context, pipleline, connectString, root);
     }
 
     @Override
-    public LineManager getlooplinemanager(LooplineInfo loopLine) {
+    public QueueManager getlooplinemanager(LooplineInfo loopLine) {
         return new ZookeeperLooplineManager(context, loopLine, connectString, root);
     }
 

@@ -2,7 +2,7 @@ package cn.mzhong.janytask.spring;
 
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.producer.TaskProducerFactory;
-import cn.mzhong.janytask.initializer.TaskProducerInitializer;
+import cn.mzhong.janytask.producer.TaskProducerInitializer;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;

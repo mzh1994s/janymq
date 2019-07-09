@@ -4,8 +4,8 @@ import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.jdbc.mapper.MessageMapper;
 import cn.mzhong.janytask.jdbc.mapper.MysqlMessageMapper;
 import cn.mzhong.janytask.jdbc.mapper.OracleMessageMapper;
-import cn.mzhong.janytask.queue.LineManager;
-import cn.mzhong.janytask.queue.Provider;
+import cn.mzhong.janytask.queue.QueueManager;
+import cn.mzhong.janytask.queue.QueueProvider;
 import cn.mzhong.janytask.queue.LooplineInfo;
 import cn.mzhong.janytask.queue.PiplelineInfo;
 import cn.mzhong.janytask.tool.PRInvoker;
@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
-public class JdbcProvider implements Provider {
+public class JdbcProvider implements QueueProvider {
 
     final static Logger Log = LoggerFactory.getLogger(JdbcProvider.class);
 
@@ -42,11 +42,11 @@ public class JdbcProvider implements Provider {
         this.table = table;
     }
 
-    public LineManager getPiplelineManager(PiplelineInfo pipleline) {
+    public QueueManager getPiplelineManager(PiplelineInfo pipleline) {
         return new JdbcLineManager(context, messageMapper, pipleline);
     }
 
-    public LineManager getlooplinemanager(LooplineInfo loopLine) {
+    public QueueManager getlooplinemanager(LooplineInfo loopLine) {
         return new JdbcLineManager(context, messageMapper, loopLine);
     }
 

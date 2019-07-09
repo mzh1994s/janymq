@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.executor;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.LineManager;
+import cn.mzhong.janytask.queue.QueueManager;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.util.ThreadUtils;
 import org.slf4j.Logger;
@@ -13,7 +13,7 @@ public abstract class TaskExecutor implements Runnable {
     final static Logger Log = LoggerFactory.getLogger(TaskExecutor.class);
 
     protected TaskContext context;
-    protected LineManager lineManager;
+    protected QueueManager lineManager;
     protected String ID;
     protected Method method;
     protected Object consumer;
@@ -22,7 +22,7 @@ public abstract class TaskExecutor implements Runnable {
     protected long cnt = 0;
 
     public TaskExecutor(TaskContext context,
-                        LineManager lineManager,
+                        QueueManager lineManager,
                         Method method,
                         Object consumer,
                         long idleInterval,

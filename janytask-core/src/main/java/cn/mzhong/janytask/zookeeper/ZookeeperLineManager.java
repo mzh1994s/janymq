@@ -2,13 +2,13 @@ package cn.mzhong.janytask.zookeeper;
 
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.queue.QueueInfo;
-import cn.mzhong.janytask.queue.LockedLineManager;
+import cn.mzhong.janytask.queue.LockedQueueManager;
 import cn.mzhong.janytask.queue.Message;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class ZookeeperLineManager extends LockedLineManager {
+public abstract class ZookeeperLineManager extends LockedQueueManager {
     final static Logger Log = LoggerFactory.getLogger(ZookeeperLineManager.class);
     protected String connectString;
     protected ZookeeperClient zkClient;

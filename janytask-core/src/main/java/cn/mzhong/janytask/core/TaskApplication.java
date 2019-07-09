@@ -7,9 +7,9 @@ import cn.mzhong.janytask.config.LooplineConfig;
 import cn.mzhong.janytask.config.PiplelineConfig;
 import cn.mzhong.janytask.exception.TaskInitExcepition;
 import cn.mzhong.janytask.exception.TaskNotFoundException;
-import cn.mzhong.janytask.initializer.TaskConsumerInitializer;
-import cn.mzhong.janytask.initializer.TaskProducerInitializer;
-import cn.mzhong.janytask.initializer.TaskLineManagerInitializer;
+import cn.mzhong.janytask.consumer.TaskConsumerInitializer;
+import cn.mzhong.janytask.producer.TaskProducerInitializer;
+import cn.mzhong.janytask.queue.TaskQueueManagerInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
@@ -50,14 +50,14 @@ public class TaskApplication extends TaskContext {
         if (piplelineConfig == null) {
             piplelineConfig = new PiplelineConfig();
         }
-        if (lineManagerProvider == null) {
+        if (queueProvider == null) {
             throw new TaskInitExcepition("LineManagerBuilder不存在，请先指定LineManagerBuilder");
         }
         if (dataSerializer == null) {
             dataSerializer = new JdkDataSerializer();
         }
-        if (LineManagerInitializer == null) {
-            LineManagerInitializer = new TaskLineManagerInitializer();
+        if (providerInitializer == null) {
+            providerInitializer = new TaskQueueManagerInitializer();
         }
         if (consumerInitializer == null) {
             consumerInitializer = new TaskConsumerInitializer();
@@ -70,7 +70,7 @@ public class TaskApplication extends TaskContext {
         setConsumerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
         // 扫描所有的生产者
         setProducerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
-        LineManagerInitializer.init(this);
+        providerInitializer.init(this);
         producerInitializer.init(this);
         consumerInitializer.init(this);
         // 正常终结

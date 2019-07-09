@@ -4,11 +4,11 @@ import cn.mzhong.janytask.core.TaskContext;
 
 import java.util.LinkedList;
 
-public abstract class LockedLineManager extends AbstractLineManager {
+public abstract class LockedQueueManager extends AbstractQueueManager {
 
     protected LinkedList<String> cacheKeys = new LinkedList<String>();
 
-    public LockedLineManager(TaskContext context, QueueInfo lineInfo) {
+    public LockedQueueManager(TaskContext context, QueueInfo lineInfo) {
         super(context, lineInfo);
     }
 

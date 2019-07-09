@@ -1,7 +1,7 @@
-package cn.mzhong.janytask.initializer;
+package cn.mzhong.janytask.producer;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.producer.TaskProducerFactory;
+import cn.mzhong.janytask.initializer.TaskComponentInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

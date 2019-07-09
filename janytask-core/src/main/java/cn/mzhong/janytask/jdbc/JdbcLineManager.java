@@ -3,13 +3,13 @@ package cn.mzhong.janytask.jdbc;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.jdbc.mapper.MessageMapper;
 import cn.mzhong.janytask.queue.QueueInfo;
-import cn.mzhong.janytask.queue.LockedLineManager;
+import cn.mzhong.janytask.queue.LockedQueueManager;
 import cn.mzhong.janytask.queue.Message;
 
 import java.util.Date;
 import java.util.LinkedList;
 
-public class JdbcLineManager extends LockedLineManager {
+public class JdbcLineManager extends LockedQueueManager {
 
     protected TaskContext context;
     protected MessageMapper messageMapper;

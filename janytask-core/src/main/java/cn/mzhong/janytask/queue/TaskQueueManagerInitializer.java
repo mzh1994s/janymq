@@ -1,22 +1,23 @@
-package cn.mzhong.janytask.initializer;
+package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.annotation.Loopline;
 import cn.mzhong.janytask.annotation.Pipleline;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.Provider;
-import cn.mzhong.janytask.queue.LineManager;
+import cn.mzhong.janytask.initializer.TaskComponentInitializer;
+import cn.mzhong.janytask.queue.QueueProvider;
+import cn.mzhong.janytask.queue.QueueManager;
 import cn.mzhong.janytask.queue.LooplineInfo;
 import cn.mzhong.janytask.queue.PiplelineInfo;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 
-public class TaskLineManagerInitializer implements TaskComponentInitializer {
+public class TaskQueueManagerInitializer implements TaskComponentInitializer {
 
     public void init(TaskContext context) {
-        Provider provider = context.getLineManagerProvider();
+        QueueProvider provider = context.getQueueProvider();
         provider.init(context);
-        Map<Method, LineManager> methodLineManagerMap = context.getMethodLineManagerMap();
+        Map<Method, QueueManager> methodLineManagerMap = context.getMethodLineManagerMap();
         for (Class<?> producerClass : context.getProducerClassSet()) {
             for (Method method : producerClass.getMethods()) {
                 // 扫描流水线队列

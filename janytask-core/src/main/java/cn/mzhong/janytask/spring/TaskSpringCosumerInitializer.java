@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.spring;
 
-import cn.mzhong.janytask.initializer.TaskConsumerInitializer;
+import cn.mzhong.janytask.consumer.TaskConsumerInitializer;
 import cn.mzhong.janytask.core.TaskContext;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;

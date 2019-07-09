@@ -2,7 +2,7 @@ package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.core.TaskContext;
 
-public abstract class AbstractLineManager implements LineManager {
+public abstract class AbstractQueueManager implements QueueManager {
     protected String ID;
     protected TaskContext context;
     protected QueueInfo lineInfo;
@@ -13,7 +13,7 @@ public abstract class AbstractLineManager implements LineManager {
         return this.ID;
     }
 
-    public AbstractLineManager(TaskContext context, QueueInfo lineInfo) {
+    public AbstractQueueManager(TaskContext context, QueueInfo lineInfo) {
         this.context = context;
         this.dataSerializer = context.getDataSerializer();
         this.lineInfo = lineInfo;

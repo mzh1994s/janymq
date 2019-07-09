@@ -2,12 +2,12 @@ package cn.mzhong.janytask.redis;
 
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.queue.QueueInfo;
-import cn.mzhong.janytask.queue.LockedLineManager;
+import cn.mzhong.janytask.queue.LockedQueueManager;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.tool.PRInvoker;
 import redis.clients.jedis.Jedis;
 
-public abstract class RedisLineManager extends LockedLineManager {
+public abstract class RedisLineManager extends LockedQueueManager {
     protected byte[] waitKey;
     protected byte[] doneKey;
     protected byte[] errorKey;

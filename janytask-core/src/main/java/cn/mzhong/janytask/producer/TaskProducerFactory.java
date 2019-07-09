@@ -5,7 +5,7 @@ import cn.mzhong.janytask.annotation.Pipleline;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.exception.TaskNotFoundException;
 import cn.mzhong.janytask.queue.Message;
-import cn.mzhong.janytask.queue.LineManager;
+import cn.mzhong.janytask.queue.QueueManager;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -30,7 +30,7 @@ public class TaskProducerFactory {
 
 class ProducerInvocationHandler implements InvocationHandler {
     TaskContext context;
-    Map<Method, LineManager> lineManagerMap;
+    Map<Method, QueueManager> lineManagerMap;
 
     ProducerInvocationHandler(TaskContext context) {
         this.context = context;
@@ -53,7 +53,7 @@ class ProducerInvocationHandler implements InvocationHandler {
         if (!isLineMethod(method)) {
             return method.invoke(proxy, args);
         }
-        LineManager storeManager = lineManagerMap.get(method);
+        QueueManager storeManager = lineManagerMap.get(method);
         if (storeManager == null) {
             throw new TaskNotFoundException("此方法不能作为提供者使用：" + method.getName());
         }

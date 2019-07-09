@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue;
 
-public interface LineManager {
+public interface QueueManager {
 
     /**
      * 获取lineID

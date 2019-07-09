@@ -173,7 +173,7 @@ class AnyLineManagerProviderParser extends ConfigParser {
 
     @Override
     public void doParser() {
-        this.beanDefinitionBuilder.addPropertyReference("lineManagerProvider", element.getAttribute("ref"));
+        this.beanDefinitionBuilder.addPropertyReference("queueProvider", element.getAttribute("ref"));
     }
 }
 
@@ -240,7 +240,7 @@ class RedisProviderParser extends ConfigParser {
         ElementToBeanDefinitionParser redisLineManagerProviderParser = new ElementToBeanDefinitionParser(element, RedisProvider.class);
         redisLineManagerProviderParser.addPropertyValue("connectionFactory", connectionFactoryBuilder.getBeanDefinition());
         redisLineManagerProviderParser.parseStringPropertyFromAttr("rootPath");
-        this.beanDefinitionBuilder.addPropertyValue("lineManagerProvider", redisLineManagerProviderParser.getBeanDefinition());
+        this.beanDefinitionBuilder.addPropertyValue("queueProvider", redisLineManagerProviderParser.getBeanDefinition());
     }
 
     @Override
@@ -280,7 +280,7 @@ class ZookeeperProviderParser extends ConfigParser {
         ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, ZookeeperLineManagerProvider.class);
         elementBeanDefinitionParser.parseStringPropertyFromAttr("connectString");
         elementBeanDefinitionParser.parseStringPropertyFromAttr("rootPath");
-        this.beanDefinitionBuilder.addPropertyValue("lineManagerProvider", elementBeanDefinitionParser.getBeanDefinition());
+        this.beanDefinitionBuilder.addPropertyValue("queueProvider", elementBeanDefinitionParser.getBeanDefinition());
     }
 }
 
@@ -296,6 +296,6 @@ class JdbcProviderParser extends ConfigParser {
         ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, JdbcProvider.class);
         elementBeanDefinitionParser.parseStringPropertyFromAttr("table");
         elementBeanDefinitionParser.parseReferencePropertyFromAttr("dataSource");
-        this.beanDefinitionBuilder.addPropertyValue("lineManagerProvider", elementBeanDefinitionParser.getBeanDefinition());
+        this.beanDefinitionBuilder.addPropertyValue("queueProvider", elementBeanDefinitionParser.getBeanDefinition());
     }
 }

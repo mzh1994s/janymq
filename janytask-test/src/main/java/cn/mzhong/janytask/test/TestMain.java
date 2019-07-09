@@ -11,7 +11,7 @@ public class TestMain {
         TaskApplication application = new TaskApplication();
         // 启动消费者
         RedisProvider manager = RedisProvider.create("mzhong.cn", 6379);
-        application.setLineManagerProvider(manager);
+        application.setQueueProvider(manager);
         application.init();
         // 测试任务
         while (true) {
