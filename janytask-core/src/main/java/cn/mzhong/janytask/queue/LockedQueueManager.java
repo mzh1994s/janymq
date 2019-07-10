@@ -6,13 +6,13 @@ import java.util.LinkedList;
 
 public abstract class LockedQueueManager extends AbstractQueueManager {
 
-    protected LinkedList<String> cacheKeys = new LinkedList<String>();
+    private LinkedList<String> cacheKeys = new LinkedList<String>();
 
     public LockedQueueManager(TaskContext context, QueueInfo lineInfo) {
         super(context, lineInfo);
     }
 
-    public Message poll() {
+    public final Message poll() {
         if (cacheKeys.isEmpty()) {
             cacheKeys = this.idList();
         }
@@ -29,7 +29,7 @@ public abstract class LockedQueueManager extends AbstractQueueManager {
         return null;
     }
 
-    public void back(Message message) {
+    public final void back(Message message) {
         this.unLock(message.getId());
     }
 

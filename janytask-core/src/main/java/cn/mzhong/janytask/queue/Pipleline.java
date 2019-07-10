@@ -29,4 +29,6 @@ public @interface Pipleline {
      * @return
      */
     long sleepInterval() default 0;
+
+    String startTime() default "01-01 00:00:00";
 }
