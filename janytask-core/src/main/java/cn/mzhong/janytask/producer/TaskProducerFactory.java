@@ -1,10 +1,8 @@
 package cn.mzhong.janytask.producer;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.Loopline;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.MessageDao;
-import cn.mzhong.janytask.queue.Pipleline;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -18,35 +16,24 @@ import java.lang.reflect.Proxy;
  */
 public class TaskProducerFactory {
 
-    public static Object newInstance(Class<?> _class, MessageDao messageDao) {
+    public static Object newInstance(TaskContext context, Class<?> _class) {
         return Proxy.newProxyInstance(
                 _class.getClassLoader(),
                 new Class[]{_class},
-                new ProducerInvocationHandler(messageDao));
+                new ProducerInvocationHandler(context));
     }
 }
 
 class ProducerInvocationHandler implements InvocationHandler {
-    MessageDao messageDao;
+    TaskContext context;
 
-    ProducerInvocationHandler(MessageDao messageDao) {
-        this.messageDao = messageDao;
-    }
-
-    /**
-     * 只允许Object以外的方法进行代理
-     *
-     * @param method
-     * @return
-     */
-    static boolean isLineMethod(Method method) {
-        boolean isPipleline = method.getAnnotation(Pipleline.class) != null;
-        boolean isLoopline = method.getAnnotation(Loopline.class) != null;
-        return isPipleline || isLoopline;
+    ProducerInvocationHandler(TaskContext context) {
+        this.context = context;
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (!isLineMethod(method)) {
+        MessageDao messageDao = context.getMethodMessageDaoMap().get(method);
+        if (messageDao == null) {
             return method.invoke(proxy, args);
         }
         Message message = new Message();

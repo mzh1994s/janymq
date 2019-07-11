@@ -29,7 +29,7 @@ public class TaskSpringCosumerInitializer extends TaskConsumerInitializer {
 
     @Override
     public void init(TaskContext context) {
-        Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
+        Map<Class<?>, Object> consumerMap = context.getConsumerMap();
         int index = 0;
         Iterator<Class<?>> iterator = context.getConsumerClassSet().iterator();
         while (iterator.hasNext()) {
@@ -37,14 +37,11 @@ public class TaskSpringCosumerInitializer extends TaskConsumerInitializer {
             BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(consumerClass);
             builder.setScope(BeanDefinition.SCOPE_SINGLETON);
             BeanDefinition beanDefinition = builder.getBeanDefinition();
-            String beanName = "jSimplemqConsumer#" + (index++);
+            String beanName = "janytask-consumer#" + (index++);
             beanDefinitionRegistry.registerBeanDefinition(beanName, beanDefinition);
             Object consumer = beanFactory.getBean(beanName);
             consumerMap.put(consumerClass, consumer);
+            super.processConsumer(context, consumer, consumerClass);
         }
-        // 保存消费者Map在Context（注意不是Spring的Context）
-        context.setConsumerMap(consumerMap);
-        // 调用服务的执行者，开启线程开始工作
-        super.initExecutor(context, consumerMap.values());
     }
 }

@@ -1,27 +1,38 @@
 package cn.mzhong.janytask.producer;
 
+import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.initializer.TaskComponentInitializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 
 public class TaskProducerInitializer implements TaskComponentInitializer {
 
-    final static Logger Log = LoggerFactory.getLogger(TaskProducerInitializer.class);
+    protected void processProducer(TaskContext context, Class<?> producerClass) {
+        // 处理生产者
+        for (Method method : producerClass.getMethods()) {
+            for (TaskAnnotationProcessor annotationProcessor : context.getAnnotationProcessors()) {
+                Annotation annotation = method.getAnnotation(annotationProcessor.getAnnotationClass());
+                if (annotation != null) {
+                    //noinspection SingleStatementInBlock,unchecked
+                    annotationProcessor.processProducer(context, new ProducerInfo<Annotation>(
+                            annotation,
+                            producerClass,
+                            method
+                    ));
+                }
+            }
+        }
+
+    }
 
     public void init(TaskContext context) {
-        Map<Class<?>, Object> producers = new HashMap<Class<?>, Object>();
-        try {
-            for (Class<?> producerClass : context.getProducerClassSet()) {
-                Object producer = TaskProducerFactory.newInstance(context, producerClass);
-                producers.put(producerClass, producer);
-            }
-        } catch (Exception e) {
-            Log.error("提供者初始化异常", e);
+        for (Class<?> producerClass : context.getProducerClassSet()) {
+            // 注册生产者代理
+            Object producer = TaskProducerFactory.newInstance(context, producerClass);
+            context.getProducerMap().put(producerClass, producer);
+            this.processProducer(context, producerClass);
         }
-        context.setProducerMap(producers);
     }
 }

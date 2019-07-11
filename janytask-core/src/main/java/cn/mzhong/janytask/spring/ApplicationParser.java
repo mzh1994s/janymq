@@ -1,8 +1,7 @@
 package cn.mzhong.janytask.spring;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
-import cn.mzhong.janytask.config.LooplineConfig;
-import cn.mzhong.janytask.config.PiplelineConfig;
+import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.jdbc.JdbcProvider;
 import cn.mzhong.janytask.redis.GenericRedisConnectionFactory;
 import cn.mzhong.janytask.redis.RedisProvider;
@@ -59,11 +58,9 @@ public class ApplicationParser extends AbstractSingleBeanDefinitionParser {
 
     protected void doParseChildren(Element root, BeanDefinitionBuilder builder) {
         String[] elementNames = new String[]{
-                "conf-pipleline", "conf-loopline",
-                "provider-any", "provider-redis", "provider-zookeeper", "provider-jdbc"};
+                "conf-queue", "provider-any", "provider-redis", "provider-zookeeper", "provider-jdbc"};
         Class<?>[] configClasses = new Class<?>[]{
-                PiplelineConfigParser.class,
-                LooplineConfigParser.class,
+                QueueConfigParser.class,
                 AnyLineManagerProviderParser.class,
                 RedisProviderParser.class,
                 ZookeeperProviderParser.class,
@@ -129,36 +126,18 @@ class ApplicationConfigParser extends ConfigParser {
 /**
  * Pipleline配置解析器
  */
-class PiplelineConfigParser extends ConfigParser {
+class QueueConfigParser extends ConfigParser {
 
-    public PiplelineConfigParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
+    public QueueConfigParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
         super(element, beanDefinitionBuilder);
     }
 
     @Override
     public void doParser() {
-        ElementToBeanDefinitionParser piplelineParser = new ElementToBeanDefinitionParser(element, PiplelineConfig.class);
+        ElementToBeanDefinitionParser piplelineParser = new ElementToBeanDefinitionParser(element, QueueConfig.class);
         piplelineParser.parseStringPropertyFromAttr("idleInterval");
         piplelineParser.parseStringPropertyFromAttr("sleepInterval");
-        this.beanDefinitionBuilder.addPropertyValue("piplelineConfig", piplelineParser.getBeanDefinition());
-    }
-}
-
-/**
- * loopline配置解析器
- */
-class LooplineConfigParser extends ConfigParser {
-
-    public LooplineConfigParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
-        super(element, beanDefinitionBuilder);
-    }
-
-    @Override
-    public void doParser() {
-        ElementToBeanDefinitionParser piplelineParser = new ElementToBeanDefinitionParser(element, LooplineConfig.class);
-        piplelineParser.parseStringPropertyFromAttr("idleInterval");
-        piplelineParser.parseStringPropertyFromAttr("sleepInterval");
-        this.beanDefinitionBuilder.addPropertyValue("looplineConfig", piplelineParser.getBeanDefinition());
+        this.beanDefinitionBuilder.addPropertyValue("queueConfig", piplelineParser.getBeanDefinition());
     }
 }
 

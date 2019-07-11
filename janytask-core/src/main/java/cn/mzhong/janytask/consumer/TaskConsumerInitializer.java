@@ -56,41 +56,33 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
     @SuppressWarnings("unchecked")
     protected <A extends Annotation> void processConsumer(
             TaskContext context,
-            Object consumer, Class<?> consumerClass,
-            Method method) {
-        for (TaskAnnotationProcessor annotationProcessor : context.getAnnotationProcessors()) {
-            ConsumerInfo<A> methodInfo = findConsumerInfo(
-                    consumer,
-                    consumerClass,
-                    method,
-                    annotationProcessor.getAnnotationClass());
-            if (methodInfo != null) {
-                annotationProcessor.processConsumer(context, methodInfo);
-            }
-        }
-    }
-
-    protected void initExecutor(TaskContext context, Collection<Object> consumerSet) {
-        for (Object consumer : consumerSet) {
-            Class<?> consumerClass = consumer.getClass();
-            for (Method method : consumerClass.getMethods()) {
-                processConsumer(context, consumer, consumerClass, method);
+            Object consumer,
+            Class<?> consumerClass) {
+        for (Method method : consumerClass.getMethods()) {
+            for (TaskAnnotationProcessor annotationProcessor : context.getAnnotationProcessors()) {
+                ConsumerInfo<A> methodInfo = findConsumerInfo(
+                        consumer,
+                        consumerClass,
+                        method,
+                        annotationProcessor.getAnnotationClass());
+                if (methodInfo != null) {
+                    annotationProcessor.processConsumer(context, methodInfo);
+                }
             }
         }
     }
 
     public void init(TaskContext context) {
-        Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
+        Map<Class<?>, Object> consumerMap = context.getConsumerMap();
         try {
             for (Class<?> consumerClass : context.getConsumerClassSet()) {
                 Object consumer = consumerClass.getDeclaredConstructor().newInstance();
                 consumerMap.put(consumerClass, consumer);
+                this.processConsumer(context, consumer, consumerClass);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        context.setConsumerMap(consumerMap);
-        initExecutor(context, consumerMap.values());
     }
 }
 

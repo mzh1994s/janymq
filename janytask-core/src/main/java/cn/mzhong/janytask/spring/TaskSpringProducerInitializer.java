@@ -30,7 +30,7 @@ public class TaskSpringProducerInitializer extends TaskProducerInitializer {
 
     @Override
     public void init(TaskContext context) {
-        Map<Class<?>, Object> producers = new HashMap<Class<?>, Object>();
+        Map<Class<?>, Object> producers = context.getProducerMap();
         int index = 0;
         // 遍历扫描到的所有生产者类
         Iterator<Class<?>> iterator = context.getProducerClassSet().iterator();
@@ -52,11 +52,11 @@ public class TaskSpringProducerInitializer extends TaskProducerInitializer {
             // 当在一个应用中需要同步实现时可通过Resource或者Autowired + Qualifier的方式实现。
             beanDefinition.setPrimary(true);
             // 注册bean到Spring容器
-            String beanName = "jSimplemqProducer#" + (index++);
+            String beanName = "janytask-producer#" + (index++);
             beanDefinitionRegistry.registerBeanDefinition(beanName, beanDefinition);
             // 通过容器获取Bean，并放在JSimpleMQ的Context中
             producers.put(producerClass, beanFactory.getBean(beanName));
+            super.processProducer(context, producerClass);
         }
-        context.setProducerMap(producers);
     }
 }

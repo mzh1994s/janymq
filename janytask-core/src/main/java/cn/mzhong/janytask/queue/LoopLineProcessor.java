@@ -3,7 +3,7 @@ package cn.mzhong.janytask.queue;
 import cn.mzhong.janytask.consumer.ConsumerInfo;
 import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.executor.TaskLooplineExecutor;
+import cn.mzhong.janytask.executor.TaskExecutor;
 import cn.mzhong.janytask.producer.ProducerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,38 +20,41 @@ public class LoopLineProcessor implements TaskAnnotationProcessor<Loopline, Loop
     }
 
     public void processConsumer(TaskContext context, ConsumerInfo<Loopline> consumerInfo) {
+        LooplineInfo looplineInfo = new LooplineInfo(
+                consumerInfo.getProducerClass(),
+                consumerInfo.getProducerMethod(),
+                consumerInfo.getConsumerClass(),
+                consumerInfo.getConsumerMethod(),
+                consumerInfo.getAnnotation());
+        // 注册messageDao
+        MessageDao messageDao = context.getQueueProvider().createMessageDao(looplineInfo);
+        consumerInfo.setMessageDao(messageDao);
         context.getConsumerExecutorService().execute(
-                new TaskLooplineExecutor(
-                        context,
-                        consumerInfo.getConsumer(),
-                        consumerInfo.getConsumerMethod(),
-                        new LooplineInfo(
-                                consumerInfo.getProducerClass(),
-                                consumerInfo.getProducerMethod(),
-                                consumerInfo.getConsumerClass(),
-                                consumerInfo.getConsumerMethod(),
-                                consumerInfo.getAnnotation())));
+                new TaskExecutor<Loopline>(context, this, consumerInfo));
     }
 
     public void processProducer(TaskContext context, ProducerInfo<Loopline> producerInfo) {
-        Map<Method, MessageDao> methodQueueManagerMap = context.getMethodQueueManagerMap();
+        Map<Method, MessageDao> methodMessageDaoMap = context.getMethodMessageDaoMap();
         LooplineInfo looplineInfo = new LooplineInfo(
                 producerInfo.getProducerClass(),
                 producerInfo.getProducerMethod(),
                 null,
                 null,
                 producerInfo.getAnnotation());
+
+        // 返回值判断
         Method method = producerInfo.getProducerMethod();
-        if (methodQueueManagerMap.containsKey(method)) {
-            throw new RuntimeException("列表冲突：" + looplineInfo.ID() + "！");
-        }
         Class<?> returnType = method.getReturnType();
         if (returnType != Boolean.class && returnType != boolean.class) {
             throw new RuntimeException("环线" + looplineInfo.ID() + "对应的方法" + method.getName() + "返回值应为Boolean");
         }
-        context.getProducerMap().put(
-                producerInfo.getProducerClass(),
-                context.getQueueProvider().createMessageDao(looplineInfo));
+
+        // 注册messageDao
+        MessageDao messageDao = context.getQueueProvider().createMessageDao(looplineInfo);
+        producerInfo.setMessageDao(messageDao);
+
+        // 映射Producer的MessageDao
+        methodMessageDaoMap.put(producerInfo.getProducerMethod(), messageDao);
     }
 
     public void processMessage(Message message, ConsumerInfo consumerInfo) {

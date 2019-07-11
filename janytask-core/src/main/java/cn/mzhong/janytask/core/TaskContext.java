@@ -1,8 +1,7 @@
 package cn.mzhong.janytask.core;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
-import cn.mzhong.janytask.config.LooplineConfig;
-import cn.mzhong.janytask.config.PiplelineConfig;
+import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.executor.TaskExecutorService;
 import cn.mzhong.janytask.initializer.TaskComponentInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
@@ -24,11 +23,7 @@ public abstract class TaskContext {
     /**
      * 流水线配置项
      */
-    protected PiplelineConfig piplelineConfig;
-    /**
-     * 环线配置项
-     */
-    protected LooplineConfig looplineConfig;
+    protected QueueConfig queueConfig;
 
     /**
      * Redis、Zookeeper或者数据库都可以作为消息传播或者持久化介质，而queueProvider为这些介质的客服端
@@ -52,11 +47,10 @@ public abstract class TaskContext {
     protected ExecutorService consumerExecutorService = new TaskExecutorService("janytask-executor");
     protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
     protected Set<Class<?>> producerClassSet = new HashSet<Class<?>>();
-    protected Map<Method, MessageDao> methodQueueManagerMap = new HashMap<Method, MessageDao>();
+    protected Map<Method, MessageDao> methodMessageDaoMap = new HashMap<Method, MessageDao>();
 
-    protected TaskComponentInitializer queueInitializer;
-    protected TaskComponentInitializer consumerInitializer;
     protected TaskComponentInitializer producerInitializer;
+    protected TaskComponentInitializer consumerInitializer;
     /**
      * JSimpleMQ应用程序是否已经终结
      */
@@ -70,20 +64,12 @@ public abstract class TaskContext {
         this.applicationConfig = applicationConfig;
     }
 
-    public PiplelineConfig getPiplelineConfig() {
-        return piplelineConfig;
+    public QueueConfig getQueueConfig() {
+        return queueConfig;
     }
 
-    public void setPiplelineConfig(PiplelineConfig piplelineConfig) {
-        this.piplelineConfig = piplelineConfig;
-    }
-
-    public LooplineConfig getLooplineConfig() {
-        return looplineConfig;
-    }
-
-    public void setLooplineConfig(LooplineConfig looplineConfig) {
-        this.looplineConfig = looplineConfig;
+    public void setQueueConfig(QueueConfig queueConfig) {
+        this.queueConfig = queueConfig;
     }
 
     public QueueProvider getQueueProvider() {
@@ -150,28 +136,12 @@ public abstract class TaskContext {
         this.producerClassSet = producerClassSet;
     }
 
-    public Map<Method, MessageDao> getMethodQueueManagerMap() {
-        return methodQueueManagerMap;
+    public Map<Method, MessageDao> getMethodMessageDaoMap() {
+        return methodMessageDaoMap;
     }
 
-    public void setMethodQueueManagerMap(Map<Method, MessageDao> methodQueueManagerMap) {
-        this.methodQueueManagerMap = methodQueueManagerMap;
-    }
-
-    public TaskComponentInitializer getQueueInitializer() {
-        return queueInitializer;
-    }
-
-    public void setQueueInitializer(TaskComponentInitializer queueInitializer) {
-        this.queueInitializer = queueInitializer;
-    }
-
-    public TaskComponentInitializer getConsumerInitializer() {
-        return consumerInitializer;
-    }
-
-    public void setConsumerInitializer(TaskComponentInitializer consumerInitializer) {
-        this.consumerInitializer = consumerInitializer;
+    public void setMethodMessageDaoMap(Map<Method, MessageDao> methodMessageDaoMap) {
+        this.methodMessageDaoMap = methodMessageDaoMap;
     }
 
     public TaskComponentInitializer getProducerInitializer() {
@@ -180,6 +150,14 @@ public abstract class TaskContext {
 
     public void setProducerInitializer(TaskComponentInitializer producerInitializer) {
         this.producerInitializer = producerInitializer;
+    }
+
+    public TaskComponentInitializer getConsumerInitializer() {
+        return consumerInitializer;
+    }
+
+    public void setConsumerInitializer(TaskComponentInitializer consumerInitializer) {
+        this.consumerInitializer = consumerInitializer;
     }
 
 

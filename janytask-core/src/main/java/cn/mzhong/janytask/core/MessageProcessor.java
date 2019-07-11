@@ -3,7 +3,9 @@ package cn.mzhong.janytask.core;
 import cn.mzhong.janytask.consumer.ConsumerInfo;
 import cn.mzhong.janytask.queue.Message;
 
-public interface MessageProcessor<A> {
+import java.lang.annotation.Annotation;
+
+public interface MessageProcessor<A extends Annotation> {
 
     void processMessage(Message message, ConsumerInfo<A> consumerInfo);
 }

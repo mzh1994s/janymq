@@ -12,7 +12,7 @@ import java.lang.annotation.Annotation;
  *
  * @param <A>
  */
-public interface TaskAnnotationProcessor<A extends Annotation, Info extends QueueInfo> {
+public interface TaskAnnotationProcessor<A extends Annotation, Info extends QueueInfo> extends MessageProcessor<A> {
 
     Class<A> getAnnotationClass();
 

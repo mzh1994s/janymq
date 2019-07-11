@@ -4,7 +4,7 @@ import cn.mzhong.janytask.tool.IDGenerator;
 
 import java.lang.reflect.Method;
 
-public abstract class QueueInfo {
+public class QueueInfo {
     protected String ID;
     protected Class<?> producerClass;
     protected Method producerMethod;

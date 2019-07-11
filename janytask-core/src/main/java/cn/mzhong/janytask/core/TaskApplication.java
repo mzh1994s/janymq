@@ -1,16 +1,14 @@
 package cn.mzhong.janytask.core;
 
+import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.consumer.Consumer;
 import cn.mzhong.janytask.producer.Producer;
 import cn.mzhong.janytask.config.ApplicationConfig;
-import cn.mzhong.janytask.config.LooplineConfig;
-import cn.mzhong.janytask.config.PiplelineConfig;
 import cn.mzhong.janytask.producer.TaskNotFoundException;
 import cn.mzhong.janytask.consumer.TaskConsumerInitializer;
-import cn.mzhong.janytask.producer.TaskProducerInitializer;
 import cn.mzhong.janytask.queue.LoopLineProcessor;
 import cn.mzhong.janytask.queue.PipleLineProcessor;
-import cn.mzhong.janytask.queue.TaskQueueInitializer;
+import cn.mzhong.janytask.producer.TaskProducerInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
@@ -34,8 +32,7 @@ public class TaskApplication extends TaskContext {
 
     protected void wellcome() {
         Log.debug(this.applicationConfig.toString());
-        Log.debug(this.piplelineConfig.toString());
-        Log.debug(this.looplineConfig.toString());
+        Log.debug(this.queueConfig.toString());
         Log.debug("janytask application started!");
     }
 
@@ -43,11 +40,8 @@ public class TaskApplication extends TaskContext {
         if (applicationConfig == null) {
             applicationConfig = new ApplicationConfig();
         }
-        if (looplineConfig == null) {
-            looplineConfig = new LooplineConfig();
-        }
-        if (piplelineConfig == null) {
-            piplelineConfig = new PiplelineConfig();
+        if (queueConfig == null) {
+            queueConfig = new QueueConfig();
         }
         if (queueProvider == null) {
             throw new TaskInitExcepition("queueProvider不存在，请先指定queueProvider");
@@ -55,14 +49,11 @@ public class TaskApplication extends TaskContext {
         if (dataSerializer == null) {
             dataSerializer = new JdkDataSerializer();
         }
-        if (queueInitializer == null) {
-            queueInitializer = new TaskQueueInitializer();
+        if (producerInitializer == null) {
+            producerInitializer = new TaskProducerInitializer();
         }
         if (consumerInitializer == null) {
             consumerInitializer = new TaskConsumerInitializer();
-        }
-        if (producerInitializer == null) {
-            producerInitializer = new TaskProducerInitializer();
         }
         // 注解组件处理器
         this.addAnnotationProcessors(new PipleLineProcessor());
@@ -73,7 +64,8 @@ public class TaskApplication extends TaskContext {
         this.setConsumerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
         // 扫描所有的生产者
         this.setProducerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
-        this.queueInitializer.init(this);
+        // 调用初始化程序
+        this.queueProvider.init(this);
         this.producerInitializer.init(this);
         this.consumerInitializer.init(this);
         // 正常终结

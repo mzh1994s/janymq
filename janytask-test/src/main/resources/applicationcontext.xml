@@ -32,8 +32,7 @@
         <!--<janytask:queue-zookeeper connectString="mzhong.cn:2181"/>-->
         <!--<janytask:queue-jdbc dataSource-ref="oracleDataSource"/>-->
         <janytask:provider-any ref="jdbc-provider"/>
-        <janytask:conf-pipleline idleInterval="5000"/>
-        <janytask:conf-loopline idleInterval="5000"/>
+        <janytask:conf-queue idleInterval="5000"/>
     </janytask:application>
 
     <bean class="cn.mzhong.janytask.consumer.TestBean"/>

@@ -18,7 +18,7 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
     protected BeanDefinitionRegistry beanDefinitionRegistry;
     protected ConfigurableListableBeanFactory beanFactory;
 
-    protected static void addBeanPostProcessor(ConfigurableListableBeanFactory factory, BeanFactoryAware beanPostProcessor) {
+    protected void addBeanPostProcessor(ConfigurableListableBeanFactory factory, BeanFactoryAware beanPostProcessor) {
         beanPostProcessor.setBeanFactory(factory);
         factory.addBeanPostProcessor((BeanPostProcessor) beanPostProcessor);
     }

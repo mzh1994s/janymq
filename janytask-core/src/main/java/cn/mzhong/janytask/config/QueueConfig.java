@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.config;
 
-public abstract class LineConfig {
+public class QueueConfig {
     /**
      * 当消费者空闲时，间隔多少时间检测一次消息
      */
@@ -28,7 +28,7 @@ public abstract class LineConfig {
 
     @Override
     public String toString() {
-        return "LineConfig{" +
+        return "QueueConfig{" +
                 "idleInterval=" + idleInterval +
                 ", sleepInterval=" + sleepInterval +
                 '}';
