@@ -8,8 +8,10 @@ import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class ZookeeperLineManager extends LockedQueueManager {
-    final static Logger Log = LoggerFactory.getLogger(ZookeeperLineManager.class);
+import java.util.LinkedList;
+
+public class ZookeeperMessageDao extends LockedQueueManager {
+    final static Logger Log = LoggerFactory.getLogger(ZookeeperMessageDao.class);
     protected String connectString;
     protected ZookeeperClient zkClient;
     protected String waitPath;
@@ -25,7 +27,7 @@ public abstract class ZookeeperLineManager extends LockedQueueManager {
 
     public void initParentPath() {
         ZookeeperPathGenerator pathGenerator = new ZookeeperPathGenerator(this.root);
-        pathGenerator.append(lineInfo.getValue()).append(lineInfo.getVersion());
+        pathGenerator.append(queueInfo.getValue()).append(queueInfo.getVersion());
         String parentPath = pathGenerator.generate();
         this.waitPath = parentPath + "/wait";
         this.donePath = parentPath + "/done";
@@ -42,7 +44,7 @@ public abstract class ZookeeperLineManager extends LockedQueueManager {
         this.root = root.startsWith("/") ? root : "/" + root;
     }
 
-    ZookeeperLineManager(TaskContext context, QueueInfo lineInfo, String connectString, String root) {
+    ZookeeperMessageDao(TaskContext context, QueueInfo lineInfo, String connectString, String root) {
         super(context, lineInfo);
         this.initZookeeperClient(connectString);
         this.initRootPath(root);
@@ -92,7 +94,6 @@ public abstract class ZookeeperLineManager extends LockedQueueManager {
         return true;
     }
 
-    @Override
     protected Message get(String id) {
         byte[] data = zkClient.getData(waitPath + "/" + id);
         try {
@@ -101,5 +102,9 @@ public abstract class ZookeeperLineManager extends LockedQueueManager {
             Log.error("消息反序列化出错，消息已被忽略！消息ID:" + id, e);
         }
         return null;
+    }
+
+    protected LinkedList<String> idList() {
+        return new LinkedList<String>(zkClient.getChildren(waitPath));
     }
 }

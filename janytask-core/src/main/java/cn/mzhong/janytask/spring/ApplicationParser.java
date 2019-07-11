@@ -8,7 +8,7 @@ import cn.mzhong.janytask.redis.GenericRedisConnectionFactory;
 import cn.mzhong.janytask.redis.RedisProvider;
 import cn.mzhong.janytask.redis.SpringRedisConnectionFactory;
 import cn.mzhong.janytask.util.StringUtils;
-import cn.mzhong.janytask.zookeeper.ZookeeperLineManagerProvider;
+import cn.mzhong.janytask.zookeeper.ZookeeperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -276,8 +276,8 @@ class ZookeeperProviderParser extends ConfigParser {
 
     @Override
     public void doParser() {
-        // bean ZookeeperLineManagerProvider
-        ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, ZookeeperLineManagerProvider.class);
+        // bean ZookeeperProvider
+        ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, ZookeeperProvider.class);
         elementBeanDefinitionParser.parseStringPropertyFromAttr("connectString");
         elementBeanDefinitionParser.parseStringPropertyFromAttr("rootPath");
         this.beanDefinitionBuilder.addPropertyValue("queueProvider", elementBeanDefinitionParser.getBeanDefinition());

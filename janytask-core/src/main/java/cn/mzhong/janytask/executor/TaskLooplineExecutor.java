@@ -17,7 +17,7 @@ public class TaskLooplineExecutor extends TaskExecutor {
 
     public TaskLooplineExecutor(TaskContext context, Object consumer, Method method, LooplineInfo looplineInfo) {
         super(context,
-                context.getMethodQueueManagerMap().get(looplineInfo.getMethod()),
+                context.getMethodQueueManagerMap().get(looplineInfo.getProducerMethod()),
                 method,
                 consumer,
                 ValueUtils.uLong(looplineInfo.getIdleInterval(), context.getLooplineConfig().getIdleInterval()),
@@ -31,14 +31,14 @@ public class TaskLooplineExecutor extends TaskExecutor {
         try {
             Boolean result = (Boolean) method.invoke(consumer, message.getContent());
             if (result != null && result) {
-                lineManager.done(message);
+                queueManager.done(message);
             } else {
-                lineManager.back(message);
+                queueManager.back(message);
             }
         } catch (Exception e) {
             Log.error(e.getLocalizedMessage(), e);
             message.setThrowable(e);
-            lineManager.error(message);
+            queueManager.error(message);
         }
     }
 }

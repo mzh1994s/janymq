@@ -4,9 +4,15 @@ import java.lang.reflect.Method;
 
 public class LooplineInfo extends QueueInfo {
 
-    public LooplineInfo(Class<?> _interface, Method method, Loopline annotation) {
-        super(_interface,
-                method,
+    public LooplineInfo(Class<?> producerClass,
+                        Method producerMethod,
+                        Class<?> consumerClass,
+                        Method consumerMethod,
+                        Loopline annotation) {
+        super(producerClass,
+                producerMethod,
+                consumerClass,
+                consumerMethod,
                 annotation.value(),
                 annotation.version(),
                 annotation.idleInterval(),

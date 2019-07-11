@@ -3,9 +3,10 @@ package cn.mzhong.janytask.core;
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.LooplineConfig;
 import cn.mzhong.janytask.config.PiplelineConfig;
+import cn.mzhong.janytask.executor.TaskExecutorService;
 import cn.mzhong.janytask.initializer.TaskComponentInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
-import cn.mzhong.janytask.queue.QueueManager;
+import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueProvider;
 
 import java.lang.reflect.Method;
@@ -40,14 +41,18 @@ public abstract class TaskContext {
      */
     protected JdkDataSerializer dataSerializer;
     /**
+     * 注解处理器
+     */
+    protected Set<TaskAnnotationProcessor> annotationProcessors = new HashSet<TaskAnnotationProcessor>();
+    /**
      * 消费者map
      */
     protected Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
     protected Set<Class<?>> consumerClassSet = new HashSet<Class<?>>();
-    protected ExecutorService consumerExecutorService;
+    protected ExecutorService consumerExecutorService = new TaskExecutorService("janytask-executor");
     protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
     protected Set<Class<?>> producerClassSet = new HashSet<Class<?>>();
-    protected Map<Method, QueueManager> methodQueueManagerMap = new HashMap<Method, QueueManager>();
+    protected Map<Method, MessageDao> methodQueueManagerMap = new HashMap<Method, MessageDao>();
 
     protected TaskComponentInitializer queueInitializer;
     protected TaskComponentInitializer consumerInitializer;
@@ -97,6 +102,14 @@ public abstract class TaskContext {
         this.dataSerializer = dataSerializer;
     }
 
+    public Set<TaskAnnotationProcessor> getAnnotationProcessors() {
+        return annotationProcessors;
+    }
+
+    public void addAnnotationProcessors(TaskAnnotationProcessor annotationProcessors) {
+        this.annotationProcessors.add(annotationProcessors);
+    }
+
     public Map<Class<?>, Object> getConsumerMap() {
         return consumerMap;
     }
@@ -137,11 +150,11 @@ public abstract class TaskContext {
         this.producerClassSet = producerClassSet;
     }
 
-    public Map<Method, QueueManager> getMethodQueueManagerMap() {
+    public Map<Method, MessageDao> getMethodQueueManagerMap() {
         return methodQueueManagerMap;
     }
 
-    public void setMethodQueueManagerMap(Map<Method, QueueManager> methodQueueManagerMap) {
+    public void setMethodQueueManagerMap(Map<Method, MessageDao> methodQueueManagerMap) {
         this.methodQueueManagerMap = methodQueueManagerMap;
     }
 

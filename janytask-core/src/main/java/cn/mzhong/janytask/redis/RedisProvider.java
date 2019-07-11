@@ -1,10 +1,7 @@
 package cn.mzhong.janytask.redis;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.QueueManager;
-import cn.mzhong.janytask.queue.QueueProvider;
-import cn.mzhong.janytask.queue.LooplineInfo;
-import cn.mzhong.janytask.queue.PiplelineInfo;
+import cn.mzhong.janytask.queue.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
@@ -46,14 +43,8 @@ public class RedisProvider implements QueueProvider {
         }
     }
 
-    public QueueManager getPiplelineManager(PiplelineInfo pipleline) {
-        RedisPiplelineManager redisPiplelineManager = new RedisPiplelineManager(context, this, pipleline);
-        return redisPiplelineManager;
-    }
-
-    public QueueManager getlooplinemanager(LooplineInfo loopLine) {
-        RedisLooplineManager looplineManager = new RedisLooplineManager(context, this, loopLine);
-        return looplineManager;
+    public MessageDao createMessageDao(QueueInfo queueInfo) {
+        return new RedisMessageDao(context, this.connectionFactory, queueInfo, rootPath);
     }
 
     @Override

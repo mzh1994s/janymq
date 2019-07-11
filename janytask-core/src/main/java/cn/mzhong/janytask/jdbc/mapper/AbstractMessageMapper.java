@@ -86,7 +86,7 @@ public abstract class AbstractMessageMapper implements MessageMapper {
 
     public void error(BytesMessage message) {
         this.sqlExecutor.update(
-                "UPDATE FROM " + table + " SET " +
+                "UPDATE " + table + " SET " +
                         "STATUS=?, " +
                         "ERROR_TIME=?, " +
                         "THROWABLE=? " +

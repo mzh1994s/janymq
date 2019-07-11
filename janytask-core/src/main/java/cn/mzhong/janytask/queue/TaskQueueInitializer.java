@@ -1,35 +1,27 @@
 package cn.mzhong.janytask.queue;
 
+import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.initializer.TaskComponentInitializer;
+import cn.mzhong.janytask.producer.ProducerInfo;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TaskQueueInitializer implements TaskComponentInitializer {
 
-    private List<QueueAnnotationProcessor<? extends Annotation>> annotationProcessors;
-
-    public TaskQueueInitializer() {
-        this.annotationProcessors = new ArrayList<QueueAnnotationProcessor<? extends Annotation>>();
-        this.addAnnotationProcessor(new PipleLineProcessor());
-        this.addAnnotationProcessor(new LoopLineProcessor());
-    }
-
-    private void annotationProcessorInvoke(TaskContext context, Class<?> producerClass, Method method) {
-        for (QueueAnnotationProcessor annotationProcessor : annotationProcessors) {
+    private void processProducer(TaskContext context, Class<?> producerClass, Method method) {
+        for (TaskAnnotationProcessor annotationProcessor : context.getAnnotationProcessors()) {
             Annotation annotation = method.getAnnotation(annotationProcessor.getAnnotationClass());
             if (annotation != null) {
                 //noinspection SingleStatementInBlock,unchecked
-                annotationProcessor.invoke(context, producerClass, method, annotation);
+                annotationProcessor.processProducer(context, new ProducerInfo<Annotation>(
+                        annotation,
+                        producerClass,
+                        method
+                ));
             }
         }
-    }
-
-    public void addAnnotationProcessor(QueueAnnotationProcessor<? extends Annotation> annotationProcessor) {
-        this.annotationProcessors.add(annotationProcessor);
     }
 
     public void init(TaskContext context) {
@@ -37,7 +29,7 @@ public class TaskQueueInitializer implements TaskComponentInitializer {
         provider.init(context);
         for (Class<?> producerClass : context.getProducerClassSet()) {
             for (Method method : producerClass.getMethods()) {
-                annotationProcessorInvoke(context, producerClass, method);
+                this.processProducer(context, producerClass, method);
             }
         }
     }

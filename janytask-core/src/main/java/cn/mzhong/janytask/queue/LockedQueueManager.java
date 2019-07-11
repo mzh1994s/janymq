@@ -8,8 +8,8 @@ public abstract class LockedQueueManager extends AbstractQueueManager {
 
     private LinkedList<String> cacheKeys = new LinkedList<String>();
 
-    public LockedQueueManager(TaskContext context, QueueInfo lineInfo) {
-        super(context, lineInfo);
+    public LockedQueueManager(TaskContext context, QueueInfo queueInfo) {
+        super(context, queueInfo);
     }
 
     public final Message poll() {

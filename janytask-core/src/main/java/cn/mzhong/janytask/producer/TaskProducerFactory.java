@@ -1,15 +1,14 @@
 package cn.mzhong.janytask.producer;
 
-import cn.mzhong.janytask.queue.Loopline;
-import cn.mzhong.janytask.queue.Pipleline;
 import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.queue.Loopline;
 import cn.mzhong.janytask.queue.Message;
-import cn.mzhong.janytask.queue.QueueManager;
+import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.Pipleline;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Map;
 
 /**
  * 使用工厂方式创建消费者代理。
@@ -19,21 +18,19 @@ import java.util.Map;
  */
 public class TaskProducerFactory {
 
-    public static Object newInstance(TaskContext context, Class<?> _class) {
+    public static Object newInstance(Class<?> _class, MessageDao messageDao) {
         return Proxy.newProxyInstance(
                 _class.getClassLoader(),
                 new Class[]{_class},
-                new ProducerInvocationHandler(context));
+                new ProducerInvocationHandler(messageDao));
     }
 }
 
 class ProducerInvocationHandler implements InvocationHandler {
-    TaskContext context;
-    Map<Method, QueueManager> lineManagerMap;
+    MessageDao messageDao;
 
-    ProducerInvocationHandler(TaskContext context) {
-        this.context = context;
-        lineManagerMap = context.getMethodQueueManagerMap();
+    ProducerInvocationHandler(MessageDao messageDao) {
+        this.messageDao = messageDao;
     }
 
     /**
@@ -52,13 +49,9 @@ class ProducerInvocationHandler implements InvocationHandler {
         if (!isLineMethod(method)) {
             return method.invoke(proxy, args);
         }
-        QueueManager storeManager = lineManagerMap.get(method);
-        if (storeManager == null) {
-            throw new TaskNotFoundException("此方法不能作为提供者使用：" + method.getName());
-        }
         Message message = new Message();
         message.setContent(args);
-        storeManager.push(message);
+        messageDao.push(message);
         return false;
     }
 }

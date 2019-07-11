@@ -14,7 +14,7 @@ public class TaskPiplelineExecutor extends TaskExecutor {
 
     public TaskPiplelineExecutor(TaskContext context, Object consumer, Method method, PiplelineInfo piplelineInfo) {
         super(context,
-                context.getMethodQueueManagerMap().get(piplelineInfo.getMethod()),
+                context.getMethodQueueManagerMap().get(piplelineInfo.getProducerMethod()),
                 method,
                 consumer,
                 ValueUtils.uLong(piplelineInfo.getIdleInterval(), context.getPiplelineConfig().getIdleInterval()),
@@ -25,11 +25,11 @@ public class TaskPiplelineExecutor extends TaskExecutor {
     public void invoke(Message message) {
         try {
             method.invoke(consumer, message.getContent());
-            lineManager.done(message);
+            queueManager.done(message);
         } catch (Exception e) {
             Log.error(e.getLocalizedMessage(), e);
             message.setThrowable(e);
-            lineManager.error(message);
+            queueManager.error(message);
         }
     }
 }

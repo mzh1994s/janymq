@@ -6,8 +6,10 @@ import java.lang.reflect.Method;
 
 public abstract class QueueInfo {
     protected String ID;
-    protected Class<?> _interface;
-    protected Method method;
+    protected Class<?> producerClass;
+    protected Method producerMethod;
+    protected Class<?> consumerClass;
+    protected Method consumerMethod;
     /**
      * 列表名称
      */
@@ -32,10 +34,20 @@ public abstract class QueueInfo {
      */
     protected long sleepInterval;
 
-    public QueueInfo(Class<?> _interface, Method method, String value, String version, long idleInterval, long sleepInterval) {
-        this._interface = _interface;
-        this.method = method;
-        this.value = value(_interface, method, value);
+    public QueueInfo(
+            Class<?> producerClass,
+            Method producerMethod,
+            Class<?> consumerClass,
+            Method consumerMethod,
+            String value,
+            String version,
+            long idleInterval,
+            long sleepInterval) {
+        this.producerClass = producerClass;
+        this.producerMethod = producerMethod;
+        this.consumerClass = consumerClass;
+        this.consumerMethod = consumerMethod;
+        this.value = value(producerClass, producerMethod, value);
         this.version = version;
         this.idleInterval = idleInterval;
         this.sleepInterval = sleepInterval;
@@ -46,48 +58,32 @@ public abstract class QueueInfo {
         return value;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
     public String getVersion() {
         return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 
     public long getIdleInterval() {
         return idleInterval;
     }
 
-    public void setIdleInterval(long idleInterval) {
-        this.idleInterval = idleInterval;
-    }
-
     public long getSleepInterval() {
         return sleepInterval;
     }
 
-    public void setSleepInterval(long sleepInterval) {
-        this.sleepInterval = sleepInterval;
+    public Class<?> getProducerClass() {
+        return producerClass;
     }
 
-    public Class<?> getInterface() {
-        return _interface;
+    public Method getProducerMethod() {
+        return producerMethod;
     }
 
-    public void setInterface(Class<?> _interface) {
-        this._interface = _interface;
+    public Class<?> getConsumerClass() {
+        return consumerClass;
     }
 
-    public Method getMethod() {
-        return method;
-    }
-
-    public void setMethod(Method method) {
-        this.method = method;
+    public Method getConsumerMethod() {
+        return consumerMethod;
     }
 
     public void value() {

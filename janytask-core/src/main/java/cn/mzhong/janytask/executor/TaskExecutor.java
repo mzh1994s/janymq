@@ -1,7 +1,8 @@
 package cn.mzhong.janytask.executor;
 
+import cn.mzhong.janytask.consumer.ConsumerInfo;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.QueueManager;
+import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.util.ThreadUtils;
 import org.slf4j.Logger;
@@ -9,11 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
-public abstract class TaskExecutor implements Runnable {
+public class TaskExecutor implements Runnable {
     final static Logger Log = LoggerFactory.getLogger(TaskExecutor.class);
 
+
+    protected ConsumerInfo consumerInfo;
     protected TaskContext context;
-    protected QueueManager lineManager;
+    protected MessageDao queueManager;
     protected String ID;
     protected Method method;
     protected Object consumer;
@@ -22,13 +25,13 @@ public abstract class TaskExecutor implements Runnable {
     protected long cnt = 0;
 
     public TaskExecutor(TaskContext context,
-                        QueueManager lineManager,
+                        MessageDao lineManager,
                         Method method,
                         Object consumer,
                         long idleInterval,
                         long sleepInterval) {
         this.context = context;
-        this.lineManager = lineManager;
+        this.queueManager = lineManager;
         this.ID = lineManager.ID();
         this.method = method;
         this.consumer = consumer;
@@ -36,11 +39,13 @@ public abstract class TaskExecutor implements Runnable {
         this.sleepInterval = sleepInterval;
     }
 
-    abstract void invoke(Message message);
+    void invoke(Message message){
+
+    }
 
     protected void invoke() {
         // 获取当前列表长度，以当前列表长度作为空闲周期
-        long length = lineManager.length();
+        long length = queueManager.length();
         long startTimeMillis = 0;
         if (Log.isDebugEnabled()) {
             Log.debug("'{}'：第{}轮消息处理开始, 本次目标长度:{}", ID, cnt, length);
@@ -51,7 +56,7 @@ public abstract class TaskExecutor implements Runnable {
             if (context.isShutdown()) {
                 break;
             }
-            Message message = lineManager.poll();
+            Message message = queueManager.poll();
             if (message != null) {
                 invoke(message);
             } else {

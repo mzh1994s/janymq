@@ -8,6 +8,8 @@ import cn.mzhong.janytask.config.PiplelineConfig;
 import cn.mzhong.janytask.producer.TaskNotFoundException;
 import cn.mzhong.janytask.consumer.TaskConsumerInitializer;
 import cn.mzhong.janytask.producer.TaskProducerInitializer;
+import cn.mzhong.janytask.queue.LoopLineProcessor;
+import cn.mzhong.janytask.queue.PipleLineProcessor;
 import cn.mzhong.janytask.queue.TaskQueueInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.util.ClassUtils;
@@ -62,19 +64,24 @@ public class TaskApplication extends TaskContext {
         if (producerInitializer == null) {
             producerInitializer = new TaskProducerInitializer();
         }
-        setDataSerializer(dataSerializer);
+        // 注解组件处理器
+        this.addAnnotationProcessors(new PipleLineProcessor());
+        this.addAnnotationProcessors(new LoopLineProcessor());
+        // 序列化
+        this.setDataSerializer(dataSerializer);
         // 扫描所有的消费者
-        setConsumerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
+        this.setConsumerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
         // 扫描所有的生产者
-        setProducerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
-        queueInitializer.init(this);
-        producerInitializer.init(this);
-        consumerInitializer.init(this);
+        this.setProducerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
+        this.queueInitializer.init(this);
+        this.producerInitializer.init(this);
+        this.consumerInitializer.init(this);
         // 正常终结
         Runtime.getRuntime().addShutdownHook(new TaskShutdownHook(this));
         this.wellcome();
     }
 
+    @SuppressWarnings("SingleStatementInBlock")
     public <T> T getProducer(Class<T> producerClass) {
         Object producer = producerMap.get(producerClass);
         if (producer == null) {

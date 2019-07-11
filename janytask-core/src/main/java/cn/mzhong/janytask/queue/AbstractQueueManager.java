@@ -2,10 +2,10 @@ package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.core.TaskContext;
 
-public abstract class AbstractQueueManager implements QueueManager {
+public abstract class AbstractQueueManager implements MessageDao {
     protected String ID;
     protected TaskContext context;
-    protected QueueInfo lineInfo;
+    protected QueueInfo queueInfo;
 
     protected JdkDataSerializer dataSerializer;
 
@@ -13,10 +13,10 @@ public abstract class AbstractQueueManager implements QueueManager {
         return this.ID;
     }
 
-    public AbstractQueueManager(TaskContext context, QueueInfo lineInfo) {
+    public AbstractQueueManager(TaskContext context, QueueInfo queueInfo) {
         this.context = context;
         this.dataSerializer = context.getDataSerializer();
-        this.lineInfo = lineInfo;
-        this.ID = lineInfo.ID();
+        this.queueInfo = queueInfo;
+        this.ID = queueInfo.ID();
     }
 }
