@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.consumer.ConsumerInfo;
+import cn.mzhong.janytask.consumer.QueueMethodInfo;
 import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
@@ -19,7 +19,7 @@ public class PipleLineProcessor implements TaskAnnotationProcessor<Pipleline, Pi
         return Pipleline.class;
     }
 
-    public void processConsumer(TaskContext context, ConsumerInfo<Pipleline> consumerInfo) {
+    public void processConsumer(TaskContext context, QueueMethodInfo<Pipleline> consumerInfo) {
         PiplelineInfo piplelineInfo = new PiplelineInfo(
                 consumerInfo.getProducerClass(),
                 consumerInfo.getProducerMethod(),
@@ -55,7 +55,7 @@ public class PipleLineProcessor implements TaskAnnotationProcessor<Pipleline, Pi
         methodMessageDaoMap.put(producerInfo.getProducerMethod(), messageDao);
     }
 
-    public void processMessage(Message message, ConsumerInfo consumerInfo) {
+    public void processMessage(Message message, QueueMethodInfo consumerInfo) {
         Object consumer = consumerInfo.getConsumer();
         Method method = consumerInfo.getConsumerMethod();
         MessageDao messageDao = consumerInfo.getMessageDao();

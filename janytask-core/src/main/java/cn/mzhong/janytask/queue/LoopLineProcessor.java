@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.consumer.ConsumerInfo;
+import cn.mzhong.janytask.consumer.QueueMethodInfo;
 import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
@@ -19,7 +19,7 @@ public class LoopLineProcessor implements TaskAnnotationProcessor<Loopline, Loop
         return Loopline.class;
     }
 
-    public void processConsumer(TaskContext context, ConsumerInfo<Loopline> consumerInfo) {
+    public void processConsumer(TaskContext context, QueueMethodInfo<Loopline> consumerInfo) {
         LooplineInfo looplineInfo = new LooplineInfo(
                 consumerInfo.getProducerClass(),
                 consumerInfo.getProducerMethod(),
@@ -57,7 +57,7 @@ public class LoopLineProcessor implements TaskAnnotationProcessor<Loopline, Loop
         methodMessageDaoMap.put(producerInfo.getProducerMethod(), messageDao);
     }
 
-    public void processMessage(Message message, ConsumerInfo consumerInfo) {
+    public void processMessage(Message message, QueueMethodInfo consumerInfo) {
         Object consumer = consumerInfo.getConsumer();
         Method method = consumerInfo.getConsumerMethod();
         MessageDao messageDao = consumerInfo.getMessageDao();

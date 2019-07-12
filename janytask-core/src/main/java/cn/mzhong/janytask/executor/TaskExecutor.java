@@ -1,10 +1,10 @@
 package cn.mzhong.janytask.executor;
 
-import cn.mzhong.janytask.consumer.ConsumerInfo;
-import cn.mzhong.janytask.core.MessageProcessor;
+import cn.mzhong.janytask.consumer.QueueMethodInfo;
+import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.Message;
+import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.util.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +17,8 @@ public class TaskExecutor<A extends Annotation> implements Runnable {
     final static Logger Log = LoggerFactory.getLogger(TaskExecutor.class);
 
     protected String ID;
-    protected MessageProcessor<A> processor;
-    protected ConsumerInfo<A> consumerInfo;
+    protected TaskAnnotationProcessor<A, ?> processor;
+    protected QueueMethodInfo<A> consumerInfo;
     protected TaskContext context;
     protected MessageDao messageDao;
     protected Method method;
@@ -27,7 +27,7 @@ public class TaskExecutor<A extends Annotation> implements Runnable {
     protected long sleepInterval;
     protected long cnt = 0;
 
-    public TaskExecutor(TaskContext context,MessageProcessor<A> processor, ConsumerInfo<A> consumerInfo) {
+    public TaskExecutor(TaskContext context,TaskAnnotationProcessor<A, ?> processor, QueueMethodInfo<A> consumerInfo) {
         this.context = context;
         this.processor = processor;
         this.consumerInfo = consumerInfo;

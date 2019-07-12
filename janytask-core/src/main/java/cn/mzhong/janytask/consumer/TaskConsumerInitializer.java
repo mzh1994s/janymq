@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,16 +24,16 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
      * @param method
      * @return
      */
-    private static <A extends Annotation> ConsumerInfo<A> findConsumerInfo(Object consumer, Class<?> consumerClass, Method method, Class<A> annotationType) {
+    private static <A extends Annotation> QueueMethodInfo<A> findConsumerInfo(Object consumer, Class<?> consumerClass, Method method, Class<A> annotationType) {
         Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
-        ConsumerInfo<A> consumerInfo = null;
+        QueueMethodInfo<A> consumerInfo = null;
         for (Class<?> _interface : interfaces) {
             try {
                 Method pMethod = _interface.getMethod(method.getName(), method.getParameterTypes());
                 if (pMethod != null) {
                     A annotation = pMethod.getAnnotation(annotationType);
                     if (annotation != null) {
-                        consumerInfo = new ConsumerInfo<A>(
+                        consumerInfo = new QueueMethodInfo<A>(
                                 annotation,
                                 _interface,
                                 pMethod,
@@ -60,7 +58,7 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
             Class<?> consumerClass) {
         for (Method method : consumerClass.getMethods()) {
             for (TaskAnnotationProcessor annotationProcessor : context.getAnnotationProcessors()) {
-                ConsumerInfo<A> methodInfo = findConsumerInfo(
+                QueueMethodInfo<A> methodInfo = findConsumerInfo(
                         consumer,
                         consumerClass,
                         method,
