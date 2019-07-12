@@ -2,7 +2,10 @@ package cn.mzhong.janytask.consumer;
 
 import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.executor.TaskExecutor;
 import cn.mzhong.janytask.initializer.TaskComponentInitializer;
+import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.QueueInfo;
 import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,16 +27,16 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
      * @param method
      * @return
      */
-    private static <A extends Annotation> QueueMethodInfo<A> findConsumerInfo(Object consumer, Class<?> consumerClass, Method method, Class<A> annotationType) {
+    private static <A extends Annotation> QueueInfo<A> findQueueInfo(Object consumer, Class<?> consumerClass, Method method, Class<A> annotationType) {
         Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
-        QueueMethodInfo<A> consumerInfo = null;
+        QueueInfo<A> queueInfo = null;
         for (Class<?> _interface : interfaces) {
             try {
                 Method pMethod = _interface.getMethod(method.getName(), method.getParameterTypes());
                 if (pMethod != null) {
                     A annotation = pMethod.getAnnotation(annotationType);
                     if (annotation != null) {
-                        consumerInfo = new QueueMethodInfo<A>(
+                        queueInfo = new QueueInfo<A>(
                                 annotation,
                                 _interface,
                                 pMethod,
@@ -47,7 +50,7 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
                 // pass
             }
         }
-        return consumerInfo;
+        return queueInfo;
     }
 
 
@@ -58,13 +61,17 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
             Class<?> consumerClass) {
         for (Method method : consumerClass.getMethods()) {
             for (TaskAnnotationProcessor annotationProcessor : context.getAnnotationProcessors()) {
-                QueueMethodInfo<A> methodInfo = findConsumerInfo(
+                QueueInfo<A> queueInfo = findQueueInfo(
                         consumer,
                         consumerClass,
                         method,
                         annotationProcessor.getAnnotationClass());
-                if (methodInfo != null) {
-                    annotationProcessor.processConsumer(context, methodInfo);
+                if (queueInfo != null) {
+                    // 注册messageDao
+                    MessageDao messageDao = context.getQueueProvider().createMessageDao(queueInfo);
+                    queueInfo.setMessageDao(messageDao);
+                    TaskExecutor<A> taskExecutor = annotationProcessor.processConsumer(context, queueInfo);
+                    context.getConsumerExecutorService().execute(taskExecutor);
                 }
             }
         }

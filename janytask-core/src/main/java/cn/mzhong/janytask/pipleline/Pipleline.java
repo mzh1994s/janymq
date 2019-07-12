@@ -1,11 +1,11 @@
-package cn.mzhong.janytask.queue;
+package cn.mzhong.janytask.pipleline;
 
 import java.lang.annotation.*;
 
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Loopline {
+public @interface Pipleline {
     /**
      * 列表名称，默认为接口全名 + 方法名
      */
@@ -29,4 +29,6 @@ public @interface Loopline {
      * @return
      */
     long sleepInterval() default 0;
+
+    String startTime() default "01-01 00:00:00";
 }

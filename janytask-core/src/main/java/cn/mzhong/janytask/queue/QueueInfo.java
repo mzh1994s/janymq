@@ -1,73 +1,48 @@
 package cn.mzhong.janytask.queue;
 
+
 import cn.mzhong.janytask.tool.IDGenerator;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-public class QueueInfo {
+public class QueueInfo<A extends Annotation> {
     protected String ID;
+    protected A annotation;
+    protected MessageDao messageDao;
     protected Class<?> producerClass;
     protected Method producerMethod;
+    protected Object consumer;
     protected Class<?> consumerClass;
     protected Method consumerMethod;
-    /**
-     * 列表名称
-     */
-    protected String value;
 
-    /**
-     * 列表版本号，参数级修改更新时使用，默认版本号为default
-     */
-    protected String version;
-
-    /**
-     * 空闲时每次检测延时时间
-     *
-     * @return
-     */
-    protected long idleInterval;
-
-    /**
-     * 每次任务完成后延时时间
-     *
-     * @return
-     */
-    protected long sleepInterval;
-
-    public QueueInfo(
-            Class<?> producerClass,
-            Method producerMethod,
-            Class<?> consumerClass,
-            Method consumerMethod,
-            String value,
-            String version,
-            long idleInterval,
-            long sleepInterval) {
+    public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, Object consumer, Class<?> consumerClass, Method consumerMethod) {
+        this.annotation = annotation;
         this.producerClass = producerClass;
         this.producerMethod = producerMethod;
+        this.consumer = consumer;
         this.consumerClass = consumerClass;
         this.consumerMethod = consumerMethod;
-        this.value = value(producerClass, producerMethod, value);
-        this.version = version;
-        this.idleInterval = idleInterval;
-        this.sleepInterval = sleepInterval;
-        this.ID = ID(this.value, version);
+        try {
+            Class<? extends Annotation> annotationType = annotation.annotationType();
+            String value = (String) annotationType.getMethod("value").invoke(annotation);
+            String version = (String) annotationType.getMethod("version").invoke(annotation);
+            this.ID = ID(value(producerClass, producerMethod, value), version);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public String getValue() {
-        return value;
+    public A getAnnotation() {
+        return annotation;
     }
 
-    public String getVersion() {
-        return version;
+    public MessageDao getMessageDao() {
+        return messageDao;
     }
 
-    public long getIdleInterval() {
-        return idleInterval;
-    }
-
-    public long getSleepInterval() {
-        return sleepInterval;
+    public void setMessageDao(MessageDao messageDao) {
+        this.messageDao = messageDao;
     }
 
     public Class<?> getProducerClass() {
@@ -78,6 +53,10 @@ public class QueueInfo {
         return producerMethod;
     }
 
+    public Object getConsumer() {
+        return consumer;
+    }
+
     public Class<?> getConsumerClass() {
         return consumerClass;
     }
@@ -86,9 +65,6 @@ public class QueueInfo {
         return consumerMethod;
     }
 
-    public void value() {
-
-    }
 
     public String ID() {
         return this.ID;

@@ -1,9 +1,9 @@
 package cn.mzhong.janytask.zookeeper;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.QueueInfo;
 import cn.mzhong.janytask.queue.LockedQueueManager;
 import cn.mzhong.janytask.queue.Message;
+import cn.mzhong.janytask.queue.QueueInfo;
 import org.apache.zookeeper.CreateMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +26,7 @@ public class ZookeeperMessageDao extends LockedQueueManager {
     }
 
     public void initParentPath() {
-        ZookeeperPathGenerator pathGenerator = new ZookeeperPathGenerator(this.root);
-        pathGenerator.append(queueInfo.getValue()).append(queueInfo.getVersion());
-        String parentPath = pathGenerator.generate();
+        String parentPath = queueInfo.ID();
         this.waitPath = parentPath + "/wait";
         this.donePath = parentPath + "/done";
         this.errorPath = parentPath + "/error";

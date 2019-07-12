@@ -1,10 +1,9 @@
 package cn.mzhong.janytask.executor;
 
-import cn.mzhong.janytask.consumer.QueueMethodInfo;
-import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.QueueInfo;
 import cn.mzhong.janytask.util.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,13 +11,12 @@ import org.slf4j.LoggerFactory;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-public class TaskExecutor<A extends Annotation> implements Runnable {
+public abstract class TaskExecutor<A extends Annotation> implements Runnable {
 
     final static Logger Log = LoggerFactory.getLogger(TaskExecutor.class);
 
     protected String ID;
-    protected TaskAnnotationProcessor<A, ?> processor;
-    protected QueueMethodInfo<A> consumerInfo;
+    protected QueueInfo<A> queueInfo;
     protected TaskContext context;
     protected MessageDao messageDao;
     protected Method method;
@@ -27,21 +25,18 @@ public class TaskExecutor<A extends Annotation> implements Runnable {
     protected long sleepInterval;
     protected long cnt = 0;
 
-    public TaskExecutor(TaskContext context,TaskAnnotationProcessor<A, ?> processor, QueueMethodInfo<A> consumerInfo) {
+    public TaskExecutor(TaskContext context, QueueInfo<A> queueInfo) {
         this.context = context;
-        this.processor = processor;
-        this.consumerInfo = consumerInfo;
-        this.messageDao = consumerInfo.getMessageDao();
+        this.queueInfo = queueInfo;
+        this.messageDao = queueInfo.getMessageDao();
         this.ID = messageDao.ID();
-        this.method = consumerInfo.getConsumerMethod();
-        this.consumer = consumerInfo.getConsumer();
+        this.method = queueInfo.getConsumerMethod();
+        this.consumer = queueInfo.getConsumer();
         this.idleInterval = context.getQueueConfig().getIdleInterval();
         this.sleepInterval = context.getQueueConfig().getSleepInterval();
     }
 
-    void invoke(Message message) {
-        processor.processMessage(message, consumerInfo);
-    }
+    protected abstract void invoke(Message message);
 
     protected void invoke() {
         // 获取当前列表长度，以当前列表长度作为空闲周期

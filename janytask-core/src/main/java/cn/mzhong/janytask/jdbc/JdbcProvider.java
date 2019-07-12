@@ -4,7 +4,9 @@ import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.jdbc.mapper.MessageMapper;
 import cn.mzhong.janytask.jdbc.mapper.MysqlMessageMapper;
 import cn.mzhong.janytask.jdbc.mapper.OracleMessageMapper;
-import cn.mzhong.janytask.queue.*;
+import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.QueueInfo;
+import cn.mzhong.janytask.queue.QueueProvider;
 import cn.mzhong.janytask.tool.PRInvoker;
 import cn.mzhong.janytask.util.Assert;
 import org.slf4j.Logger;
@@ -40,7 +42,7 @@ public class JdbcProvider implements QueueProvider {
     }
 
     public MessageDao createMessageDao(QueueInfo queueInfo) {
-        return new JdbcLineManager(context, messageMapper, queueInfo);
+        return new JdbcMessageDao(context, messageMapper, queueInfo);
     }
 
     protected String getDriverName() {

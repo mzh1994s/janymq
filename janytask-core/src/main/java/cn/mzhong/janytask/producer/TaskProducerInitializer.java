@@ -1,11 +1,14 @@
 package cn.mzhong.janytask.producer;
 
+import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.QueueInfo;
 import cn.mzhong.janytask.core.TaskAnnotationProcessor;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.initializer.TaskComponentInitializer;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 public class TaskProducerInitializer implements TaskComponentInitializer {
 
@@ -15,12 +18,23 @@ public class TaskProducerInitializer implements TaskComponentInitializer {
             for (TaskAnnotationProcessor annotationProcessor : context.getAnnotationProcessors()) {
                 Annotation annotation = method.getAnnotation(annotationProcessor.getAnnotationClass());
                 if (annotation != null) {
-                    //noinspection SingleStatementInBlock,unchecked
-                    annotationProcessor.processProducer(context, new ProducerInfo<Annotation>(
+                    QueueInfo queueInfo = new QueueInfo<Annotation>(
                             annotation,
                             producerClass,
-                            method
-                    ));
+                            method,
+                            null,
+                            null,
+                            null
+                    );
+                    Map<Method, MessageDao> methodMessageDaoMap = context.getMethodMessageDaoMap();
+                    // 注册messageDao
+                    MessageDao messageDao = context.getQueueProvider().createMessageDao(queueInfo);
+                    queueInfo.setMessageDao(messageDao);
+
+                    // 映射Producer的MessageDao
+                    methodMessageDaoMap.put(queueInfo.getProducerMethod(), messageDao);
+                    //noinspection SingleStatementInBlock,unchecked
+                    annotationProcessor.processProducer(context, queueInfo);
                 }
             }
         }
