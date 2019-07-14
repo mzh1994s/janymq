@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.pipleline;
 
-import cn.mzhong.janytask.core.TaskAnnotationProcessor;
+import cn.mzhong.janytask.core.TaskAnnotationHandler;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
 import cn.mzhong.janytask.queue.Message;
@@ -12,21 +12,21 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
-public class PipleLineProcessor implements TaskAnnotationProcessor<Pipleline> {
+public class PipleLineAnnotationHandler implements TaskAnnotationHandler<Pipleline> {
 
 
     public Class<Pipleline> getAnnotationClass() {
         return Pipleline.class;
     }
 
-    public void processProducer(TaskContext context, QueueInfo<Pipleline> queueInfo) {
+    public void handleProducer(TaskContext context, QueueInfo<Pipleline> queueInfo) {
         Method method = queueInfo.getProducerMethod();
         if (method.getReturnType() != Void.TYPE) {
             throw new RuntimeException("流水线" + queueInfo.ID() + "对应的方法" + method.getName() + "返回值应为void");
         }
     }
 
-    public TaskExecutor<Pipleline> processConsumer(TaskContext context, QueueInfo<Pipleline> queueInfo) {
+    public TaskExecutor<Pipleline> handleConsumer(TaskContext context, QueueInfo<Pipleline> queueInfo) {
         return new PiplelineTaskExecutor(context, queueInfo);
     }
 }
@@ -35,7 +35,7 @@ class PiplelineTaskExecutor extends TaskExecutor<Pipleline> {
 
     Pipleline pipleline;
 
-    Logger Log = LoggerFactory.getLogger(PipleLineProcessor.class);
+    Logger Log = LoggerFactory.getLogger(PipleLineAnnotationHandler.class);
 
     public PiplelineTaskExecutor(TaskContext context, QueueInfo<Pipleline> queueInfo) {
         super(context, queueInfo);

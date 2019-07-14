@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.consumer;
 
-import cn.mzhong.janytask.core.TaskAnnotationProcessor;
+import cn.mzhong.janytask.core.TaskAnnotationHandler;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
 import cn.mzhong.janytask.initializer.TaskComponentInitializer;
@@ -60,7 +60,7 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
             Object consumer,
             Class<?> consumerClass) {
         for (Method method : consumerClass.getMethods()) {
-            for (TaskAnnotationProcessor annotationProcessor : context.getAnnotationProcessors()) {
+            for (TaskAnnotationHandler annotationProcessor : context.getAnnotationProcessors()) {
                 QueueInfo<A> queueInfo = findQueueInfo(
                         consumer,
                         consumerClass,
@@ -70,8 +70,11 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
                     // 注册messageDao
                     MessageDao messageDao = context.getQueueProvider().createMessageDao(queueInfo);
                     queueInfo.setMessageDao(messageDao);
-                    TaskExecutor<A> taskExecutor = annotationProcessor.processConsumer(context, queueInfo);
+                    TaskExecutor<A> taskExecutor = annotationProcessor.handleConsumer(context, queueInfo);
                     context.getConsumerExecutorService().execute(taskExecutor);
+                    if(Log.isDebugEnabled()){
+                        Log.debug("consumer:'" + queueInfo.ID() + "'inited.");
+                    }
                 }
             }
         }

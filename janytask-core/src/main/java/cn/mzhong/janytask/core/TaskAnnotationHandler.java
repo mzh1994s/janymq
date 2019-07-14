@@ -10,11 +10,11 @@ import java.lang.annotation.Annotation;
  *
  * @param <A>
  */
-public interface TaskAnnotationProcessor<A extends Annotation> {
+public interface TaskAnnotationHandler<A extends Annotation> {
 
     Class<A> getAnnotationClass();
 
-    void processProducer(TaskContext context, QueueInfo<A> queueInfo);
+    void handleProducer(TaskContext context, QueueInfo<A> queueInfo);
 
-    TaskExecutor<A> processConsumer(TaskContext context, QueueInfo<A> queueInfo);
+    TaskExecutor<A> handleConsumer(TaskContext context, QueueInfo<A> queueInfo);
 }

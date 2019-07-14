@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.loopline;
 
-import cn.mzhong.janytask.core.TaskAnnotationProcessor;
+import cn.mzhong.janytask.core.TaskAnnotationHandler;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
 import cn.mzhong.janytask.queue.Message;
@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
-public class LoopLineProcessor implements TaskAnnotationProcessor<Loopline> {
+public class LoopLineAnnotationHandler implements TaskAnnotationHandler<Loopline> {
 
     public Class<Loopline> getAnnotationClass() {
         return Loopline.class;
     }
 
-    public void processProducer(TaskContext context, QueueInfo<Loopline> queueInfo) {
+    public void handleProducer(TaskContext context, QueueInfo<Loopline> queueInfo) {
         // 返回值判断
         Method method = queueInfo.getProducerMethod();
         Class<?> returnType = method.getReturnType();
@@ -27,14 +27,14 @@ public class LoopLineProcessor implements TaskAnnotationProcessor<Loopline> {
         }
     }
 
-    public TaskExecutor<Loopline> processConsumer(TaskContext context, QueueInfo<Loopline> queueInfo) {
+    public TaskExecutor<Loopline> handleConsumer(TaskContext context, QueueInfo<Loopline> queueInfo) {
         return new LooplineTaskExecutor(context, queueInfo);
     }
 }
 
 class LooplineTaskExecutor extends TaskExecutor<Loopline> {
 
-    Logger Log = LoggerFactory.getLogger(LoopLineProcessor.class);
+    Logger Log = LoggerFactory.getLogger(LoopLineAnnotationHandler.class);
 
     Loopline loopline;
 

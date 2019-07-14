@@ -6,8 +6,8 @@ import cn.mzhong.janytask.producer.Producer;
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.producer.TaskNotFoundException;
 import cn.mzhong.janytask.consumer.TaskConsumerInitializer;
-import cn.mzhong.janytask.loopline.LoopLineProcessor;
-import cn.mzhong.janytask.pipleline.PipleLineProcessor;
+import cn.mzhong.janytask.loopline.LoopLineAnnotationHandler;
+import cn.mzhong.janytask.pipleline.PipleLineAnnotationHandler;
 import cn.mzhong.janytask.producer.TaskProducerInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.util.ClassUtils;
@@ -56,8 +56,8 @@ public class TaskApplication extends TaskContext {
             consumerInitializer = new TaskConsumerInitializer();
         }
         // 注解组件处理器
-        this.addAnnotationProcessors(new PipleLineProcessor());
-        this.addAnnotationProcessors(new LoopLineProcessor());
+        this.addAnnotationProcessors(new PipleLineAnnotationHandler());
+        this.addAnnotationProcessors(new LoopLineAnnotationHandler());
         // 序列化
         this.setDataSerializer(dataSerializer);
         // 扫描所有的消费者

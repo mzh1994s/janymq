@@ -38,7 +38,7 @@ public abstract class TaskContext {
     /**
      * 注解处理器
      */
-    protected Set<TaskAnnotationProcessor> annotationProcessors = new HashSet<TaskAnnotationProcessor>();
+    protected Set<TaskAnnotationHandler> annotationProcessors = new HashSet<TaskAnnotationHandler>();
     /**
      * 消费者map
      */
@@ -88,11 +88,11 @@ public abstract class TaskContext {
         this.dataSerializer = dataSerializer;
     }
 
-    public Set<TaskAnnotationProcessor> getAnnotationProcessors() {
+    public Set<TaskAnnotationHandler> getAnnotationProcessors() {
         return annotationProcessors;
     }
 
-    public void addAnnotationProcessors(TaskAnnotationProcessor annotationProcessors) {
+    public void addAnnotationProcessors(TaskAnnotationHandler annotationProcessors) {
         this.annotationProcessors.add(annotationProcessors);
     }
 
