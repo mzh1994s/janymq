@@ -22,7 +22,7 @@ public class ZookeeperClient implements Watcher {
     /**
      * 创建节点
      *
-     * @param path       必须使用标准的路径格式，如：/root/node1/node2
+     * @param path       必须使用标准的路径格式，如：/rootPath/node1/node2
      * @param data
      * @param createMode
      * @return

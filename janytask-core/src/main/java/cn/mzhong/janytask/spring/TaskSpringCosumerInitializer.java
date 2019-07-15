@@ -7,7 +7,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -19,8 +18,9 @@ import java.util.Map;
  */
 public class TaskSpringCosumerInitializer extends TaskConsumerInitializer {
 
-    ConfigurableListableBeanFactory beanFactory;
-    BeanDefinitionRegistry beanDefinitionRegistry;
+    protected ConfigurableListableBeanFactory beanFactory;
+    protected BeanDefinitionRegistry beanDefinitionRegistry;
+    protected int cnt = 0;
 
     public TaskSpringCosumerInitializer(ConfigurableListableBeanFactory beanFactory, BeanDefinitionRegistry beanDefinitionRegistry) {
         this.beanFactory = beanFactory;
@@ -28,20 +28,12 @@ public class TaskSpringCosumerInitializer extends TaskConsumerInitializer {
     }
 
     @Override
-    public void init(TaskContext context) {
-        Map<Class<?>, Object> consumerMap = context.getConsumerMap();
-        int index = 0;
-        Iterator<Class<?>> iterator = context.getConsumerClassSet().iterator();
-        while (iterator.hasNext()) {
-            Class<?> consumerClass = iterator.next();
-            BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(consumerClass);
-            builder.setScope(BeanDefinition.SCOPE_SINGLETON);
-            BeanDefinition beanDefinition = builder.getBeanDefinition();
-            String beanName = "janytask-consumer#" + (index++);
-            beanDefinitionRegistry.registerBeanDefinition(beanName, beanDefinition);
-            Object consumer = beanFactory.getBean(beanName);
-            consumerMap.put(consumerClass, consumer);
-            super.processConsumer(context, consumer, consumerClass);
-        }
+    protected Object createConsumer(Class<?> consumerClass) {
+        BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(consumerClass);
+        builder.setScope(BeanDefinition.SCOPE_SINGLETON);
+        BeanDefinition beanDefinition = builder.getBeanDefinition();
+        String beanName = "janytask-consumer#" + (cnt++);
+        beanDefinitionRegistry.registerBeanDefinition(beanName, beanDefinition);
+        return beanFactory.getBean(beanName);
     }
 }

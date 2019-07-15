@@ -1,13 +1,13 @@
 package cn.mzhong.janytask.core;
 
+import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.consumer.Consumer;
-import cn.mzhong.janytask.producer.Producer;
-import cn.mzhong.janytask.config.ApplicationConfig;
-import cn.mzhong.janytask.producer.TaskNotFoundException;
 import cn.mzhong.janytask.consumer.TaskConsumerInitializer;
 import cn.mzhong.janytask.loopline.LoopLineAnnotationHandler;
 import cn.mzhong.janytask.pipleline.PipleLineAnnotationHandler;
+import cn.mzhong.janytask.producer.Producer;
+import cn.mzhong.janytask.producer.TaskNotFoundException;
 import cn.mzhong.janytask.producer.TaskProducerInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.util.ClassUtils;
@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * @author mzhong
  * @version 1.0.0
- * @date 2019年7月10日4
+ * @date 2019年7月10日
  */
 public class TaskApplication extends TaskContext {
 
@@ -56,8 +56,8 @@ public class TaskApplication extends TaskContext {
             consumerInitializer = new TaskConsumerInitializer();
         }
         // 注解组件处理器
-        this.addAnnotationProcessors(new PipleLineAnnotationHandler());
-        this.addAnnotationProcessors(new LoopLineAnnotationHandler());
+        this.addAnnotationHandler(new PipleLineAnnotationHandler());
+        this.addAnnotationHandler(new LoopLineAnnotationHandler());
         // 序列化
         this.setDataSerializer(dataSerializer);
         // 扫描所有的消费者

@@ -18,7 +18,7 @@ public class RedisMessageDao extends LockedQueueManager {
     protected RedisClient redisClient;
 
     private static String key(String rootPath, QueueInfo queueInfo) {
-        return rootPath + ":queue:" + queueInfo.ID();
+        return rootPath + ":" + queueInfo.ID();
     }
 
     public RedisMessageDao(TaskContext context, RedisConnectionFactory connectionFactory, QueueInfo queueInfo, String rootPath) {

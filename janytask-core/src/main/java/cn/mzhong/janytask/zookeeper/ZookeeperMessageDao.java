@@ -18,7 +18,7 @@ public class ZookeeperMessageDao extends LockedQueueManager {
     protected String donePath;
     protected String errorPath;
     protected String lockPath;
-    protected String root;
+    protected String rootPath;
 
     public void initZookeeperClient(String connectString) {
         this.connectString = connectString;
@@ -26,7 +26,7 @@ public class ZookeeperMessageDao extends LockedQueueManager {
     }
 
     public void initParentPath() {
-        String parentPath = queueInfo.ID();
+        String parentPath = rootPath + "/" + queueInfo.ID();
         this.waitPath = parentPath + "/wait";
         this.donePath = parentPath + "/done";
         this.errorPath = parentPath + "/error";
@@ -38,14 +38,14 @@ public class ZookeeperMessageDao extends LockedQueueManager {
         zkClient.create(lockPath, null, CreateMode.PERSISTENT);
     }
 
-    public void initRootPath(String root) {
-        this.root = root.startsWith("/") ? root : "/" + root;
+    public void initRootPath(String rootPath) {
+        this.rootPath = rootPath.startsWith("/") ? rootPath : "/" + rootPath;
     }
 
-    ZookeeperMessageDao(TaskContext context, QueueInfo lineInfo, String connectString, String root) {
+    ZookeeperMessageDao(TaskContext context, QueueInfo lineInfo, String connectString, String rootPath) {
         super(context, lineInfo);
         this.initZookeeperClient(connectString);
-        this.initRootPath(root);
+        this.initRootPath(rootPath);
         this.initParentPath();
     }
 

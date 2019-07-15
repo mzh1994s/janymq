@@ -19,7 +19,7 @@ public class TaskProducerInitializer implements TaskComponentInitializer {
     protected void processProducer(TaskContext context, Class<?> producerClass) {
         // 处理生产者
         for (Method method : producerClass.getMethods()) {
-            for (TaskAnnotationHandler annotationProcessor : context.getAnnotationProcessors()) {
+            for (TaskAnnotationHandler annotationProcessor : context.getAnnotationHandlers()) {
                 Annotation annotation = method.getAnnotation(annotationProcessor.getAnnotationClass());
                 if (annotation != null) {
                     QueueInfo queueInfo = new QueueInfo<Annotation>(

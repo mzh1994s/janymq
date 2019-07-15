@@ -1,14 +1,19 @@
 package cn.mzhong.janytask.executor;
 
-import java.util.concurrent.*;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class TaskExecutorService extends ThreadPoolExecutor {
 
-    public TaskExecutorService(String name) {
-        super(0, Integer.MAX_VALUE,
-                60L, TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>());
-        super.setThreadFactory(new TaskThreadFactory(name));
+    public TaskExecutorService(int nThreads) {
+        super(nThreads,
+                nThreads,
+                0L,
+                TimeUnit.MILLISECONDS,
+                new SynchronousQueue<Runnable>(),
+                new TaskThreadFactory("janytask-executor"));
     }
 }
 
