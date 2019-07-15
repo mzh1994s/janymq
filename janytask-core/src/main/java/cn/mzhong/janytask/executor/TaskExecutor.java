@@ -59,16 +59,19 @@ public abstract class TaskExecutor<A extends Annotation> implements Runnable {
             }
             done++;
         }
+        int spendTime = (int) (System.currentTimeMillis() - startTimeMillis);
         if (Log.isDebugEnabled()) {
             int speed = 0;
-            int time = (int) (System.currentTimeMillis() - startTimeMillis + 1);
+            float time = spendTime + 1;
             int seconds = Math.round(time / 1000);
             if (done > 0) {
                 speed = (int) (time / done);
             }
             Log.debug("'{}'：第{}轮消息处理完毕，数量:{}，总耗时:{}秒，单条耗时:{}毫秒", ID, cnt, done, seconds, speed);
         }
-        ThreadUtils.sleep(idleInterval);
+        if (spendTime < idleInterval) {
+            ThreadUtils.sleep(idleInterval - spendTime);
+        }
     }
 
     public void run() {

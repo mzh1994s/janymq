@@ -6,7 +6,7 @@ import cn.mzhong.janytask.pipleline.Pipleline;
 @Producer
 public interface TestMQ {
 
-    @Pipleline
+    @Pipleline(version = "1.0.0")
     void testPipleline(String value);
 
     @Loopline
