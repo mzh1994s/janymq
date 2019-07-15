@@ -2,7 +2,7 @@ package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.core.TaskContext;
 
-public abstract class AbstractQueueManager implements MessageDao {
+public abstract class AbstractMessageDao implements MessageDao {
     protected String ID;
     protected TaskContext context;
     protected QueueInfo queueInfo;
@@ -13,7 +13,7 @@ public abstract class AbstractQueueManager implements MessageDao {
         return this.ID;
     }
 
-    public AbstractQueueManager(TaskContext context, QueueInfo queueInfo) {
+    public AbstractMessageDao(TaskContext context, QueueInfo queueInfo) {
         this.context = context;
         this.dataSerializer = context.getDataSerializer();
         this.queueInfo = queueInfo;

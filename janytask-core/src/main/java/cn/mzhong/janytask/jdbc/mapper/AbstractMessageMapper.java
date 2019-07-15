@@ -3,6 +3,7 @@ package cn.mzhong.janytask.jdbc.mapper;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.jdbc.BytesMessage;
 import cn.mzhong.janytask.jdbc.DataSourceHelper;
+import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.tool.PRInvoker;
 
 import java.sql.ResultSet;
@@ -33,13 +34,13 @@ public abstract class AbstractMessageMapper implements MessageMapper {
                 message.getQueueId(),
                 new Timestamp(message.getPushTime().getTime()),
                 message.getContentBytes(),
-                MESSAGE_STATUS_WAIT);
+                Message.STATUS_WAIT);
     }
 
     public LinkedList<String> keys() {
         return this.sqlExecutor.queryList(
                 "SELECT MESSAGE_ID FROM " + table + " WHERE STATUS=?",
-                new Object[]{MESSAGE_STATUS_WAIT},
+                new Object[]{Message.STATUS_WAIT},
                 new PRInvoker<ResultSet, String>() {
                     public String invoke(ResultSet resultSet) throws Exception {
                         return resultSet.getString(1);
@@ -50,13 +51,13 @@ public abstract class AbstractMessageMapper implements MessageMapper {
     public boolean lock(String key) {
         return 1 == this.sqlExecutor.update(
                 "UPDATE " + table + " SET STATUS=? WHERE MESSAGE_ID=? AND STATUS=?",
-                MESSAGE_STATUS_LOCK, key, MESSAGE_STATUS_WAIT);
+                Message.STATUS_LOCK, key, Message.STATUS_WAIT);
     }
 
     public boolean unLock(String key) {
         return 1 == this.sqlExecutor.update(
                 "UPDATE " + table + " SET STATUS=? WHERE MESSAGE_ID=? AND STATUS=?",
-                MESSAGE_STATUS_WAIT, key, MESSAGE_STATUS_LOCK);
+                Message.STATUS_WAIT, key, Message.STATUS_LOCK);
     }
 
     public BytesMessage get(final String key) {
@@ -79,7 +80,7 @@ public abstract class AbstractMessageMapper implements MessageMapper {
                         "STATUS=?, " +
                         "DONE_TIME=? " +
                         "WHERE MESSAGE_ID=?",
-                MESSAGE_STATUS_DONE,
+                Message.STATUS_DONE,
                 new Timestamp(message.getDoneTime().getTime()),
                 message.getId());
     }
@@ -91,7 +92,7 @@ public abstract class AbstractMessageMapper implements MessageMapper {
                         "ERROR_TIME=?, " +
                         "THROWABLE=? " +
                         "WHERE MESSAGE_ID=?",
-                MESSAGE_STATUS_ERROR,
+                Message.STATUS_ERROR,
                 new Timestamp(message.getErrorTime().getTime()),
                 message.getThrowableBytes(),
                 message.getId());
@@ -100,6 +101,6 @@ public abstract class AbstractMessageMapper implements MessageMapper {
     public long length(String lineID) {
         return this.sqlExecutor.queryLong(
                 "SELECT COUNT(*) FROM " + table + " WHERE QUEUE_ID=? AND STATUS=?",
-                new Object[]{lineID, MESSAGE_STATUS_WAIT});
+                new Object[]{lineID, Message.STATUS_WAIT});
     }
 }

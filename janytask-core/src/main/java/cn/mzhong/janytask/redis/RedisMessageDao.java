@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.redis;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.LockedQueueManager;
+import cn.mzhong.janytask.queue.LockedMessageDao;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.QueueInfo;
 import cn.mzhong.janytask.tool.PRInvoker;
@@ -10,7 +10,7 @@ import redis.clients.jedis.Jedis;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class RedisMessageDao extends LockedQueueManager {
+public class RedisMessageDao extends LockedMessageDao {
     protected byte[] waitKey;
     protected byte[] doneKey;
     protected byte[] errorKey;
@@ -102,7 +102,7 @@ public class RedisMessageDao extends LockedQueueManager {
         });
     }
 
-    protected LinkedList<String> idList() {
+    protected LinkedList<String> queueIdList() {
         return this.redisClient.execute(new PRInvoker<Jedis, LinkedList<String>>() {
             public LinkedList<String> invoke(Jedis jedis) throws Exception {
                 LinkedList<String> list = new LinkedList<String>();

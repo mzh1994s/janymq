@@ -2,14 +2,14 @@ package cn.mzhong.janytask.jdbc;
 
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.jdbc.mapper.MessageMapper;
-import cn.mzhong.janytask.queue.LockedQueueManager;
+import cn.mzhong.janytask.queue.LockedMessageDao;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.QueueInfo;
 
 import java.util.Date;
 import java.util.LinkedList;
 
-public class JdbcMessageDao extends LockedQueueManager {
+public class JdbcMessageDao extends LockedMessageDao {
 
     protected TaskContext context;
     protected MessageMapper messageMapper;
@@ -44,7 +44,7 @@ public class JdbcMessageDao extends LockedQueueManager {
     }
 
     @Override
-    protected LinkedList<String> idList() {
+    protected LinkedList<String> queueIdList() {
         return this.messageMapper.keys();
     }
 

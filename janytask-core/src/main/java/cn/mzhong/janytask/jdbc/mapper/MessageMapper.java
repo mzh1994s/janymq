@@ -6,15 +6,6 @@ import java.util.LinkedList;
 
 public interface MessageMapper {
 
-    // 等待状态
-    final static String MESSAGE_STATUS_WAIT = "W";
-    // 锁定状态
-    final static String MESSAGE_STATUS_LOCK = "L";
-    // 完成状态
-    final static String MESSAGE_STATUS_DONE = "D";
-    // 错误状态
-    final static String MESSAGE_STATUS_ERROR = "E";
-
     /**
      * 初始化
      */

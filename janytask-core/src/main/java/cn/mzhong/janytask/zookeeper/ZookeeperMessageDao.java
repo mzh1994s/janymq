@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.zookeeper;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.LockedQueueManager;
+import cn.mzhong.janytask.queue.LockedMessageDao;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.QueueInfo;
 import org.apache.zookeeper.CreateMode;
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 
-public class ZookeeperMessageDao extends LockedQueueManager {
+public class ZookeeperMessageDao extends LockedMessageDao {
     final static Logger Log = LoggerFactory.getLogger(ZookeeperMessageDao.class);
     protected String connectString;
     protected ZookeeperClient zkClient;
@@ -102,7 +102,7 @@ public class ZookeeperMessageDao extends LockedQueueManager {
         return null;
     }
 
-    protected LinkedList<String> idList() {
+    protected LinkedList<String> queueIdList() {
         return new LinkedList<String>(zkClient.getChildren(waitPath));
     }
 }

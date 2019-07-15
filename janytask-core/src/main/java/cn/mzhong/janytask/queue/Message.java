@@ -6,8 +6,19 @@ import java.util.Date;
 
 public class Message implements Serializable {
     private static final long serialVersionUID = -2043879152912282934L;
+
+    // 等待状态
+    public final static String STATUS_WAIT = "W";
+    // 锁定状态
+    public final static String STATUS_LOCK = "L";
+    // 完成状态
+    public final static String STATUS_DONE = "D";
+    // 错误状态
+    public final static String STATUS_ERROR = "E";
+
     protected String id;
     protected String queueId;
+    protected String status;
     protected Date pushTime;
     protected Date doneTime;
     protected Date errorTime;
@@ -33,6 +44,14 @@ public class Message implements Serializable {
 
     public void setQueueId(String queueId) {
         this.queueId = queueId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Date getPushTime() {
@@ -95,6 +114,7 @@ public class Message implements Serializable {
         return "Message{" +
                 "id='" + id + '\'' +
                 ", queueId='" + queueId + '\'' +
+                ", status='" + status + '\'' +
                 ", pushTime=" + pushTime +
                 ", doneTime=" + doneTime +
                 ", errorTime=" + errorTime +

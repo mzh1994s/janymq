@@ -4,17 +4,17 @@ import cn.mzhong.janytask.core.TaskContext;
 
 import java.util.LinkedList;
 
-public abstract class LockedQueueManager extends AbstractQueueManager {
+public abstract class LockedMessageDao extends AbstractMessageDao {
 
     private LinkedList<String> cacheKeys = new LinkedList<String>();
 
-    public LockedQueueManager(TaskContext context, QueueInfo queueInfo) {
+    public LockedMessageDao(TaskContext context, QueueInfo queueInfo) {
         super(context, queueInfo);
     }
 
     public final Message poll() {
         if (cacheKeys.isEmpty()) {
-            cacheKeys = this.idList();
+            cacheKeys = this.queueIdList();
         }
         while (!cacheKeys.isEmpty()) {
             // ShutdownBreak;
@@ -33,7 +33,7 @@ public abstract class LockedQueueManager extends AbstractQueueManager {
         this.unLock(message.getId());
     }
 
-    protected abstract LinkedList<String> idList();
+    protected abstract LinkedList<String> queueIdList();
 
     protected abstract Message get(String id);
 
