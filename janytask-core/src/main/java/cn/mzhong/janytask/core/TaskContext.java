@@ -3,7 +3,6 @@ package cn.mzhong.janytask.core;
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.executor.TaskExecutorService;
-import cn.mzhong.janytask.initializer.TaskComponentInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueProvider;

@@ -73,7 +73,7 @@ public class TaskApplication extends TaskContext {
         this.wellcome();
     }
 
-    @SuppressWarnings("SingleStatementInBlock")
+    @SuppressWarnings({"SingleStatementInBlock", "unchecked"})
     public <T> T getProducer(Class<T> producerClass) {
         Object producer = producerMap.get(producerClass);
         if (producer == null) {

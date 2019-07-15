@@ -2,7 +2,7 @@ package cn.mzhong.janytask.producer;
 
 import cn.mzhong.janytask.core.TaskAnnotationHandler;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.initializer.TaskComponentInitializer;
+import cn.mzhong.janytask.core.TaskComponentInitializer;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueInfo;
 import org.slf4j.Logger;

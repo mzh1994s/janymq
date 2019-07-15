@@ -3,7 +3,7 @@ package cn.mzhong.janytask.consumer;
 import cn.mzhong.janytask.core.TaskAnnotationHandler;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
-import cn.mzhong.janytask.initializer.TaskComponentInitializer;
+import cn.mzhong.janytask.core.TaskComponentInitializer;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueInfo;
 import cn.mzhong.janytask.util.ClassUtils;
