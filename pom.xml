@@ -3,6 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
     <groupId>cn.mzhong</groupId>
     <artifactId>janytask-parent</artifactId>
@@ -10,9 +16,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>janytask-admin</module>
         <module>janytask-core</module>
-        <module>janytask-test</module>
     </modules>
 
     <licenses>
@@ -32,24 +36,9 @@
         <developer>
             <name>mzhong</name>
             <email>email@mzhong.cn</email>
-            <organization>神仙叔叔</organization>
+            <organization>赤脚码农</organization>
         </developer>
     </developers>
-
-    <repositories>
-        <repository>
-            <id>public</id>
-            <url>https://maven.aliyun.com/repository/public</url>
-        </repository>
-        <repository>
-            <id>releases</id>
-            <url>https://maven.aliyun.com/repository/releases</url>
-        </repository>
-        <repository>
-            <id>central</id>
-            <url>https://maven.aliyun.com/repository/central</url>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -106,6 +95,26 @@
                     <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <additionalOptions>
+                        <additionalOption>-Xdoclint:none</additionalOption>
+                    </additionalOptions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <additionalparam>-Xdoclint:none</additionalparam>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
