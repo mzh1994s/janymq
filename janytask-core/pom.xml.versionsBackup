@@ -6,7 +6,7 @@
     <parent>
         <groupId>cn.mzhong</groupId>
         <artifactId>janytask-parent</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.0-SNAPSHOTS</version>
     </parent>
 
     <artifactId>janytask-core</artifactId>
