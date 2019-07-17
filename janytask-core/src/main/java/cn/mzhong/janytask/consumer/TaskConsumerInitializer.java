@@ -12,10 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class TaskConsumerInitializer implements TaskComponentInitializer {
@@ -67,11 +64,11 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
      * @return
      */
     @SuppressWarnings("unchecked")
-    protected <A extends Annotation> List<TaskExecutor<A>> handleConsumer(
+    protected <A extends Annotation> Set<TaskExecutor<A>> handleConsumer(
             TaskContext context,
             Object consumer,
             Class<?> consumerClass) {
-        List<TaskExecutor<A>> taskList = new ArrayList<TaskExecutor<A>>();
+        Set<TaskExecutor<A>> taskList = new HashSet<TaskExecutor<A>>();
         for (Method method : consumerClass.getMethods()) {
             for (TaskAnnotationHandler annotationProcessor : context.getAnnotationHandlers()) {
                 QueueInfo<A> queueInfo = findQueueInfo(
@@ -113,8 +110,8 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
      * @param context
      * @return
      */
-    protected List<TaskExecutor<? extends Annotation>> createTaskList(TaskContext context) {
-        List<TaskExecutor<? extends Annotation>> taskList = new ArrayList<TaskExecutor<? extends Annotation>>();
+    protected Set<TaskExecutor<? extends Annotation>> createTaskExecutors(TaskContext context) {
+        Set<TaskExecutor<? extends Annotation>> taskList = context.getTaskExecutors();
         Map<Class<?>, Object> consumerMap = context.getConsumerMap();
         try {
             for (Class<?> consumerClass : context.getConsumerClassSet()) {
@@ -128,18 +125,19 @@ public class TaskConsumerInitializer implements TaskComponentInitializer {
         return taskList;
     }
 
-    protected void runTaskExecutors(TaskContext context, List<TaskExecutor<? extends Annotation>> taskList) {
+    protected void runTaskExecutors(TaskContext context, Set<TaskExecutor<? extends Annotation>> taskList) {
         // 初始化线程池
         int nThreads = taskList.size();
         TaskExecutorService taskExecutorService = new TaskExecutorService(nThreads);
         context.setConsumerExecutorService(taskExecutorService);
-        for (int i = 0; i < nThreads; i++) {
-            taskExecutorService.execute(taskList.get(i));
+        Iterator<TaskExecutor<? extends Annotation>> iterator = taskList.iterator();
+        while (iterator.hasNext()){
+            taskExecutorService.execute(iterator.next());
         }
     }
 
     public void init(TaskContext context) {
-        runTaskExecutors(context, this.createTaskList(context));
+        runTaskExecutors(context, this.createTaskExecutors(context));
     }
 }
 

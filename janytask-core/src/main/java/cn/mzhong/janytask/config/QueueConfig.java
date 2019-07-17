@@ -10,6 +10,8 @@ public class QueueConfig {
      */
     protected long sleepInterval = 0;
 
+    protected String cron = "";
+
     public long getIdleInterval() {
         return idleInterval;
     }

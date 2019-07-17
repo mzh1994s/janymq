@@ -2,10 +2,12 @@ package cn.mzhong.janytask.core;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
+import cn.mzhong.janytask.executor.TaskExecutor;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueProvider;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +54,11 @@ public abstract class TaskContext {
      * 方法与MessageDao映射Map，在生产者代理中会用到此映射来寻找生产者MessageDao
      */
     protected Map<Method, MessageDao> methodMessageDaoMap = new HashMap<Method, MessageDao>();
+
+    /**
+     * 消费者执行者列表
+     */
+    protected Set<TaskExecutor<? extends Annotation>> taskExecutors = new HashSet<TaskExecutor<? extends Annotation>>();
 
     /**
      * 消费者线程池
@@ -129,6 +136,10 @@ public abstract class TaskContext {
 
     public void setConsumerExecutorService(ExecutorService consumerExecutorService) {
         this.consumerExecutorService = consumerExecutorService;
+    }
+
+    public Set<TaskExecutor<? extends Annotation>> getTaskExecutors() {
+        return taskExecutors;
     }
 
     public Map<Class<?>, Object> getProducerMap() {
