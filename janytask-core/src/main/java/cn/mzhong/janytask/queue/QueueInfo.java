@@ -91,7 +91,7 @@ public class QueueInfo<A extends Annotation> {
     }
 
     protected static String ID(String value, String... items) {
-        IDGenerator generator = new IDGenerator(value, "#");
+        IDGenerator generator = new IDGenerator(value, "-");
         for (String item : items) {
             generator.append(item);
         }

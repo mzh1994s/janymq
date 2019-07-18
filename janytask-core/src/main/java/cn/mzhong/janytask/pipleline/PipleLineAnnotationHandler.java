@@ -1,8 +1,8 @@
 package cn.mzhong.janytask.pipleline;
 
-import cn.mzhong.janytask.core.TaskAnnotationHandler;
+import cn.mzhong.janytask.core.TaskQueueAnnotationHandler;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.executor.TaskExecutor;
+import cn.mzhong.janytask.queue.TaskQueueExecutor;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueInfo;
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
-public class PipleLineAnnotationHandler implements TaskAnnotationHandler<Pipleline> {
+public class PipleLineAnnotationHandler implements TaskQueueAnnotationHandler<Pipleline> {
 
 
     public Class<Pipleline> getAnnotationClass() {
@@ -26,12 +26,12 @@ public class PipleLineAnnotationHandler implements TaskAnnotationHandler<Pipleli
         }
     }
 
-    public TaskExecutor<Pipleline> handleConsumer(TaskContext context, QueueInfo<Pipleline> queueInfo) {
+    public TaskQueueExecutor<Pipleline> handleConsumer(TaskContext context, QueueInfo<Pipleline> queueInfo) {
         return new PiplelineTaskExecutor(context, queueInfo);
     }
 }
 
-class PiplelineTaskExecutor extends TaskExecutor<Pipleline> {
+class PiplelineTaskExecutor extends TaskQueueExecutor<Pipleline> {
 
     Pipleline pipleline;
 

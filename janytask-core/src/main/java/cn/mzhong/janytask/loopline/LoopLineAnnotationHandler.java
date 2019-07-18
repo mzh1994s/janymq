@@ -1,8 +1,8 @@
 package cn.mzhong.janytask.loopline;
 
-import cn.mzhong.janytask.core.TaskAnnotationHandler;
+import cn.mzhong.janytask.core.TaskQueueAnnotationHandler;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.executor.TaskExecutor;
+import cn.mzhong.janytask.queue.TaskQueueExecutor;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueInfo;
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
 
-public class LoopLineAnnotationHandler implements TaskAnnotationHandler<Loopline> {
+public class LoopLineAnnotationHandler implements TaskQueueAnnotationHandler<Loopline> {
 
     public Class<Loopline> getAnnotationClass() {
         return Loopline.class;
@@ -27,12 +27,12 @@ public class LoopLineAnnotationHandler implements TaskAnnotationHandler<Loopline
         }
     }
 
-    public TaskExecutor<Loopline> handleConsumer(TaskContext context, QueueInfo<Loopline> queueInfo) {
+    public TaskQueueExecutor<Loopline> handleConsumer(TaskContext context, QueueInfo<Loopline> queueInfo) {
         return new LooplineTaskExecutor(context, queueInfo);
     }
 }
 
-class LooplineTaskExecutor extends TaskExecutor<Loopline> {
+class LooplineTaskExecutor extends TaskQueueExecutor<Loopline> {
 
     Logger Log = LoggerFactory.getLogger(LoopLineAnnotationHandler.class);
 

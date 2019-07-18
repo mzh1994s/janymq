@@ -3,7 +3,6 @@ package cn.mzhong.janytask.util;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +44,28 @@ public class ClassUtils {
         }
         return list;
     }
+
+//    private static Class<? extends Annotation>[] getAAnnotations(Class<? extends Annotation> annotation) {
+//        Class<? extends Annotation>[] finallyAnnotations = new Class[0];
+//        Annotation[] annotations = annotation.getAnnotations();
+//        int len = annotations.length;
+//        for (int i = 0; i < len; i++) {
+//            Class<? extends Annotation> element = annotations[i].annotationType();
+//            Arrays.add(finallyAnnotations, element);
+//        }
+//        return finallyAnnotations;
+//    }
+
+//    private static <A extends Annotation> Class<A>[] getAAnnotations(Class<?> _class) {
+//        Class<A>[] finallyAnnotations = new Class[0];
+//        Annotation[] annotations = _class.getAnnotations();
+//        int len = annotations.length;
+//        for (int i = 0; i < len; i++) {
+////            finallyAnnotations = Arrays.copyOf(finallyAnnotations, finallyAnnotations.length + 1);
+////            Class<A> annotation = annotations[i];
+//        }
+//        return annotations;
+//    }
 
     /**
      * 通过包名扫描类
@@ -94,7 +115,11 @@ public class ClassUtils {
         if (superclass != null) {
             interfaces.addAll(getInterfaces(superclass));
         }
-        interfaces.addAll(Arrays.asList(_class.getInterfaces()));
+        Class<?>[] classInterfaces = _class.getInterfaces();
+        int len = classInterfaces.length;
+        for (int i = 0; i < len; i++) {
+            interfaces.add(classInterfaces[i]);
+        }
         return interfaces;
     }
 

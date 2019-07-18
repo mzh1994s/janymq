@@ -3,9 +3,6 @@ package cn.mzhong.janytask.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-
 /**
  * 正常终结、安全关闭消费者线程
  */
@@ -19,20 +16,17 @@ public class TaskShutdownHook extends Thread {
 class TaskShutdownHookExecutor implements Runnable {
     final static Logger Log = LoggerFactory.getLogger(TaskShutdownHookExecutor.class);
     TaskContext context;
-    ExecutorService executorService;
 
     public TaskShutdownHookExecutor(TaskContext context) {
         this.context = context;
-        this.executorService = context.getConsumerExecutorService();
     }
 
     public void run() {
         Log.debug("janytask应用程序正在终结...");
         // 写终结
         context.setShutdown(true);
-        executorService.shutdown();
         try {
-            if (executorService.awaitTermination(1000, TimeUnit.SECONDS)) {
+            if (context.getTaskWorker().shutdownAndAwait()) {
                 Log.debug("janytask应用程序已终结，拜拜!");
                 return;
             }

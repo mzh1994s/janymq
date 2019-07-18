@@ -2,18 +2,15 @@ package cn.mzhong.janytask.core;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
-import cn.mzhong.janytask.executor.TaskExecutor;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueProvider;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 
 public abstract class TaskContext {
     /**
@@ -38,7 +35,7 @@ public abstract class TaskContext {
     /**
      * 注解处理器
      */
-    protected Set<TaskAnnotationHandler> annotationHandlers = new HashSet<TaskAnnotationHandler>();
+    protected Set<TaskQueueAnnotationHandler> annotationHandlers = new HashSet<TaskQueueAnnotationHandler>();
     /**
      * 消费者
      */
@@ -49,6 +46,7 @@ public abstract class TaskContext {
      */
     protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
     protected Set<Class<?>> producerClassSet;
+    protected Set<Class<?>> compnentClassSet;
 
     /**
      * 方法与MessageDao映射Map，在生产者代理中会用到此映射来寻找生产者MessageDao
@@ -56,14 +54,11 @@ public abstract class TaskContext {
     protected Map<Method, MessageDao> methodMessageDaoMap = new HashMap<Method, MessageDao>();
 
     /**
-     * 消费者执行者列表
+     * 任务调度器
+     *
+     * @since 1.0.1
      */
-    protected Set<TaskExecutor<? extends Annotation>> taskExecutors = new HashSet<TaskExecutor<? extends Annotation>>();
-
-    /**
-     * 消费者线程池
-     */
-    protected ExecutorService consumerExecutorService;
+    protected TaskWorker taskWorker = new TaskWorker();
 
     /**
      * 生产者初始化程序，用于生成生产者代理
@@ -110,11 +105,11 @@ public abstract class TaskContext {
         this.dataSerializer = dataSerializer;
     }
 
-    public Set<TaskAnnotationHandler> getAnnotationHandlers() {
+    public Set<TaskQueueAnnotationHandler> getAnnotationHandlers() {
         return annotationHandlers;
     }
 
-    public void addAnnotationHandler(TaskAnnotationHandler annotationHandler) {
+    public void addAnnotationHandler(TaskQueueAnnotationHandler annotationHandler) {
         this.annotationHandlers.add(annotationHandler);
     }
 
@@ -130,18 +125,6 @@ public abstract class TaskContext {
         this.consumerClassSet = consumerClassSet;
     }
 
-    public ExecutorService getConsumerExecutorService() {
-        return consumerExecutorService;
-    }
-
-    public void setConsumerExecutorService(ExecutorService consumerExecutorService) {
-        this.consumerExecutorService = consumerExecutorService;
-    }
-
-    public Set<TaskExecutor<? extends Annotation>> getTaskExecutors() {
-        return taskExecutors;
-    }
-
     public Map<Class<?>, Object> getProducerMap() {
         return producerMap;
     }
@@ -154,8 +137,20 @@ public abstract class TaskContext {
         this.producerClassSet = producerClassSet;
     }
 
+    public Set<Class<?>> getCompnentClassSet() {
+        return compnentClassSet;
+    }
+
+    public void setCompnentClassSet(Set<Class<?>> compnentClassSet) {
+        this.compnentClassSet = compnentClassSet;
+    }
+
     public Map<Method, MessageDao> getMethodMessageDaoMap() {
         return methodMessageDaoMap;
+    }
+
+    public TaskWorker getTaskWorker() {
+        return taskWorker;
     }
 
     public TaskComponentInitializer getProducerInitializer() {

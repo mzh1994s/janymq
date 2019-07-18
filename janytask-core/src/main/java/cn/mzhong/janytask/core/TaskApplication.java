@@ -64,12 +64,16 @@ public class TaskApplication extends TaskContext {
         this.setConsumerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
         // 扫描所有的生产者
         this.setProducerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
+
+        this.setCompnentClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), JanyTask.class));
         // 调用初始化程序
         this.queueProvider.init(this);
         this.producerInitializer.init(this);
         this.consumerInitializer.init(this);
         // 正常终结
         Runtime.getRuntime().addShutdownHook(new TaskShutdownHook(this));
+        // 启动worker
+        this.taskWorker.start();
         this.wellcome();
     }
 
