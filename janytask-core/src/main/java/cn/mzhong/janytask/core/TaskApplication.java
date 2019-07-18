@@ -2,15 +2,8 @@ package cn.mzhong.janytask.core;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
-import cn.mzhong.janytask.consumer.Consumer;
-import cn.mzhong.janytask.consumer.TaskConsumerInitializer;
-import cn.mzhong.janytask.loopline.LoopLineAnnotationHandler;
-import cn.mzhong.janytask.pipleline.PipleLineAnnotationHandler;
-import cn.mzhong.janytask.producer.Producer;
 import cn.mzhong.janytask.producer.TaskNotFoundException;
-import cn.mzhong.janytask.producer.TaskProducerInitializer;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
-import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,29 +42,16 @@ public class TaskApplication extends TaskContext {
         if (dataSerializer == null) {
             dataSerializer = new JdkDataSerializer();
         }
-        if (producerInitializer == null) {
-            producerInitializer = new TaskProducerInitializer();
-        }
-        if (consumerInitializer == null) {
-            consumerInitializer = new TaskConsumerInitializer();
-        }
-        // 注解组件处理器
-        this.addAnnotationHandler(new PipleLineAnnotationHandler());
-        this.addAnnotationHandler(new LoopLineAnnotationHandler());
         // 序列化
         this.setDataSerializer(dataSerializer);
-        // 扫描所有的消费者
-        this.setConsumerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Consumer.class));
-        // 扫描所有的生产者
-        this.setProducerClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), Producer.class));
 
-        this.setCompnentClassSet(ClassUtils.scanByAnnotation(applicationConfig.getBasePackage(), JanyTask.class));
         // 调用初始化程序
         this.queueProvider.init(this);
-        this.producerInitializer.init(this);
-        this.consumerInitializer.init(this);
+        this.queueManager.init(this);
+
         // 正常终结
         Runtime.getRuntime().addShutdownHook(new TaskShutdownHook(this));
+
         // 启动worker
         this.taskWorker.start();
         this.wellcome();
@@ -79,6 +59,7 @@ public class TaskApplication extends TaskContext {
 
     @SuppressWarnings({"SingleStatementInBlock", "unchecked"})
     public <T> T getProducer(Class<T> producerClass) {
+        Map<Class<?>, Object> producerMap = this.queueManager.getProducerMap();
         Object producer = producerMap.get(producerClass);
         if (producer == null) {
             for (Map.Entry<Class<?>, Object> entry : producerMap.entrySet()) {

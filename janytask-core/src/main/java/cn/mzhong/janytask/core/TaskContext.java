@@ -3,14 +3,9 @@ package cn.mzhong.janytask.core;
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
-import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.QueueManager;
 import cn.mzhong.janytask.queue.QueueProvider;
-
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import cn.mzhong.janytask.schedule.ScheduleManager;
 
 public abstract class TaskContext {
     /**
@@ -33,26 +28,17 @@ public abstract class TaskContext {
      */
     protected JdkDataSerializer dataSerializer;
     /**
-     * 注解处理器
+     * 队列型任务管理器
+     *
+     * @since 1.0.1
      */
-    protected Set<TaskQueueAnnotationHandler> annotationHandlers = new HashSet<TaskQueueAnnotationHandler>();
+    protected QueueManager queueManager = new QueueManager();
     /**
-     * 消费者
+     * 定时型任务管理器
+     *
+     * @since 1.0.1
      */
-    protected Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
-    protected Set<Class<?>> consumerClassSet;
-    /**
-     * 生产者
-     */
-    protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
-    protected Set<Class<?>> producerClassSet;
-    protected Set<Class<?>> compnentClassSet;
-
-    /**
-     * 方法与MessageDao映射Map，在生产者代理中会用到此映射来寻找生产者MessageDao
-     */
-    protected Map<Method, MessageDao> methodMessageDaoMap = new HashMap<Method, MessageDao>();
-
+    protected ScheduleManager scheduleManager = new ScheduleManager();
     /**
      * 任务调度器
      *
@@ -60,14 +46,6 @@ public abstract class TaskContext {
      */
     protected TaskWorker taskWorker = new TaskWorker();
 
-    /**
-     * 生产者初始化程序，用于生成生产者代理
-     */
-    protected TaskComponentInitializer producerInitializer;
-    /**
-     * 消费者初始化程序，用于创建消费者线程
-     */
-    protected TaskComponentInitializer consumerInitializer;
     /**
      * JSimpleMQ应用程序是否已经终结
      */
@@ -97,6 +75,14 @@ public abstract class TaskContext {
         this.queueProvider = queueProvider;
     }
 
+    public ScheduleManager getScheduleManager() {
+        return scheduleManager;
+    }
+
+    public void setScheduleManager(ScheduleManager scheduleManager) {
+        this.scheduleManager = scheduleManager;
+    }
+
     public JdkDataSerializer getDataSerializer() {
         return dataSerializer;
     }
@@ -105,70 +91,9 @@ public abstract class TaskContext {
         this.dataSerializer = dataSerializer;
     }
 
-    public Set<TaskQueueAnnotationHandler> getAnnotationHandlers() {
-        return annotationHandlers;
-    }
-
-    public void addAnnotationHandler(TaskQueueAnnotationHandler annotationHandler) {
-        this.annotationHandlers.add(annotationHandler);
-    }
-
-    public Map<Class<?>, Object> getConsumerMap() {
-        return consumerMap;
-    }
-
-    public Set<Class<?>> getConsumerClassSet() {
-        return consumerClassSet;
-    }
-
-    public void setConsumerClassSet(Set<Class<?>> consumerClassSet) {
-        this.consumerClassSet = consumerClassSet;
-    }
-
-    public Map<Class<?>, Object> getProducerMap() {
-        return producerMap;
-    }
-
-    public Set<Class<?>> getProducerClassSet() {
-        return producerClassSet;
-    }
-
-    public void setProducerClassSet(Set<Class<?>> producerClassSet) {
-        this.producerClassSet = producerClassSet;
-    }
-
-    public Set<Class<?>> getCompnentClassSet() {
-        return compnentClassSet;
-    }
-
-    public void setCompnentClassSet(Set<Class<?>> compnentClassSet) {
-        this.compnentClassSet = compnentClassSet;
-    }
-
-    public Map<Method, MessageDao> getMethodMessageDaoMap() {
-        return methodMessageDaoMap;
-    }
-
     public TaskWorker getTaskWorker() {
         return taskWorker;
     }
-
-    public TaskComponentInitializer getProducerInitializer() {
-        return producerInitializer;
-    }
-
-    public void setProducerInitializer(TaskComponentInitializer producerInitializer) {
-        this.producerInitializer = producerInitializer;
-    }
-
-    public TaskComponentInitializer getConsumerInitializer() {
-        return consumerInitializer;
-    }
-
-    public void setConsumerInitializer(TaskComponentInitializer consumerInitializer) {
-        this.consumerInitializer = consumerInitializer;
-    }
-
 
     public boolean isShutdown() {
         return shutdown;

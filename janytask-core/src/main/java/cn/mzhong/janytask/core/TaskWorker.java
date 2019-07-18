@@ -46,22 +46,26 @@ public class TaskWorker extends Thread {
     @Override
     public void run() {
         while (true) {
+            long currentTimeMillis = System.currentTimeMillis();
             Iterator<TaskExecutor> iterator = taskExecutors.iterator();
             while (iterator.hasNext()) {
-                TaskExecutor next = iterator.next();
-                // 如果当前执行者繁忙，则跳过
-                if (next.getStatus() == TaskExecutor.Status.BUSY) {
-                    continue;
-                }
                 if (this.isShutdown) {
                     break;
                 }
-                executors.execute(next);
+                TaskExecutor next = iterator.next();
+                // 如果当前执行者繁忙，则跳过
+                if (next.isReady()) {
+                    executors.execute(next);
+                }
             }
-            try {
-                sleep(100);
-            } catch (InterruptedException e) {
-                // pass
+            long spend = System.currentTimeMillis() - currentTimeMillis;
+            long sleep = 1000 - spend;
+            if (sleep > 0) {
+                try {
+                    sleep(sleep);
+                } catch (InterruptedException e) {
+                    // pass
+                }
             }
         }
     }

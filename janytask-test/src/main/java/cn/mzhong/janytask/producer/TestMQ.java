@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.producer;
 
-import cn.mzhong.janytask.loopline.Loopline;
-import cn.mzhong.janytask.pipleline.Pipleline;
+import cn.mzhong.janytask.queue.loopline.Loopline;
+import cn.mzhong.janytask.queue.pipleline.Pipleline;
 
 @Producer
 public interface TestMQ {

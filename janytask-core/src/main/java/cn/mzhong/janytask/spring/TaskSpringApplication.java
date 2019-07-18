@@ -29,9 +29,11 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
         this.addBeanPostProcessor(beanFactory, new AutowiredAnnotationBeanPostProcessor());
         // 支持Resource、PostConstruct等注解
         this.addBeanPostProcessor(beanFactory, new CommonAnnotationBeanPostProcessor());
-        // 使用Spring初始化程序
-        this.producerInitializer = new TaskSpringProducerInitializer(beanFactory, beanDefinitionRegistry);
-        this.consumerInitializer = new TaskSpringCosumerInitializer(beanFactory, beanDefinitionRegistry);
+        // 使用Spring生成生产者和消费者
+        queueManager.setProducerCreator(
+                new SpringProducerCreator(beanFactory, beanDefinitionRegistry,
+                        queueManager.getMethodMessageDaoMap()));
+        queueManager.setConsumerCreator(new SpringConsumerCreator(beanFactory, beanDefinitionRegistry));
         this.init();
     }
 

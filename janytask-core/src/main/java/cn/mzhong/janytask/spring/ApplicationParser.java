@@ -2,12 +2,12 @@ package cn.mzhong.janytask.spring;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
-import cn.mzhong.janytask.jdbc.JdbcProvider;
-import cn.mzhong.janytask.redis.GenericRedisConnectionFactory;
-import cn.mzhong.janytask.redis.RedisProvider;
-import cn.mzhong.janytask.redis.SpringRedisConnectionFactory;
+import cn.mzhong.janytask.provider.jdbc.JdbcProvider;
+import cn.mzhong.janytask.provider.redis.GenericRedisConnectionFactory;
+import cn.mzhong.janytask.provider.redis.RedisProvider;
+import cn.mzhong.janytask.provider.redis.SpringRedisConnectionFactory;
 import cn.mzhong.janytask.util.StringUtils;
-import cn.mzhong.janytask.zookeeper.ZookeeperProvider;
+import cn.mzhong.janytask.provider.zookeeper.ZookeeperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
