@@ -12,9 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * <p>
  * ****************************************************************************
- * used for cn.mzhong.janytask.org.springframework.CronSequenceGenerator.java
- * ****************************************************************************
+ * 为了解决依赖问题，本文件来自org.springframework.util.StringUtils.
+ * 去掉了其他有与spring依赖的方法，本文件用于类cn.mzhong.janytask.org.springframework.CronSequenceGenerator
+ * </p>
  */
 package cn.mzhong.janytask.org.springframework;
 

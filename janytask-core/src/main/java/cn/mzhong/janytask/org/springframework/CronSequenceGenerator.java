@@ -13,9 +13,11 @@ package cn.mzhong.janytask.org.springframework;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * <p>
  * ****************************************************************************
- * used for janytask->schedule, use full file from springframework.5.1.8.RELEASE
- * ****************************************************************************
+ * 为了解决依赖问题，本文件来自org.springframework.scheduling.support.CronSequenceGenerator.
+ * 增加了一个构造方法：public CronSequenceGenerator(String expression, String zone);
+ * </p>
  */
 
 import java.util.ArrayList;
