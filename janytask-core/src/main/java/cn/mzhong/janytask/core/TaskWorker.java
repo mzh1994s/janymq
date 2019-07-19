@@ -46,7 +46,7 @@ public class TaskWorker extends Thread {
     @Override
     public void run() {
         while (true) {
-            long currentTimeMillis = System.currentTimeMillis();
+            long current = System.currentTimeMillis();
             Iterator<TaskExecutor> iterator = taskExecutors.iterator();
             while (iterator.hasNext()) {
                 if (this.isShutdown) {
@@ -55,11 +55,11 @@ public class TaskWorker extends Thread {
                 TaskExecutor next = iterator.next();
                 // 如果当前执行者繁忙，则跳过
                 if (next.isReady()) {
+                    next.setBusy();
                     executors.execute(next);
                 }
             }
-            long spend = System.currentTimeMillis() - currentTimeMillis;
-            long sleep = 1000 - spend;
+            long sleep = 1000 - (System.currentTimeMillis() - current);
             if (sleep > 0) {
                 try {
                     sleep(sleep);
@@ -70,8 +70,16 @@ public class TaskWorker extends Thread {
         }
     }
 
+    @SuppressWarnings("SynchronizationOnLocalVariableOrMethodParameter")
     public boolean shutdownAndAwait() throws InterruptedException {
         this.isShutdown = true;
+        Iterator<TaskExecutor> iterator = taskExecutors.iterator();
+        while (iterator.hasNext()) {
+            TaskExecutor next = iterator.next();
+            synchronized (next) {
+                next.notify();
+            }
+        }
         this.executors.shutdown();
         return this.executors.awaitTermination(1000, TimeUnit.SECONDS);
     }

@@ -3,7 +3,6 @@ package cn.mzhong.janytask.test;
 import cn.mzhong.janytask.core.TaskApplication;
 import cn.mzhong.janytask.producer.TestMQ;
 import cn.mzhong.janytask.provider.redis.RedisProvider;
-import cn.mzhong.janytask.util.ThreadUtils;
 
 public class TestMain {
 
@@ -18,7 +17,11 @@ public class TestMain {
             TestMQ testMQ = application.getProducer(TestMQ.class);
 //            testMQ.testPipleline("123");
 //            testMQ.testLoopline("321");
-            ThreadUtils.sleep(1000);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

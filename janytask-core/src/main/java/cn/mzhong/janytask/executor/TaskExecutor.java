@@ -1,6 +1,7 @@
 package cn.mzhong.janytask.executor;
 
 import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.org.springframework.CronSequenceGenerator;
 
 import java.util.Date;
 
@@ -10,56 +11,61 @@ import java.util.Date;
 public abstract class TaskExecutor implements Runnable {
 
     protected TaskContext context;
-    protected String cron = "* * * * * * ?";
-    protected String zone;
-    protected Date next = new Date();
+    protected Date next;
+    protected CronSequenceGenerator cronSeq;
     /**
      * 当前执行者状态
      *
      * @since 1.0.1
      */
-    protected TaskExecutor.Status status = Status.READY;
+    protected volatile TaskExecutor.Status status = Status.READY;
 
-    public TaskExecutor(TaskContext context) {
+    public TaskExecutor(TaskContext context, CronSequenceGenerator cronSeq) {
         this.context = context;
+        this.cronSeq = cronSeq;
+        this.next = cronSeq.next(new Date());
     }
 
-    public Status getStatus() {
-        return status;
-    }
-
-    public String getCron() {
-        return cron;
-    }
-
-    public void setCron(String cron) {
-        this.cron = cron;
-    }
-
-    public String getZone() {
-        return zone;
-    }
-
-    public void setZone(String zone) {
-        this.zone = zone;
-    }
-
-    public boolean isReady(){
-        if(status == Status.READY && new Date().after(next)){
+    public boolean isReady() {
+        if (status == Status.READY) {
             return true;
         }
         return false;
     }
 
+    public void setBusy() {
+        this.status = Status.BUSY;
+    }
+
+    private void sleep() {
+        long current = System.currentTimeMillis();
+        long timeout = next.getTime() - current;
+        if (timeout > 0) {
+            sleep(timeout);
+        }
+    }
+
+    protected void sleep(long timeout) {
+        try {
+            synchronized (this) {
+                this.wait(timeout);
+            }
+        } catch (InterruptedException e) {
+            // pass
+        }
+    }
+
     protected abstract void execute();
 
     public void run() {
-        if (context.isShutdown()) {
+        this.status = Status.BUSY;
+        this.sleep();
+        if (this.context.isShutdown()) {
             return;
         }
-        status = Status.BUSY;
         this.execute();
-        status = Status.READY;
+        this.next = cronSeq.next(next);
+        this.status = Status.READY;
     }
 
     public enum Status {

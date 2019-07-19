@@ -17,6 +17,22 @@ public @interface Loopline {
     String version() default "";
 
     /**
+     * 计划任务（只用于表述时间范围）
+     *
+     * @return
+     * @since 1.0.1
+     */
+    String cron() default "* * * * * ?";
+
+    /**
+     * 计划任务（时间区间）
+     *
+     * @return
+     * @since 1.0.1
+     */
+    String zone() default "";
+
+    /**
      * 空闲时每次检测延时时间
      *
      * @return

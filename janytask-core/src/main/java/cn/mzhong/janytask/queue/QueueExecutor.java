@@ -2,7 +2,6 @@ package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
-import cn.mzhong.janytask.util.ThreadUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +22,7 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
     protected long cnt = 0;
 
     public QueueExecutor(TaskContext context, QueueInfo<A> queueInfo) {
-        super(context);
+        super(context, queueInfo.cronSequenceGenerator);
         this.queueInfo = queueInfo;
         this.messageDao = queueInfo.getMessageDao();
         this.ID = messageDao.ID();
@@ -41,7 +40,7 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
             invoke();
         } catch (Exception e) {
             Log.error(e.getLocalizedMessage(), e);
-            ThreadUtils.sleep(15000);
+            sleep(15000);
         }
     }
 
@@ -77,7 +76,7 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
             Log.debug("'{}'：第{}轮消息处理完毕，数量:{}，总耗时:{}秒，单条耗时:{}毫秒", ID, cnt, done, seconds, speed);
         }
         if (spendTime < idleInterval) {
-            ThreadUtils.sleep(idleInterval - spendTime);
+            sleep(idleInterval - spendTime);
         }
     }
 

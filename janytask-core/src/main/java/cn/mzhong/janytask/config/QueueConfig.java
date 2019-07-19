@@ -2,11 +2,11 @@ package cn.mzhong.janytask.config;
 
 public class QueueConfig {
     /**
-     * 当消费者空闲时，间隔多少时间检测一次消息
+     * 当消费者检测到任务列表为空时的空闲时间
      */
-    protected long idleInterval = 3000;
+    protected long idleInterval = 0;
     /**
-     * 当消费者处理完一条消息后，休息多少时间进行下一次消息处理
+     * 当消费者处理完一条消息后的休息时间
      */
     protected long sleepInterval = 0;
 

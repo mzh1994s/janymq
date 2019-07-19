@@ -11,6 +11,6 @@ public class TestMQImpl implements TestMQ {
 
     public boolean testLoopline(String value) {
         System.out.println(value);
-        return false;
+        return true;
     }
 }

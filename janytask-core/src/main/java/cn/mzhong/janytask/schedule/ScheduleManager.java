@@ -3,14 +3,18 @@ package cn.mzhong.janytask.schedule;
 import cn.mzhong.janytask.core.TaskComponent;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
+import cn.mzhong.janytask.org.springframework.CronSequenceGenerator;
 import cn.mzhong.janytask.util.ClassUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Set;
 
 public class ScheduleManager implements TaskComponent {
+
+    Logger Log = LoggerFactory.getLogger(ScheduleManager.class);
 
     @SuppressWarnings("unchecked")
     public void init(TaskContext context) {
@@ -24,41 +28,43 @@ public class ScheduleManager implements TaskComponent {
             int len = methods.length;
             for (int i = 0; i < len; i++) {
                 Method method = methods[i];
-                Cron cron = method.getAnnotation(Cron.class);
-                if(cron != null){
-                    context.getTaskWorker().addExecutor(new ScheduleExecutor(context, schedule));
+                Scheduled scheduled = method.getAnnotation(Scheduled.class);
+                if (scheduled != null) {
+                    CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(scheduled.cron(), scheduled.zone());
+                    context.getTaskWorker().addExecutor(new ScheduleExecutor(context, schedule, method, cronSequenceGenerator));
                 }
             }
         }
     }
 
-    protected Object createSchedule(Class<?> _class){
+    protected Object createSchedule(Class<?> _class) {
         try {
             return _class.getDeclaredConstructor().newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            Log.error(e.getLocalizedMessage(), e);
         }
         return null;
     }
+
+    class ScheduleExecutor extends TaskExecutor {
+
+        Object schedule;
+        Method scheduled;
+
+        public ScheduleExecutor(TaskContext context, Object schedule, Method scheduled, CronSequenceGenerator cronSequenceGenerator) {
+            super(context, cronSequenceGenerator);
+            this.schedule = schedule;
+            this.scheduled = scheduled;
+        }
+
+        @Override
+        protected void execute() {
+            try {
+                scheduled.invoke(schedule);
+            } catch (Exception e) {
+                Log.error(e.getLocalizedMessage(), e);
+            }
+        }
+    }
 }
 
-class ScheduleExecutor extends TaskExecutor{
-
-    Object schedule;
-
-    public ScheduleExecutor(TaskContext context, Object schedule) {
-        super(context);
-        this.schedule = schedule;
-    }
-
-    @Override
-    protected void execute() {
-
-    }
-}

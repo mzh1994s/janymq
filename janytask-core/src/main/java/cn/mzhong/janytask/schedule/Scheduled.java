@@ -1,25 +1,29 @@
 package cn.mzhong.janytask.schedule;
 
-import org.springframework.scheduling.annotation.Scheduled;
+import java.lang.annotation.*;
 
 /**
  * 定时任务时间表达式
  *
  * @since 1.0.1
  */
-public @interface Cron {
+
+@Documented
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Scheduled {
 
     /**
      * 定时任务cron
      *
      * @return
      */
-    String value();
+    String cron();
 
     /**
      * 时区
      *
      * @return
      */
-    String zone();
+    String zone() default "";
 }

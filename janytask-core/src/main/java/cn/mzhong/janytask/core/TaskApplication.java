@@ -48,6 +48,7 @@ public class TaskApplication extends TaskContext {
         // 调用初始化程序
         this.queueProvider.init(this);
         this.queueManager.init(this);
+        this.scheduleManager.init(this);
 
         // 正常终结
         Runtime.getRuntime().addShutdownHook(new TaskShutdownHook(this));

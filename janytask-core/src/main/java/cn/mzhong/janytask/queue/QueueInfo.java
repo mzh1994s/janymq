@@ -1,7 +1,10 @@
 package cn.mzhong.janytask.queue;
 
 
+import cn.mzhong.janytask.org.springframework.CronSequenceGenerator;
 import cn.mzhong.janytask.tool.IDGenerator;
+import cn.mzhong.janytask.util.AnnotationUtils;
+import cn.mzhong.janytask.util.StringUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -15,6 +18,7 @@ public class QueueInfo<A extends Annotation> {
     protected Object consumer;
     protected Class<?> consumerClass;
     protected Method consumerMethod;
+    CronSequenceGenerator cronSequenceGenerator;
 
     public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, Object consumer, Class<?> consumerClass, Method consumerMethod) {
         this.annotation = annotation;
@@ -23,14 +27,12 @@ public class QueueInfo<A extends Annotation> {
         this.consumer = consumer;
         this.consumerClass = consumerClass;
         this.consumerMethod = consumerMethod;
-        try {
-            Class<? extends Annotation> annotationType = annotation.annotationType();
-            String value = (String) annotationType.getMethod("value").invoke(annotation);
-            String version = (String) annotationType.getMethod("version").invoke(annotation);
-            this.ID = ID(value(producerClass, producerMethod, value), version);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        String value = AnnotationUtils.getAnnotationValue(annotation, "value");
+        String version = AnnotationUtils.getAnnotationValue(annotation, "version");
+        String cron = AnnotationUtils.getAnnotationValue(annotation,"cron");
+        String zone = AnnotationUtils.getAnnotationValue(annotation,"zone");
+        this.ID = ID(value(producerClass, producerMethod, value), version);
+        this.cronSequenceGenerator = new CronSequenceGenerator(cron, zone);
     }
 
     public A getAnnotation() {
@@ -84,7 +86,7 @@ public class QueueInfo<A extends Annotation> {
 
     protected static String value(Class<?> _interface, Method method, String value) {
         String lineName = value;
-        if ("".equals(lineName.trim())) {
+        if (StringUtils.isEmpty(lineName)) {
             lineName = _interface.getName() + "." + method.getName() + "(" + parameterTypeString(method) + ")";
         }
         return lineName;
@@ -92,8 +94,11 @@ public class QueueInfo<A extends Annotation> {
 
     protected static String ID(String value, String... items) {
         IDGenerator generator = new IDGenerator(value, "-");
-        for (String item : items) {
-            generator.append(item);
+        if (items != null) {
+            int len = items.length;
+            for (int i = 0; i < len; i++) {
+                generator.append(items[i]);
+            }
         }
         return generator.generate();
     }
