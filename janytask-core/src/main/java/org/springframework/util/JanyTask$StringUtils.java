@@ -14,11 +14,11 @@
  * limitations under the License.
  * <p>
  * ****************************************************************************
- * 为了解决依赖问题，本文件来自org.springframework.util.StringUtils.
- * 去掉了其他有与spring依赖的方法，本文件用于类cn.mzhong.janytask.org.springframework.CronSequenceGenerator
+ * 为了解决依赖问题，本文件来自org.springframework.util.JanyTask$StringUtils.
+ * 去掉了其他有与spring依赖的方法，本文件用于类cn.mzhong.janytask.org.springframework.JanyTask$CronSequenceGenerator
  * </p>
  */
-package cn.mzhong.janytask.org.springframework;
+package org.springframework.util;
 
 import java.util.*;
 
@@ -44,7 +44,7 @@ import java.util.*;
  * @author Brian Clozel
  * @since 16 April 2001
  */
-public abstract class StringUtils {
+public abstract class JanyTask$StringUtils {
 
     private static final String FOLDER_SEPARATOR = "/";
 
@@ -88,10 +88,10 @@ public abstract class StringUtils {
      * <p>Note: this method returns {@code true} for a {@code CharSequence}
      * that purely consists of whitespace.
      * <p><pre class="code">
-     * StringUtils.hasLength(null) = false
-     * StringUtils.hasLength("") = false
-     * StringUtils.hasLength(" ") = true
-     * StringUtils.hasLength("Hello") = true
+     * JanyTask$StringUtils.hasLength(null) = false
+     * JanyTask$StringUtils.hasLength("") = false
+     * JanyTask$StringUtils.hasLength(" ") = true
+     * JanyTask$StringUtils.hasLength("Hello") = true
      * </pre>
      *
      * @param str the {@code CharSequence} to check (may be {@code null})
@@ -123,11 +123,11 @@ public abstract class StringUtils {
      * {@code CharSequence} is not {@code null}, its length is greater than
      * 0, and it contains at least one non-whitespace character.
      * <p><pre class="code">
-     * StringUtils.hasText(null) = false
-     * StringUtils.hasText("") = false
-     * StringUtils.hasText(" ") = false
-     * StringUtils.hasText("12345") = true
-     * StringUtils.hasText(" 12345 ") = true
+     * JanyTask$StringUtils.hasText(null) = false
+     * JanyTask$StringUtils.hasText("") = false
+     * JanyTask$StringUtils.hasText(" ") = false
+     * JanyTask$StringUtils.hasText("12345") = true
+     * JanyTask$StringUtils.hasText(" 12345 ") = true
      * </pre>
      *
      * @param str the {@code CharSequence} to check (may be {@code null})

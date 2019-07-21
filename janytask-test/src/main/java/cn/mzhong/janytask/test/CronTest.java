@@ -1,12 +1,12 @@
 package cn.mzhong.janytask.test;
 
-import org.springframework.scheduling.support.CronSequenceGenerator;
+import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 
 import java.util.Date;
 
 public class CronTest {
     public static void main(String[] args) {
-        CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator("* * * * * ?");
+        JanyTask$CronSequenceGenerator cronSequenceGenerator = new JanyTask$CronSequenceGenerator("* * * * * ?");
         System.out.println(cronSequenceGenerator.next(new Date()));
     }
 }

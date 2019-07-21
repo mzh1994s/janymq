@@ -3,7 +3,7 @@ package cn.mzhong.janytask.schedule;
 import cn.mzhong.janytask.core.TaskComponent;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.executor.TaskExecutor;
-import cn.mzhong.janytask.org.springframework.CronSequenceGenerator;
+import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class ScheduleManager implements TaskComponent {
                 Method method = methods[i];
                 Scheduled scheduled = method.getAnnotation(Scheduled.class);
                 if (scheduled != null) {
-                    CronSequenceGenerator cronSequenceGenerator = new CronSequenceGenerator(scheduled.cron(), scheduled.zone());
+                    JanyTask$CronSequenceGenerator cronSequenceGenerator = new JanyTask$CronSequenceGenerator(scheduled.cron(), scheduled.zone());
                     context.getTaskWorker().addExecutor(new ScheduleExecutor(context, schedule, method, cronSequenceGenerator));
                 }
             }
@@ -51,7 +51,7 @@ public class ScheduleManager implements TaskComponent {
         Object schedule;
         Method scheduled;
 
-        public ScheduleExecutor(TaskContext context, Object schedule, Method scheduled, CronSequenceGenerator cronSequenceGenerator) {
+        public ScheduleExecutor(TaskContext context, Object schedule, Method scheduled, JanyTask$CronSequenceGenerator cronSequenceGenerator) {
             super(context, cronSequenceGenerator);
             this.schedule = schedule;
             this.scheduled = scheduled;

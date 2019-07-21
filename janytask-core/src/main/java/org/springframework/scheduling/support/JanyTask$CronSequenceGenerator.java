@@ -1,4 +1,4 @@
-package cn.mzhong.janytask.org.springframework;
+package org.springframework.scheduling.support;
 /*
  * Copyright 2002-2018 the original author or authors.
  *
@@ -15,10 +15,12 @@ package cn.mzhong.janytask.org.springframework;
  * limitations under the License.
  * <p>
  * ****************************************************************************
- * 为了解决依赖问题，本文件来自org.springframework.scheduling.support.CronSequenceGenerator.
- * 增加了一个构造方法：public CronSequenceGenerator(String expression, String zone);
+ * 为了解决依赖问题，本文件来自org.springframework.scheduling.support.JanyTask$CronSequenceGenerator.
+ * 增加了一个构造方法：public JanyTask$CronSequenceGenerator(String expression, String zone);
  * </p>
  */
+
+import org.springframework.util.JanyTask$StringUtils;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -54,7 +56,7 @@ import java.util.TimeZone;
  * @author Ruslan Sibgatullin
  * @since 3.0
  */
-public class CronSequenceGenerator {
+public class JanyTask$CronSequenceGenerator {
 
     private final String expression;
 
@@ -74,26 +76,26 @@ public class CronSequenceGenerator {
 
 
     /**
-     * Construct a {@link CronSequenceGenerator} from the pattern provided,
+     * Construct a {@link JanyTask$CronSequenceGenerator} from the pattern provided,
      * using the default {@link TimeZone}.
      *
      * @param expression a space-separated list of time fields
      * @throws IllegalArgumentException if the pattern cannot be parsed
      * @see java.util.TimeZone#getDefault()
      */
-    public CronSequenceGenerator(String expression) {
+    public JanyTask$CronSequenceGenerator(String expression) {
         this(expression, TimeZone.getDefault());
     }
 
     /**
-     * Construct a {@link CronSequenceGenerator} from the pattern provided,
+     * Construct a {@link JanyTask$CronSequenceGenerator} from the pattern provided,
      * using the specified {@link TimeZone}.
      *
      * @param expression a space-separated list of time fields
      * @param timeZone   the TimeZone to use for generated trigger times
      * @throws IllegalArgumentException if the pattern cannot be parsed
      */
-    public CronSequenceGenerator(String expression, TimeZone timeZone) {
+    public JanyTask$CronSequenceGenerator(String expression, TimeZone timeZone) {
         this.expression = expression;
         this.timeZone = timeZone;
         parse(expression);
@@ -105,20 +107,20 @@ public class CronSequenceGenerator {
      * @param expression
      * @param zone
      */
-    public CronSequenceGenerator(String expression, String zone) {
-        if (StringUtils.isEmpty(zone)) {
+    public JanyTask$CronSequenceGenerator(String expression, String zone) {
+        if (JanyTask$StringUtils.isEmpty(zone)) {
             this.timeZone = TimeZone.getDefault();
         } else {
             this.timeZone = TimeZone.getTimeZone(zone);
         }
-        if (StringUtils.isEmpty(expression)) {
+        if (JanyTask$StringUtils.isEmpty(expression)) {
             expression = "* * * * * ?";
         }
         this.expression = expression;
         parse(expression);
     }
 
-    private CronSequenceGenerator(String expression, String[] fields) {
+    private JanyTask$CronSequenceGenerator(String expression, String[] fields) {
         this.expression = expression;
         this.timeZone = null;
         doParse(fields);
@@ -287,7 +289,7 @@ public class CronSequenceGenerator {
      * Parse the given pattern expression.
      */
     private void parse(String expression) throws IllegalArgumentException {
-        String[] fields = StringUtils.tokenizeToStringArray(expression, " ");
+        String[] fields = JanyTask$StringUtils.tokenizeToStringArray(expression, " ");
         if (!areValidCronFields(fields)) {
             throw new IllegalArgumentException(String.format(
                     "Scheduled expression must consist of 6 fields (found %d in \"%s\")", fields.length, expression));
@@ -317,10 +319,10 @@ public class CronSequenceGenerator {
      * @return a new String with the values from the list replaced
      */
     private String replaceOrdinals(String value, String commaSeparatedList) {
-        String[] list = StringUtils.commaDelimitedListToStringArray(commaSeparatedList);
+        String[] list = JanyTask$StringUtils.commaDelimitedListToStringArray(commaSeparatedList);
         for (int i = 0; i < list.length; i++) {
             String item = list[i].toUpperCase();
-            value = StringUtils.replace(value.toUpperCase(), item, "" + i);
+            value = JanyTask$StringUtils.replace(value.toUpperCase(), item, "" + i);
         }
         return value;
     }
@@ -355,14 +357,14 @@ public class CronSequenceGenerator {
     }
 
     private void setNumberHits(BitSet bits, String value, int min, int max) {
-        String[] fields = StringUtils.delimitedListToStringArray(value, ",");
+        String[] fields = JanyTask$StringUtils.delimitedListToStringArray(value, ",");
         for (String field : fields) {
             if (!field.contains("/")) {
                 // Not an incrementer so it must be a range (possibly empty)
                 int[] range = getRange(field, min, max);
                 bits.set(range[0], range[1] + 1);
             } else {
-                String[] split = StringUtils.delimitedListToStringArray(field, "/");
+                String[] split = JanyTask$StringUtils.delimitedListToStringArray(field, "/");
                 if (split.length > 2) {
                     throw new IllegalArgumentException("Incrementer has more than two fields: '" +
                             field + "' in expression \"" + this.expression + "\"");
@@ -393,7 +395,7 @@ public class CronSequenceGenerator {
         if (!field.contains("-")) {
             result[0] = result[1] = Integer.valueOf(field);
         } else {
-            String[] split = StringUtils.delimitedListToStringArray(field, "-");
+            String[] split = JanyTask$StringUtils.delimitedListToStringArray(field, "-");
             if (split.length > 2) {
                 throw new IllegalArgumentException("Range has more than two fields: '" +
                         field + "' in expression \"" + this.expression + "\"");
@@ -428,12 +430,12 @@ public class CronSequenceGenerator {
         if (expression == null) {
             return false;
         }
-        String[] fields = StringUtils.tokenizeToStringArray(expression, " ");
+        String[] fields = JanyTask$StringUtils.tokenizeToStringArray(expression, " ");
         if (!areValidCronFields(fields)) {
             return false;
         }
         try {
-            new CronSequenceGenerator(expression, fields);
+            new JanyTask$CronSequenceGenerator(expression, fields);
             return true;
         } catch (IllegalArgumentException ex) {
             return false;
@@ -450,10 +452,10 @@ public class CronSequenceGenerator {
         if (this == other) {
             return true;
         }
-        if (!(other instanceof CronSequenceGenerator)) {
+        if (!(other instanceof JanyTask$CronSequenceGenerator)) {
             return false;
         }
-        CronSequenceGenerator otherCron = (CronSequenceGenerator) other;
+        JanyTask$CronSequenceGenerator otherCron = (JanyTask$CronSequenceGenerator) other;
         return (this.months.equals(otherCron.months) && this.daysOfMonth.equals(otherCron.daysOfMonth) &&
                 this.daysOfWeek.equals(otherCron.daysOfWeek) && this.hours.equals(otherCron.hours) &&
                 this.minutes.equals(otherCron.minutes) && this.seconds.equals(otherCron.seconds));

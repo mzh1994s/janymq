@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.executor;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.org.springframework.CronSequenceGenerator;
+import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 
 import java.util.Date;
 
@@ -12,7 +12,7 @@ public abstract class TaskExecutor implements Runnable {
 
     protected TaskContext context;
     protected Date next;
-    protected CronSequenceGenerator cronSeq;
+    protected JanyTask$CronSequenceGenerator cronSeq;
     /**
      * 当前执行者状态
      *
@@ -20,7 +20,7 @@ public abstract class TaskExecutor implements Runnable {
      */
     protected volatile TaskExecutor.Status status = Status.READY;
 
-    public TaskExecutor(TaskContext context, CronSequenceGenerator cronSeq) {
+    public TaskExecutor(TaskContext context, JanyTask$CronSequenceGenerator cronSeq) {
         this.context = context;
         this.cronSeq = cronSeq;
         this.next = cronSeq.next(new Date());

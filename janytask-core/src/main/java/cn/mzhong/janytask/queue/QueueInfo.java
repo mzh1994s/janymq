@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.queue;
 
 
-import cn.mzhong.janytask.org.springframework.CronSequenceGenerator;
+import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 import cn.mzhong.janytask.tool.IDGenerator;
 import cn.mzhong.janytask.util.AnnotationUtils;
 import cn.mzhong.janytask.util.StringUtils;
@@ -18,7 +18,7 @@ public class QueueInfo<A extends Annotation> {
     protected Object consumer;
     protected Class<?> consumerClass;
     protected Method consumerMethod;
-    CronSequenceGenerator cronSequenceGenerator;
+    JanyTask$CronSequenceGenerator cronSequenceGenerator;
 
     public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, Object consumer, Class<?> consumerClass, Method consumerMethod) {
         this.annotation = annotation;
@@ -32,7 +32,7 @@ public class QueueInfo<A extends Annotation> {
         String cron = AnnotationUtils.getAnnotationValue(annotation,"cron");
         String zone = AnnotationUtils.getAnnotationValue(annotation,"zone");
         this.ID = ID(value(producerClass, producerMethod, value), version);
-        this.cronSequenceGenerator = new CronSequenceGenerator(cron, zone);
+        this.cronSequenceGenerator = new JanyTask$CronSequenceGenerator(cron, zone);
     }
 
     public A getAnnotation() {
