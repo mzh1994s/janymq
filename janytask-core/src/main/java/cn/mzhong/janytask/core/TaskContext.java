@@ -44,7 +44,7 @@ public abstract class TaskContext {
      *
      * @since 1.0.1
      */
-    protected TaskWorker taskWorker = new TaskWorker();
+    protected TaskWorker taskWorker = new TaskWorker(this);
 
     /**
      * JSimpleMQ应用程序是否已经终结

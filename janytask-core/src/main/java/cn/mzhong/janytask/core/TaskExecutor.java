@@ -7,6 +7,8 @@ import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 import java.util.Date;
 
 /**
+ * 任务执行者，每个时间段只会有一个任务执行者在运行。
+ *
  * @since 1.0.1
  */
 public abstract class TaskExecutor implements Runnable {
