@@ -230,20 +230,6 @@ public class QueueManager implements TaskComponent {
         }
 
         /**
-         * 创建消费者对象
-         *
-         * @param consumerClass
-         * @return
-         */
-        public Object createConsumer(Class<?> consumerClass) {
-            try {
-                return consumerClass.getDeclaredConstructor().newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        /**
          * 创建线程列表（一个消费者消息队列一个线程）
          *
          * @param context
@@ -257,7 +243,7 @@ public class QueueManager implements TaskComponent {
             TaskWorker taskWorker = context.getTaskWorker();
             try {
                 for (Class<?> consumerClass : consumerClassSet) {
-                    Object consumer = this.createConsumer(consumerClass);
+                    Object consumer = consumerCreator.createConsumer(consumerClass);
                     consumerMap.put(consumerClass, consumer);
                     taskWorker.addExecutors(this.handleConsumer(context, consumer, consumerClass));
                 }

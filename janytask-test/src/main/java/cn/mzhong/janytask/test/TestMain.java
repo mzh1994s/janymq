@@ -18,7 +18,7 @@ public class TestMain {
 //            testMQ.testPipleline("123");
 //            testMQ.testLoopline("321");
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

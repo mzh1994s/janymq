@@ -10,6 +10,13 @@ public class ScheduleBean {
     public void doService() {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        System.out.println(dateFormat.format(date));
+        System.out.println("doService:" + dateFormat.format(date));
+    }
+
+    @Scheduled(cron = "00 01 * * * ?")
+    public void doService2() {
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        System.out.println("doService2:" + dateFormat.format(date));
     }
 }
