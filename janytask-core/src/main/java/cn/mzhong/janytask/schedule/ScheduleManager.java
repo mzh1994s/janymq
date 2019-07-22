@@ -2,7 +2,7 @@ package cn.mzhong.janytask.schedule;
 
 import cn.mzhong.janytask.core.TaskComponent;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.executor.TaskExecutor;
+import cn.mzhong.janytask.core.TaskExecutor;
 import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;

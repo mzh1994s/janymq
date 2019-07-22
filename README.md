@@ -1,42 +1,30 @@
-**快速开始**
-<br/>
+***Janytask***<br/>
+_宗旨：用尽可能少的维护成本搭建任务平台，用尽可能简单的调用方式处理异步任务。_<br/>
+目前已支持Redis、Zookeeper、数据库（mysql、oracle）作为中间件支撑任务运行。后期会加入更多的中间件作为提供商（Provider）<br/>
+
+***快速开始***<br/>
 1普通应用方式<br>
 TestMQ.java
 <pre>
-package cn.mzhong.janymq.test;
-
-import Pipleline;
-import Producer;
-
-import java.util.List;
-import java.util.Map;
-
 @Producer
 public interface TestMQ {
 
     @Pipleline("TestMQ")
     void testVoid();
 
-    @Pipleline(value = "TestMQ", version = "string")
+    @Pipleline(value = "TestMQ", version = "1.0.0")
     void testString(String value);
 
-    @Pipleline(value = "TestMQ", version = "list")
+    @Pipleline(value = "TestMQ", version = "1.0.1")
     void testList(List<String> value);
 
-    @Pipleline(value = "TestMQ", version = "map")
+    @Pipleline
     void testMap(Map<String, String> value);
 }
 </pre>
 TestMQImpl.java
 <br>
 <pre>
-package cn.mzhong.janymq.test;
-
-import Consumer;
-
-import java.util.List;
-import java.util.Map;
-
 @Consumer
 public class TestMQImpl implements TestMQ {
 
@@ -65,31 +53,25 @@ public class TestMQImpl implements TestMQ {
 TestMain.java
 <br>
 <pre>
-package cn.mzhong.janymq.test;
-
-import MQApplication;
-import TestMQ;
-import RedisLineManagerProvider;
-import ThreadUtils;
-
 public class TestMain {
 
     public static void main(String[] args) {
         // 启动消费者
-        RedisLineManagerProvider manager = new RedisLineManagerProvider();
-        manager.setHostName("mzhong.cn");
-        manager.setPort(6379);
-        manager.setTimeout(1500);
-        manager.init();
-        MQApplication application = new MQApplication();
-        application.setLineManagerProvider(manager);
+        TaskApplication application = new TaskApplication();
+        // Janytask依靠第三方提供商运行，必须指定提供商
+        RedisProvider manager = RedisProvider.create("mzhong.cn", 6379);
+        application.setQueueProvider(manager);
         application.init();
+        TestMQ testMQ = application.getProducer(TestMQ.class);
         // 测试任务
         while (true) {
-            TestMQ testMQ = application.getProducer(TestMQ.class);
-            testMQ.testPipleline("123");
-            testMQ.testLoopline("321");
-            ThreadUtils.sleep(1000);
+            testMQ.testVoid();
+            testMQ.testString("321");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
@@ -113,21 +95,14 @@ spring-janymq.xml
 </pre>
 TestSpring.java
 <pre>
-package cn.mzhong.janymq.test;
-
-import TestBean;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 public class TestSpring {
 
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("spring-janymq.xml");
-        TestBean testBean = context.getBean(TestBean.class);
-        int cnt = 1;
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring-janytask.xml");
+        TestMQ testBean = context.getBean(TestMQ.class);
         while (cnt >= 0) {
-            testBean.testPipleline();
-            testBean.testLoopline();
+            testMQ.testVoid();
+            testMQ.testString("321");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

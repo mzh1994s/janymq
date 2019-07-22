@@ -5,7 +5,7 @@ import cn.mzhong.janytask.consumer.ConsumerCreator;
 import cn.mzhong.janytask.core.TaskComponent;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.core.TaskWorker;
-import cn.mzhong.janytask.executor.TaskExecutor;
+import cn.mzhong.janytask.core.TaskExecutor;
 import cn.mzhong.janytask.queue.loopline.LoopLineAnnotationHandler;
 import cn.mzhong.janytask.queue.pipleline.PipleLineAnnotationHandler;
 import cn.mzhong.janytask.producer.Producer;

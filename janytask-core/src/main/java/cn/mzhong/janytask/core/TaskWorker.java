@@ -1,6 +1,5 @@
 package cn.mzhong.janytask.core;
 
-import cn.mzhong.janytask.executor.TaskExecutor;
 import cn.mzhong.janytask.tool.PInvoker;
 import cn.mzhong.janytask.util.Arrays;
 

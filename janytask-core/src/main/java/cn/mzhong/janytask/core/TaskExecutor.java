@@ -1,6 +1,5 @@
-package cn.mzhong.janytask.executor;
+package cn.mzhong.janytask.core;
 
-import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.tool.PInvoker;
 import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 

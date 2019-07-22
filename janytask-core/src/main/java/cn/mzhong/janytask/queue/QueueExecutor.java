@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.executor.TaskExecutor;
+import cn.mzhong.janytask.core.TaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
