@@ -84,13 +84,13 @@ spring-janymq.xml
 &lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:janymq="http://www.mzhong.cn/schema/janymq" xmlns:bean="http://www.springframework.org/schema/util"
+       xmlns:janymq="http://www.mzhong.cn/schema/janytask" xmlns:bean="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-            http://www.mzhong.cn/schema/janymq http://www.mzhong.cn/schema/janymq.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"&gt;
+            http://www.mzhong.cn/schema/janytask http://www.mzhong.cn/schema/janymq.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"&gt;
     &lt;!--redis 实现--&gt;
-    &lt;janymq:application basePackage="cn.mzhong"&gt;
-        &lt;janymq:redis hostName="mzhong.cn" port="6379"/&gt;
-    &lt;/janymq:application&gt;
+    &lt;janytask:application basePackage="cn.mzhong"&gt;
+        &lt;janytask:redis hostName="mzhong.cn" port="6379"/&gt;
+    &lt;/janytask:application&gt;
 &lt;/beans&gt;
 </pre>
 TestSpring.java
