@@ -2,8 +2,10 @@ package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.core.TaskExecutor;
+import cn.mzhong.janytask.util.ValueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -17,19 +19,18 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
     protected MessageDao messageDao;
     protected Method method;
     protected Object consumer;
-    protected long idleInterval;
-    protected long sleepInterval;
     protected long cnt = 0;
 
     public QueueExecutor(TaskContext context, QueueInfo<A> queueInfo) {
-        super(context, queueInfo.cronSequenceGenerator);
+        super(context, new JanyTask$CronSequenceGenerator(
+                ValueUtils.uEmptyStr(queueInfo.cron, context.getQueueConfig().getCron()),
+                ValueUtils.uEmptyStr(queueInfo.zone, context.getQueueConfig().getZone())
+        ));
         this.queueInfo = queueInfo;
         this.messageDao = queueInfo.getMessageDao();
         this.ID = messageDao.ID();
         this.method = queueInfo.getConsumerMethod();
         this.consumer = queueInfo.getConsumer();
-        this.idleInterval = context.getQueueConfig().getIdleInterval();
-        this.sleepInterval = context.getQueueConfig().getSleepInterval();
     }
 
     protected abstract void invoke(Message message);
@@ -74,9 +75,6 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
                 speed = (int) (time / done);
             }
             Log.debug("'{}'：第{}轮消息处理完毕，数量:{}，总耗时:{}秒，单条耗时:{}毫秒", ID, cnt, done, seconds, speed);
-        }
-        if (spendTime < idleInterval) {
-            sleep(idleInterval - spendTime);
         }
     }
 

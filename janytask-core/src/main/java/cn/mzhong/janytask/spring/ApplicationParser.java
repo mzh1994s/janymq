@@ -135,8 +135,8 @@ class QueueConfigParser extends ConfigParser {
     @Override
     public void doParser() {
         ElementToBeanDefinitionParser piplelineParser = new ElementToBeanDefinitionParser(element, QueueConfig.class);
-        piplelineParser.parseStringPropertyFromAttr("idleInterval");
-        piplelineParser.parseStringPropertyFromAttr("sleepInterval");
+        piplelineParser.parseStringPropertyFromAttr("cron");
+        piplelineParser.parseStringPropertyFromAttr("zone");
         this.beanDefinitionBuilder.addPropertyValue("queueConfig", piplelineParser.getBeanDefinition());
     }
 }

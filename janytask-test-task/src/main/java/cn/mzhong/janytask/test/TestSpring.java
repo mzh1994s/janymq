@@ -11,8 +11,8 @@ public class TestSpring {
         TestMQ testBean = context.getBean(TestMQ.class);
         int cnt = 1;
         while (cnt >= 0) {
-            testBean.testLoopline("loopline");
-            testBean.testPipleline("pipleline");
+//            testBean.testLoopline("loopline");
+//            testBean.testPipleline("pipleline");
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {

@@ -16,7 +16,7 @@ import java.util.Map;
  * 你只需编写消费者代码即可由janytask应用程序获取到生产者的代理，而且编写一个消费者也特别容易。
  *
  * @author mzhong
- * @version 1.0.0
+ * @version 1.0.1
  * @date 2019年7月10日
  */
 public class TaskApplication extends TaskContext {
@@ -37,7 +37,7 @@ public class TaskApplication extends TaskContext {
             queueConfig = new QueueConfig();
         }
         if (queueProvider == null) {
-            throw new TaskInitExcepition("queueProvider不存在，请先指定queueProvider");
+            throw new TaskInitExcepition("未找到提供商，请先指定提供商！");
         }
         if (dataSerializer == null) {
             dataSerializer = new JdkDataSerializer();
@@ -49,6 +49,7 @@ public class TaskApplication extends TaskContext {
         this.queueProvider.init(this);
         this.queueManager.init(this);
         this.scheduleManager.init(this);
+        this.taskWorker.init(this);
 
         // 正常终结
         Runtime.getRuntime().addShutdownHook(new TaskShutdownHook(this));

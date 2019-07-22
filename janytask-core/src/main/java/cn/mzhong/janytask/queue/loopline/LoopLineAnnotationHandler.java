@@ -41,8 +41,6 @@ class LooplineTaskExecutor extends QueueExecutor<Loopline> {
     public LooplineTaskExecutor(TaskContext context, QueueInfo<Loopline> queueInfo) {
         super(context, queueInfo);
         this.loopline = queueInfo.getAnnotation();
-        this.idleInterval = ValueUtils.uLong(loopline.idleInterval(), this.idleInterval);
-        this.sleepInterval = ValueUtils.uLong(loopline.sleepInterval(), this.sleepInterval);
     }
 
     protected void invoke(Message message) {

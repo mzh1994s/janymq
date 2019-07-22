@@ -11,6 +11,10 @@ import java.lang.reflect.Method;
 
 public class QueueInfo<A extends Annotation> {
     protected String ID;
+    protected String value;
+    protected String version;
+    protected String cron;
+    protected String zone;
     protected A annotation;
     protected MessageDao messageDao;
     protected Class<?> producerClass;
@@ -18,7 +22,6 @@ public class QueueInfo<A extends Annotation> {
     protected Object consumer;
     protected Class<?> consumerClass;
     protected Method consumerMethod;
-    JanyTask$CronSequenceGenerator cronSequenceGenerator;
 
     public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, Object consumer, Class<?> consumerClass, Method consumerMethod) {
         this.annotation = annotation;
@@ -27,12 +30,12 @@ public class QueueInfo<A extends Annotation> {
         this.consumer = consumer;
         this.consumerClass = consumerClass;
         this.consumerMethod = consumerMethod;
-        String value = AnnotationUtils.getAnnotationValue(annotation, "value");
-        String version = AnnotationUtils.getAnnotationValue(annotation, "version");
-        String cron = AnnotationUtils.getAnnotationValue(annotation,"cron");
-        String zone = AnnotationUtils.getAnnotationValue(annotation,"zone");
-        this.ID = ID(value(producerClass, producerMethod, value), version);
-        this.cronSequenceGenerator = new JanyTask$CronSequenceGenerator(cron, zone);
+        String annotationValue = AnnotationUtils.getAnnotationValue(annotation, "value");
+        this.value = value(producerClass, producerMethod, annotationValue);
+        this.version = AnnotationUtils.getAnnotationValue(annotation, "version");
+        this.cron = AnnotationUtils.getAnnotationValue(annotation, "cron");
+        this.zone = AnnotationUtils.getAnnotationValue(annotation, "zone");
+        this.ID = ID(this.value, this.version);
     }
 
     public A getAnnotation() {

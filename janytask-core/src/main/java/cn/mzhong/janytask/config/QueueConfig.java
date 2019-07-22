@@ -1,38 +1,45 @@
 package cn.mzhong.janytask.config;
 
 public class QueueConfig {
+
+
     /**
-     * 当消费者检测到任务列表为空时的空闲时间
+     * 计划任务（只用于表述时间范围）
+     *
+     * @return
+     * @since 1.0.1
      */
-    protected long idleInterval = 0;
+    private String cron = "* * * * * ?";
+
     /**
-     * 当消费者处理完一条消息后的休息时间
+     * 计划任务（时间区间）
+     *
+     * @return
+     * @since 1.0.1
      */
-    protected long sleepInterval = 0;
+    private String zone = "";
 
-    protected String cron = "";
-
-    public long getIdleInterval() {
-        return idleInterval;
+    public String getCron() {
+        return cron;
     }
 
-    public void setIdleInterval(long idleInterval) {
-        this.idleInterval = idleInterval;
+    public void setCron(String cron) {
+        this.cron = cron;
     }
 
-    public long getSleepInterval() {
-        return sleepInterval;
+    public String getZone() {
+        return zone;
     }
 
-    public void setSleepInterval(long sleepInterval) {
-        this.sleepInterval = sleepInterval;
+    public void setZone(String zone) {
+        this.zone = zone;
     }
 
     @Override
     public String toString() {
         return "QueueConfig{" +
-                "idleInterval=" + idleInterval +
-                ", sleepInterval=" + sleepInterval +
+                "cron='" + cron + '\'' +
+                ", zone='" + zone + '\'' +
                 '}';
     }
 }

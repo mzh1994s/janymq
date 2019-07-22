@@ -31,7 +31,7 @@ public @interface Pipleline {
      * @return
      * @since 1.0.1
      */
-    String cron() default "* * * * * ?";
+    String cron() default "";
 
     /**
      * 计划任务（时间区间）
@@ -40,20 +40,4 @@ public @interface Pipleline {
      * @since 1.0.1
      */
     String zone() default "";
-
-    /**
-     * 空闲时每次检测延时时间
-     *
-     * @return
-     * @since 1.0.0
-     */
-    long idleInterval() default -1;
-
-    /**
-     * 每次任务完成后延时时间
-     *
-     * @return
-     * @since 1.0.0
-     */
-    long sleepInterval() default 0;
 }

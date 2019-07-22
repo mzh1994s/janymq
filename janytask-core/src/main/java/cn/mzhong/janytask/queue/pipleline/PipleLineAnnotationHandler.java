@@ -40,8 +40,6 @@ class PiplelineTaskExecutor extends QueueExecutor<Pipleline> {
     public PiplelineTaskExecutor(TaskContext context, QueueInfo<Pipleline> queueInfo) {
         super(context, queueInfo);
         this.pipleline = queueInfo.getAnnotation();
-        this.idleInterval = ValueUtils.uLong(pipleline.idleInterval(), this.idleInterval);
-        this.sleepInterval = ValueUtils.uLong(pipleline.sleepInterval(), this.sleepInterval);
     }
 
     protected void invoke(Message message) {

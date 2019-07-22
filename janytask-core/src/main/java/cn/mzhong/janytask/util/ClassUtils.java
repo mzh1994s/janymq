@@ -1,44 +1,73 @@
 package cn.mzhong.janytask.util;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * classpath 工具类
  */
-public class ClassUtils {
+public abstract class ClassUtils {
 
     private ClassUtils() {
     }
 
-    public final static String classpath;
-    private final static int cutstart;
-
-    static {
-        File classpathFile = new File(ClassUtils.class.getClassLoader().getResource("").getFile());
-        classpath = classpathFile.getAbsolutePath();
-        cutstart = classpath.length() + 1;
-    }
-
-    private static Set<Class<?>> scanByPackage(String packagePattern, File file) {
+    /**
+     * 扫描本地classpath中的类
+     *
+     * @param packagePattern
+     * @param file
+     * @param classPathStart
+     * @return
+     */
+    private static Set<Class<?>> scanByPackage(String packagePattern, File file, int classPathStart) {
         Set<Class<?>> list = new HashSet<Class<?>>();
         for (File children : file.listFiles()) {
             if (children.isDirectory()) {
-                list.addAll(scanByPackage(packagePattern, children));
+                list.addAll(scanByPackage(packagePattern, children, classPathStart));
             } else if (children.getName().endsWith(".class")) {
-                String classpath = children.getParent().substring(cutstart);
-                String _package = classpath.replace(File.separator, ".");
-                if (_package.matches(packagePattern)) {
-                    String filename = children.getName();
-                    String classname = _package + "." + filename.substring(0, filename.length() - 6);
+                String classpath = children.getAbsolutePath().substring(classPathStart);
+                String classFile = classpath.replace(File.separator, ".");
+                if (classFile.matches(packagePattern)) {
+                    String classname = classFile.substring(0, classFile.length() - 6);
                     try {
                         list.add(Class.forName(classname));
                     } catch (ClassNotFoundException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 扫描jar包中的类
+     *
+     * @param packagePattern
+     * @param jarFile
+     * @return
+     */
+    private static Set<Class<?>> scanByPackage(String packagePattern, JarFile jarFile) {
+        Set<Class<?>> list = new HashSet<Class<?>>();
+        Enumeration<JarEntry> entries = jarFile.entries();
+        while (entries.hasMoreElements()) {
+            JarEntry jarEntry = entries.nextElement();
+            String name = jarEntry.getName();
+            if (name.endsWith(".class") && name.matches(packagePattern)) {
+                try {
+                    list.add(Class.forName(name.substring(0, name.length() - 6)));
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -52,14 +81,29 @@ public class ClassUtils {
      * @return
      */
     public static Set<Class<?>> scanByPackage(String _package) {
-        final URL classpathUrl = ClassUtils.class.getClassLoader().getResource("");
-        System.out.println(classpathUrl.getProtocol());
-        File classpathFile = new File(classpathUrl.getFile());
         String packagePattern = _package.replace(".", "\\.");
         packagePattern = packagePattern.replaceAll("\\*{2}", ".+");
         packagePattern = packagePattern.replace("*", "\\S+");
         packagePattern = packagePattern + ".*";
-        return scanByPackage(packagePattern, classpathFile);
+        Set<Class<?>> classSet = new HashSet<Class<?>>();
+        try {
+            Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources("");
+            while (resources.hasMoreElements()) {
+                URL url = resources.nextElement();
+                String protocolUpperCase = url.getProtocol().toUpperCase();
+                if ("JAR".equals(protocolUpperCase)) {
+                    JarURLConnection urlConnection = (JarURLConnection) url.openConnection();
+                    classSet.addAll(scanByPackage(packagePattern, urlConnection.getJarFile()));
+                } else if ("FILE".equals(protocolUpperCase)) {
+                    File classpathFile = new File(url.getFile());
+                    int classPathStart = url.getFile().length() - 1;
+                    classSet.addAll(scanByPackage(packagePattern, classpathFile, classPathStart));
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return classSet;
     }
 
     /**
@@ -72,9 +116,12 @@ public class ClassUtils {
     public static Set<Class<?>> scanByAnnotation(String _package, Class<? extends Annotation>... annotations) {
         Set<Class<?>> list = new HashSet<Class<?>>();
         Set<Class<?>> foundList = scanByPackage(_package);
-        for (Class<?> _class : foundList) {
-            for (Class<? extends Annotation> annotation : annotations) {
-                if (_class.getAnnotation(annotation) != null) {
+        Iterator<Class<?>> iterator = foundList.iterator();
+        while (iterator.hasNext()) {
+            Class<?> _class = iterator.next();
+            int len = annotations.length;
+            for (int i = 0; i < len; i++) {
+                if (_class.getAnnotation(annotations[i]) != null) {
                     list.add(_class);
                 }
             }

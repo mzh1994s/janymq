@@ -22,7 +22,7 @@ public @interface Loopline {
      * @return
      * @since 1.0.1
      */
-    String cron() default "* * * * * ?";
+    String cron() default "";
 
     /**
      * 计划任务（时间区间）
@@ -31,18 +31,4 @@ public @interface Loopline {
      * @since 1.0.1
      */
     String zone() default "";
-
-    /**
-     * 空闲时每次检测延时时间
-     *
-     * @return
-     */
-    long idleInterval() default -1;
-
-    /**
-     * 每次任务完成后延时时间
-     *
-     * @return
-     */
-    long sleepInterval() default 0;
 }
