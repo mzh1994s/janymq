@@ -45,28 +45,6 @@ public class ClassUtils {
         return list;
     }
 
-//    private static Class<? extends Annotation>[] getAAnnotations(Class<? extends Annotation> annotation) {
-//        Class<? extends Annotation>[] finallyAnnotations = new Class[0];
-//        Annotation[] annotations = annotation.getAnnotations();
-//        int len = annotations.length;
-//        for (int i = 0; i < len; i++) {
-//            Class<? extends Annotation> element = annotations[i].annotationType();
-//            Arrays.add(finallyAnnotations, element);
-//        }
-//        return finallyAnnotations;
-//    }
-
-//    private static <A extends Annotation> Class<A>[] getAAnnotations(Class<?> _class) {
-//        Class<A>[] finallyAnnotations = new Class[0];
-//        Annotation[] annotations = _class.getAnnotations();
-//        int len = annotations.length;
-//        for (int i = 0; i < len; i++) {
-////            finallyAnnotations = Arrays.copyOf(finallyAnnotations, finallyAnnotations.length + 1);
-////            Class<A> annotation = annotations[i];
-//        }
-//        return annotations;
-//    }
-
     /**
      * 通过包名扫描类
      *
@@ -75,6 +53,7 @@ public class ClassUtils {
      */
     public static Set<Class<?>> scanByPackage(String _package) {
         final URL classpathUrl = ClassUtils.class.getClassLoader().getResource("");
+        System.out.println(classpathUrl.getProtocol());
         File classpathFile = new File(classpathUrl.getFile());
         String packagePattern = _package.replace(".", "\\.");
         packagePattern = packagePattern.replaceAll("\\*{2}", ".+");
