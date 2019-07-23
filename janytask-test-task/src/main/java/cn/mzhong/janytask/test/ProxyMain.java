@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.test;
 
-import cn.mzhong.janytask.producer.TestMQ;
+import cn.mzhong.janytask.producer.TestTask;
 
 import java.lang.reflect.Proxy;
 
@@ -8,7 +8,7 @@ public class ProxyMain {
 
     public static void main(String[] args) {
 
-        Class<?> proxyClass = Proxy.getProxyClass(TestMQ.class.getClassLoader(), TestMQ.class);
+        Class<?> proxyClass = Proxy.getProxyClass(TestTask.class.getClassLoader(), TestTask.class);
         try {
             Class.forName(proxyClass.getName());
             System.out.println(proxyClass.getName());

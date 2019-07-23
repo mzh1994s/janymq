@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.core;
 
 public interface TaskComponent {
-
-    void init(TaskContext context);
+    void setContext(TaskContext context);
+    void init();
 }

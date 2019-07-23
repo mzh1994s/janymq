@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.test;
 
 import cn.mzhong.janytask.core.TaskApplication;
-import cn.mzhong.janytask.producer.TestMQ;
+import cn.mzhong.janytask.producer.TestTask;
 import cn.mzhong.janytask.provider.redis.RedisProvider;
 
 public class TestMain {
@@ -14,7 +14,7 @@ public class TestMain {
         application.init();
         // 测试任务
         while (true) {
-            TestMQ testMQ = application.getProducer(TestMQ.class);
+            TestTask testMQ = application.getProducer(TestTask.class);
 //            testMQ.testPipleline("123");
 //            testMQ.testLoopline("321");
             try {

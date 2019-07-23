@@ -8,16 +8,6 @@ import cn.mzhong.janytask.queue.QueueProvider;
 import cn.mzhong.janytask.schedule.ScheduleManager;
 
 public abstract class TaskContext {
-    protected String test;
-
-    public String getTest() {
-        return test;
-    }
-
-    public void setTest(String test) {
-        System.out.println(test);
-        this.test = test;
-    }
 
     /**
      * 应用程序配置项
@@ -41,24 +31,26 @@ public abstract class TaskContext {
     /**
      * 队列型任务管理器
      *
-     * @since 1.0.1
+     * @since 2.0.0
      */
     protected QueueManager queueManager = new QueueManager();
     /**
      * 定时型任务管理器
      *
-     * @since 1.0.1
+     * @since 2.0.0
      */
     protected ScheduleManager scheduleManager = new ScheduleManager();
     /**
      * 任务调度器
      *
-     * @since 1.0.1
+     * @since 2.0.0
      */
     protected TaskWorker taskWorker = new TaskWorker();
 
     /**
-     * JSimpleMQ应用程序是否已经终结
+     * 应用程序终结标志
+     *
+     * @since 1.0.0
      */
     protected volatile boolean shutdown = false;
 
@@ -100,6 +92,10 @@ public abstract class TaskContext {
 
     public void setDataSerializer(JdkDataSerializer dataSerializer) {
         this.dataSerializer = dataSerializer;
+    }
+
+    public QueueManager getQueueManager() {
+        return queueManager;
     }
 
     public TaskWorker getTaskWorker() {

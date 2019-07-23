@@ -4,13 +4,14 @@ import cn.mzhong.janytask.consumer.Consumer;
 import cn.mzhong.janytask.consumer.ConsumerCreator;
 import cn.mzhong.janytask.core.TaskComponent;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.core.TaskWorker;
 import cn.mzhong.janytask.core.TaskExecutor;
-import cn.mzhong.janytask.queue.loopline.LoopLineAnnotationHandler;
-import cn.mzhong.janytask.queue.pipleline.PipleLineAnnotationHandler;
+import cn.mzhong.janytask.core.TaskWorker;
 import cn.mzhong.janytask.producer.Producer;
 import cn.mzhong.janytask.producer.ProducerCreator;
 import cn.mzhong.janytask.producer.ProducerFactory;
+import cn.mzhong.janytask.queue.loopline.LoopLineAnnotationHandler;
+import cn.mzhong.janytask.queue.pipleline.PipleLineAnnotationHandler;
+import cn.mzhong.janytask.tool.PInvoker;
 import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,14 +30,10 @@ public class QueueManager implements TaskComponent {
     protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
     protected ProducerCreator producerCreator;
     protected Set<QueueAnnotationHandler> annotationHandlers = new HashSet<QueueAnnotationHandler>();
-    /**
-     * 方法与MessageDao映射Map，在生产者代理中会用到此映射来寻找生产者MessageDao
-     */
+    protected Set<Class<?>> producerClassSet = new HashSet<Class<?>>();
+    protected Set<Class<?>> consumerClassSet = new HashSet<Class<?>>();
+    // 方法与MessageDao映射Map，在生产者代理中会用到此映射来寻找生产者MessageDao
     protected Map<Method, MessageDao> methodMessageDaoMap = new HashMap<Method, MessageDao>();
-
-    public TaskContext getContext() {
-        return context;
-    }
 
     public void setContext(TaskContext context) {
         this.context = context;
@@ -90,7 +87,34 @@ public class QueueManager implements TaskComponent {
         this.methodMessageDaoMap = methodMessageDaoMap;
     }
 
-    public void init(TaskContext context) {
+    private void foreachComponentClassSet(
+            Set<Class<?>> classSet,
+            PInvoker<Class<?>> classPInvoker,
+            Class<? extends Annotation> annotationClass) {
+        if (classSet.isEmpty()) {
+            String basePackage = context.getApplicationConfig().getBasePackage();
+            classSet.addAll(ClassUtils.scanByAnnotation(basePackage, annotationClass));
+        }
+        Iterator<Class<?>> iterator = classSet.iterator();
+        while (iterator.hasNext()) {
+            try {
+                classPInvoker.invoke(iterator.next());
+            } catch (Exception e) {
+                //
+            }
+        }
+    }
+
+    public void foreachProducerClassSet(PInvoker<Class<?>> classPInvoker) {
+        this.foreachComponentClassSet(producerClassSet, classPInvoker, Producer.class);
+    }
+
+
+    public void foreachConsumerClassSet(PInvoker<Class<?>> classPInvoker) {
+        this.foreachComponentClassSet(consumerClassSet, classPInvoker, Consumer.class);
+    }
+
+    public void init() {
         if (this.producerCreator == null) {
             this.producerCreator = new InternalProducerCreator();
         }
@@ -101,11 +125,14 @@ public class QueueManager implements TaskComponent {
         this.annotationHandlers.add(new PipleLineAnnotationHandler());
         this.annotationHandlers.add(new LoopLineAnnotationHandler());
         // 初始化
-        new ProducerInitializer().init(context);
-        new ConsumerInitializer().init(context);
+        new ProducerInitializer().init();
+        new ConsumerInitializer().init();
     }
 
     class ProducerInitializer implements TaskComponent {
+
+        public void setContext(TaskContext context) {
+        }
 
         protected void processProducer(TaskContext context, Class<?> producerClass) {
             // 处理生产者
@@ -141,21 +168,23 @@ public class QueueManager implements TaskComponent {
         }
 
         @SuppressWarnings("unchecked")
-        public void init(TaskContext context) {
-            String basePackage = context.getApplicationConfig().getBasePackage();
-            // 扫描所有的生产者
-            Set<Class<?>> producerClassSet = ClassUtils.scanByAnnotation(basePackage, Producer.class);
-            for (Class<?> producerClass : producerClassSet) {
-                // 注册生产者代理
-                Object producer = producerCreator.createProducer(producerClass);
-                producerMap.put(producerClass, producer);
-                this.processProducer(context, producerClass);
-            }
+        public void init() {
+            QueueManager.this.foreachProducerClassSet(new PInvoker<Class<?>>() {
+                public void invoke(Class<?> producerClass) throws Exception {
+                    // 注册生产者代理
+                    Object producer = producerCreator.createProducer(producerClass);
+                    producerMap.put(producerClass, producer);
+                    ProducerInitializer.this.processProducer(context, producerClass);
+                }
+            });
         }
 
     }
 
     class ConsumerInitializer implements TaskComponent {
+        public void setContext(TaskContext context) {
+
+        }
 
         /**
          * 消费者是提供者的实现，所以扫描消费者Class的接口，目的是找到提供者中的Pipleline、Loopline等注解
@@ -237,26 +266,22 @@ public class QueueManager implements TaskComponent {
          */
 
         @SuppressWarnings("unchecked")
-        public void init(TaskContext context) {
-            String basePackage = context.getApplicationConfig().getBasePackage();
-            Set<Class<?>> consumerClassSet = ClassUtils.scanByAnnotation(basePackage, Consumer.class);
-            TaskWorker taskWorker = context.getTaskWorker();
-            try {
-                for (Class<?> consumerClass : consumerClassSet) {
+        public void init() {
+            final TaskWorker taskWorker = context.getTaskWorker();
+            QueueManager.this.foreachConsumerClassSet(new PInvoker<Class<?>>() {
+                public void invoke(Class<?> consumerClass) throws Exception {
                     Object consumer = consumerCreator.createConsumer(consumerClass);
-                    consumerMap.put(consumerClass, consumer);
-                    taskWorker.addExecutors(this.handleConsumer(context, consumer, consumerClass));
+                    QueueManager.this.consumerMap.put(consumerClass, consumer);
+                    taskWorker.addExecutors(ConsumerInitializer.this.handleConsumer(context, consumer, consumerClass));
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            });
         }
     }
 
     class InternalProducerCreator implements ProducerCreator {
 
         public Object createProducer(Class<?> _class) {
-            return ProducerFactory.newInstance(methodMessageDaoMap, _class);
+            return ProducerFactory.newInstance(context, _class);
         }
     }
 

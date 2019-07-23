@@ -15,7 +15,7 @@ public interface TestMQ {
     @Pipleline(value = "TestMQ", version = "1.0.0")
     void testString(String value);
 
-    @Pipleline(value = "TestMQ", version = "1.0.1")
+    @Pipleline(value = "TestMQ", version = "2.0.0")
     void testList(List<String> value);
 
     @Pipleline

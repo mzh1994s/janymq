@@ -20,6 +20,13 @@ public class ElementToBeanDefinitionParser {
         return null;
     }
 
+    public Integer getIntegerFromAttr(String name){
+        if (element.hasAttribute(name)) {
+            return Integer.parseInt(element.getAttribute(name).trim());
+        }
+        return null;
+    }
+
     public ElementToBeanDefinitionParser parseStringConstructorFromAttr(String attributeName) {
         if (element.hasAttribute(attributeName)) {
             this.beanDefinitionBuilder.addConstructorArgValue(getStringFromAttr(attributeName));
@@ -29,7 +36,7 @@ public class ElementToBeanDefinitionParser {
 
     public ElementToBeanDefinitionParser parseIntConstructorFromAttr(String attributeName) {
         if (element.hasAttribute(attributeName)) {
-            this.beanDefinitionBuilder.addConstructorArgValue(getStringFromAttr(attributeName));
+            this.beanDefinitionBuilder.addConstructorArgValue(getIntegerFromAttr(attributeName));
         }
         return this;
     }
@@ -47,7 +54,7 @@ public class ElementToBeanDefinitionParser {
 
     public ElementToBeanDefinitionParser parseIntPropertyFromAttr(String attributeName) {
         if (element.hasAttribute(attributeName)) {
-            this.beanDefinitionBuilder.addPropertyValue(attributeName, getStringFromAttr(attributeName));
+            this.beanDefinitionBuilder.addPropertyValue(attributeName, getIntegerFromAttr(attributeName));
         }
         return this;
     }

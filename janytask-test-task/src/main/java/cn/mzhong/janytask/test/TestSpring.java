@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.test;
 
-import cn.mzhong.janytask.producer.TestMQ;
+import cn.mzhong.janytask.producer.TestTask;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -8,7 +8,7 @@ public class TestSpring {
 
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationcontext.xml");
-        TestMQ testBean = context.getBean(TestMQ.class);
+        TestTask testBean = context.getBean(TestTask.class);
         int cnt = 1;
         while (cnt >= 0) {
 //            testBean.testLoopline("loopline");

@@ -119,7 +119,6 @@ class ApplicationConfigParser extends ConfigParser {
         ElementToBeanDefinitionParser configParser = new ElementToBeanDefinitionParser(element, ApplicationConfig.class);
         configParser.parseStringPropertyFromAttr("basePackage");
         this.beanDefinitionBuilder.addPropertyValue("applicationConfig", configParser.getBeanDefinition());
-        this.beanDefinitionBuilder.addPropertyValue("test", "${redis.cache.port}");
     }
 }
 

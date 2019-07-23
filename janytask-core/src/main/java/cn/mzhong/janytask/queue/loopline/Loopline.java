@@ -20,7 +20,7 @@ public @interface Loopline {
      * 计划任务（只用于表述时间范围）
      *
      * @return
-     * @since 1.0.1
+     * @since 2.0.0
      */
     String cron() default "";
 
@@ -28,7 +28,7 @@ public @interface Loopline {
      * 计划任务（时间区间）
      *
      * @return
-     * @since 1.0.1
+     * @since 2.0.0
      */
     String zone() default "";
 }

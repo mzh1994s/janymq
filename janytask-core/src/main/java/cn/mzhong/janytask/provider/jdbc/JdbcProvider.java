@@ -25,6 +25,10 @@ public class JdbcProvider implements QueueProvider {
     protected MessageMapper messageMapper;
     protected TaskContext context;
 
+    public void setContext(TaskContext context) {
+        this.context = context;
+    }
+
     public DataSource getDataSource() {
         return dataSource;
     }
@@ -64,8 +68,7 @@ public class JdbcProvider implements QueueProvider {
         return DriverType.UNKNOWN;
     }
 
-    public void init(TaskContext context) {
-        this.context = context;
+    public void init() {
         // 表名大写
         this.table = this.table.toUpperCase();
         this.dataSourceHelper = new DataSourceHelper(this.dataSource);

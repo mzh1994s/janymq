@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.consumer;
 
 /**
- * @since 1.0.1
+ * @since 2.0.0
  */
 public interface ConsumerCreator {
 

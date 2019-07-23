@@ -17,19 +17,19 @@ import java.util.Map;
  */
 public class ProducerFactory {
 
-    public static Object newInstance(Map<Method, MessageDao> methodMessageDaoMap, Class<?> _class) {
+    public static Object newInstance(TaskContext context, Class<?> _class) {
         return Proxy.newProxyInstance(
                 _class.getClassLoader(),
                 new Class[]{_class},
-                new ProducerInvocationHandler(methodMessageDaoMap));
+                new ProducerInvocationHandler(context));
     }
 }
 
 class ProducerInvocationHandler implements InvocationHandler {
     Map<Method, MessageDao> methodMessageDaoMap;
 
-    ProducerInvocationHandler(Map<Method, MessageDao> methodMessageDaoMap) {
-        this.methodMessageDaoMap = methodMessageDaoMap;
+    ProducerInvocationHandler(TaskContext context) {
+        this.methodMessageDaoMap = context.getQueueManager().getMethodMessageDaoMap();
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {

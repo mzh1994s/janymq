@@ -17,6 +17,10 @@ public class RedisProvider implements QueueProvider {
     protected RedisConnectionFactory connectionFactory;
     protected TaskContext context;
 
+    public void setContext(TaskContext context) {
+        this.context = context;
+    }
+
     public String getRootPath() {
         return rootPath;
     }
@@ -33,8 +37,7 @@ public class RedisProvider implements QueueProvider {
         this.connectionFactory = connectionFactory;
     }
 
-    public void init(TaskContext context) {
-        this.context = context;
+    public void init() {
         if (this.connectionFactory == null) {
             throw new RuntimeException("无Redis连接工厂，请先指定Redis连接工厂！");
         }

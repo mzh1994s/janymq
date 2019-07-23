@@ -26,12 +26,20 @@
         <property name="dataSource" ref="mysqlDataSource"/>
     </bean>
 
+    <bean id="configurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:janytask.properties</value>
+            </list>
+        </property>
+    </bean>
+
     <!--redis 实现-->
     <janytask:application basePackage="cn.mzhong">
-        <!--<janytask:provider-redis host="mzhong.cn" port="6379"/>-->
+        <janytask:provider-redis host="${janytask.redis.host}" port="6379"/>
         <!--<janytask:provider-zookeeper connectString="mzhong.cn:2181"/>-->
         <!--<janytask:provider-jdbc dataSource-ref="oracleDataSource"/>-->
-        <janytask:provider-any ref="jdbc-provider"/>
+        <!--<janytask:provider-any ref="jdbc-provider"/>-->
         <janytask:conf-queue cron="0/20 * * * * ?"/>
     </janytask:application>
 

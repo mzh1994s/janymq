@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 定时任务时间表达式
  *
- * @since 1.0.1
+ * @since 2.0.0
  */
 
 @Documented

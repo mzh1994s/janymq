@@ -16,8 +16,14 @@ public class ScheduleManager implements TaskComponent {
 
     Logger Log = LoggerFactory.getLogger(ScheduleManager.class);
 
+    protected TaskContext context;
+
+    public void setContext(TaskContext context) {
+        this.context = context;
+    }
+
     @SuppressWarnings("unchecked")
-    public void init(TaskContext context) {
+    public void init() {
         String basePackage = context.getApplicationConfig().getBasePackage();
         Set<Class<?>> scheduleClassSet = ClassUtils.scanByAnnotation(basePackage, Schedule.class);
         Iterator<Class<?>> iterator = scheduleClassSet.iterator();

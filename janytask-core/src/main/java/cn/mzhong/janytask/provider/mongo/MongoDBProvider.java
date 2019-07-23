@@ -22,12 +22,15 @@ public class MongoDBProvider implements QueueProvider {
     protected MongoDatabase mongoDatabase;
     protected TaskContext context;
 
+    public void setContext(TaskContext context) {
+        this.context = context;
+    }
+
     public MessageDao createMessageDao(QueueInfo queueInfo) {
         return new MongoDbMessageDao(context, queueInfo, mongoDatabase.getCollection(queueInfo.ID()));
     }
 
-    public void init(TaskContext context) {
-        this.context = context;
+    public void init() {
         ServerAddress serverAddress = new ServerAddress(host, port);
         MongoCredential credential = MongoCredential.createScramSha1Credential(username, database, password.toCharArray());
         List<ServerAddress> addressList = new ArrayList<ServerAddress>();

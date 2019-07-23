@@ -9,6 +9,10 @@ public class ZookeeperProvider implements QueueProvider {
     protected String root = "janytask";
     protected TaskContext context;
 
+    public void setContext(TaskContext context) {
+        this.context = context;
+    }
+
     public String getConnectString() {
         return connectString;
     }
@@ -21,7 +25,6 @@ public class ZookeeperProvider implements QueueProvider {
         return new ZookeeperMessageDao(context, queueInfo, connectString, root);
     }
 
-    public void init(TaskContext context) {
-        this.context = context;
+    public void init() {
     }
 }

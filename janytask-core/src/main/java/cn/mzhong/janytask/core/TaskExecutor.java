@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * 任务执行者，每个时间段只会有一个任务执行者在运行。
  *
- * @since 1.0.1
+ * @since 2.0.0
  */
 public abstract class TaskExecutor implements Runnable {
 

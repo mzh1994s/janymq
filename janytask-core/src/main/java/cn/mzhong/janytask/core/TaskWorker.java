@@ -11,7 +11,7 @@ import java.util.concurrent.*;
  *
  * @author mzhong
  * @date 2019年7月18日
- * @since 1.0.1
+ * @since 2.0.0
  */
 public class TaskWorker extends Thread implements TaskComponent {
 
@@ -46,6 +46,10 @@ public class TaskWorker extends Thread implements TaskComponent {
 
     public TaskWorker() {
         this.setName("janytask-worker");
+    }
+
+    public void setContext(TaskContext context) {
+        this.context = context;
     }
 
     /**
@@ -194,7 +198,7 @@ public class TaskWorker extends Thread implements TaskComponent {
         return this.executors.awaitTermination(1000, TimeUnit.SECONDS);
     }
 
-    public void init(TaskContext context) {
-        this.context = context;
+    public void init() {
+        // empty
     }
 }
