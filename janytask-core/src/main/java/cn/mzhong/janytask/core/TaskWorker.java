@@ -13,7 +13,10 @@ import java.util.concurrent.*;
  * @date 2019年7月18日
  * @since 1.0.1
  */
-public class TaskWorker extends Thread implements TaskComponent{
+public class TaskWorker extends Thread implements TaskComponent {
+
+    // 空闲延时
+    private final static int IDLE_INTERVAL = 1000;
 
     // 上下文对象
     protected TaskContext context;
@@ -90,7 +93,7 @@ public class TaskWorker extends Thread implements TaskComponent{
      * @param nextTime
      * @return
      */
-    protected TaskExecutor[] getNexts(Date nextTime) {
+    protected TaskExecutor[] getNextExecutors(Date nextTime) {
         return this.waitingExecutors.remove(nextTime);
     }
 
@@ -103,10 +106,12 @@ public class TaskWorker extends Thread implements TaskComponent{
         Date nextTime = null;
         Set<Date> nextTimes = waitingExecutors.keySet();
         Iterator<Date> iterator = nextTimes.iterator();
-        Date currentTime = new Date();
+        if (iterator.hasNext()) {
+            nextTime = iterator.next();
+        }
         while (iterator.hasNext()) {
             Date next = iterator.next();
-            if (next.before(currentTime)) {
+            if (next.before(nextTime)) {
                 nextTime = next;
             }
         }
@@ -133,27 +138,37 @@ public class TaskWorker extends Thread implements TaskComponent{
 
     @Override
     public void run() {
+        // 永久循环，直到shutdown命令到来
         while (true) {
             // 获取下一个时间点
             Date nextTime = this.getNextTime();
             // 获取不到下一个时间点则说明任务都繁忙
             if (nextTime == null) {
-                this.waiting(1000);
-                continue;
+                // 空闲阻塞
+                this.waiting(IDLE_INTERVAL);
+            } else {
+                // 计算需要等待的时间
+                long waiting = nextTime.getTime() - System.currentTimeMillis();
+                if (waiting > IDLE_INTERVAL) {
+                    // 如果等待时间大于空闲时间，则进行空闲阻塞，避免耗时阻塞影响其他业务
+                    // 但是为了精准控制，小于空闲时间的进行阻塞操作。
+                    this.waiting(IDLE_INTERVAL);
+                } else {
+                    // 时间点等待
+                    this.waiting(waiting);
+                    // 终结检测
+                    if (this.context.isShutdown()) {
+                        break;
+                    }
+                    // 获取下一个时间点需要执行的Executor
+                    TaskExecutor[] nexts = this.getNextExecutors(nextTime);
+                    // 执行每一个Executor
+                    int len = nexts.length;
+                    for (int i = 0; i < len; i++) {
+                        executors.execute(nexts[i]);
+                    }
+                }
             }
-            // 时间点等待
-            this.waiting(nextTime.getTime() - System.currentTimeMillis());
-            if (this.context.isShutdown()) {
-                break;
-            }
-            // 获取下一个时间点需要执行的Executor
-            TaskExecutor[] nexts = this.getNexts(nextTime);
-            // 执行每一个Executor
-            int len = nexts.length;
-            for (int i = 0; i < len; i++) {
-                executors.execute(nexts[i]);
-            }
-
         }
     }
 
