@@ -8,6 +8,17 @@ import cn.mzhong.janytask.queue.QueueProvider;
 import cn.mzhong.janytask.schedule.ScheduleManager;
 
 public abstract class TaskContext {
+    protected String test;
+
+    public String getTest() {
+        return test;
+    }
+
+    public void setTest(String test) {
+        System.out.println(test);
+        this.test = test;
+    }
+
     /**
      * 应用程序配置项
      */

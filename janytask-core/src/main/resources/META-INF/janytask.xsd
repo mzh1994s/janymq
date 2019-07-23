@@ -13,7 +13,7 @@
                 <xsd:documentation><![CDATA[ redis Host ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="port" type="xsd:int">
+        <xsd:attribute name="port" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ redis port ]]></xsd:documentation>
             </xsd:annotation>
@@ -23,12 +23,12 @@
                 <xsd:documentation><![CDATA[ redis password ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="database" type="xsd:int">
+        <xsd:attribute name="database" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ redis 数据库 ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="timeout" type="xsd:int">
+        <xsd:attribute name="timeout" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ redis 超时时间 ]]></xsd:documentation>
             </xsd:annotation>

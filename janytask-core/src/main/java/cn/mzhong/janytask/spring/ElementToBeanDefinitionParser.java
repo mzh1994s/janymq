@@ -10,21 +10,14 @@ public class ElementToBeanDefinitionParser {
 
     public ElementToBeanDefinitionParser(Element element, Class<?> _class) {
         this.element = element;
-        this.beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(_class);
+        this.beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(_class);
     }
 
     public String getStringFromAttr(String name) {
         if (element.hasAttribute(name)) {
-            return element.getAttribute(name);
+            return element.getAttribute(name).trim();
         }
         return null;
-    }
-
-    public int getIntFromAttr(String name) {
-        if (element.hasAttribute(name)) {
-            return Integer.parseInt(element.getAttribute(name));
-        }
-        return 0;
     }
 
     public ElementToBeanDefinitionParser parseStringConstructorFromAttr(String attributeName) {
@@ -36,7 +29,7 @@ public class ElementToBeanDefinitionParser {
 
     public ElementToBeanDefinitionParser parseIntConstructorFromAttr(String attributeName) {
         if (element.hasAttribute(attributeName)) {
-            this.beanDefinitionBuilder.addConstructorArgValue(getIntFromAttr(attributeName));
+            this.beanDefinitionBuilder.addConstructorArgValue(getStringFromAttr(attributeName));
         }
         return this;
     }
@@ -54,7 +47,7 @@ public class ElementToBeanDefinitionParser {
 
     public ElementToBeanDefinitionParser parseIntPropertyFromAttr(String attributeName) {
         if (element.hasAttribute(attributeName)) {
-            this.beanDefinitionBuilder.addPropertyValue(attributeName, getIntFromAttr(attributeName));
+            this.beanDefinitionBuilder.addPropertyValue(attributeName, getStringFromAttr(attributeName));
         }
         return this;
     }

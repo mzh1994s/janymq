@@ -35,7 +35,7 @@ public class ApplicationParser extends AbstractSingleBeanDefinitionParser {
      */
     protected String doSpecialIDAttribute(Element element, BeanDefinitionBuilder builder) {
         String id = element.getAttribute("id");
-        if (id == null || id.length() == 0) {
+        if (StringUtils.isEmpty(id)) {
             id = _class.getName();
             element.setAttribute("id", id);
         }
@@ -61,7 +61,7 @@ public class ApplicationParser extends AbstractSingleBeanDefinitionParser {
                 "conf-queue", "provider-any", "provider-redis", "provider-zookeeper", "provider-jdbc"};
         Class<?>[] configClasses = new Class<?>[]{
                 QueueConfigParser.class,
-                AnyLineManagerProviderParser.class,
+                AnyProviderParser.class,
                 RedisProviderParser.class,
                 ZookeeperProviderParser.class,
                 JdbcProviderParser.class
@@ -75,7 +75,6 @@ public class ApplicationParser extends AbstractSingleBeanDefinitionParser {
                     parser.doParser();
                 } catch (Exception e) {
                     Log.error("解析配置出错：" + elementNames[i], e);
-                    // pass
                 }
             }
         }
@@ -120,6 +119,7 @@ class ApplicationConfigParser extends ConfigParser {
         ElementToBeanDefinitionParser configParser = new ElementToBeanDefinitionParser(element, ApplicationConfig.class);
         configParser.parseStringPropertyFromAttr("basePackage");
         this.beanDefinitionBuilder.addPropertyValue("applicationConfig", configParser.getBeanDefinition());
+        this.beanDefinitionBuilder.addPropertyValue("test", "${redis.cache.port}");
     }
 }
 
@@ -144,9 +144,9 @@ class QueueConfigParser extends ConfigParser {
 /**
  * 自定义提供者解析器
  */
-class AnyLineManagerProviderParser extends ConfigParser {
+class AnyProviderParser extends ConfigParser {
 
-    public AnyLineManagerProviderParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
+    public AnyProviderParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
         super(element, beanDefinitionBuilder);
     }
 
