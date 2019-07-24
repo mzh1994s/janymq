@@ -1,25 +1,26 @@
 package cn.mzhong.janytask.provider.zookeeper;
 
-import cn.mzhong.janytask.spring.ConfigParser;
-import cn.mzhong.janytask.spring.ElementToBeanDefinitionParser;
+import cn.mzhong.janytask.spring.ElementBeanDefinitionBuilder;
+import cn.mzhong.janytask.spring.ProviderParser;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 /**
  * Zookeeper提供者解析器
  */
-public class ZookeeperProviderParser extends ConfigParser {
+public class ZookeeperProviderParser extends ProviderParser {
 
-    public ZookeeperProviderParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
-        super(element, beanDefinitionBuilder);
+    @Override
+    protected Class<?> getBeanClass(Element element) {
+        return ZookeeperProvider.class;
     }
 
     @Override
-    public void doParser() {
-        // bean ZookeeperProvider
-        ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, ZookeeperProvider.class);
-        elementBeanDefinitionParser.parseStringPropertyFromAttr("connectString");
-        elementBeanDefinitionParser.parseStringPropertyFromAttr("rootPath");
-        this.beanDefinitionBuilder.addPropertyValue("queueProvider", elementBeanDefinitionParser.getBeanDefinition());
+    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+        ElementBeanDefinitionBuilder builderPlus = new ElementBeanDefinitionBuilder(element, builder);
+        builderPlus.parseStringPropertyFromAttr("connectString");
+        builderPlus.parseStringPropertyFromAttr("rootPath");
+        super.doParse(element, parserContext, builder);
     }
 }

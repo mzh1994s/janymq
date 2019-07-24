@@ -1,46 +1,38 @@
 package cn.mzhong.janytask.provider.redis;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.*;
+import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.QueueInfo;
+import cn.mzhong.janytask.queue.QueueProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-public class RedisProvider implements QueueProvider {
+public class RedisProvider extends RedisProviderConfig implements QueueProvider {
 
     final static Logger Log = LoggerFactory.getLogger(RedisProvider.class);
 
-    // 根目录
-    protected String rootPath = "janytask";
     // redis连接工厂
-    protected RedisConnectionFactory connectionFactory;
+    RedisConnectionFactory connectionFactory;
     protected TaskContext context;
 
     public void setContext(TaskContext context) {
         this.context = context;
     }
 
-    public String getRootPath() {
-        return rootPath;
-    }
-
-    public void setRootPath(String rootPath) {
-        this.rootPath = rootPath;
-    }
-
     public RedisConnectionFactory getConnectionFactory() {
         return connectionFactory;
     }
 
-    public void setConnectionFactory(RedisConnectionFactory connectionFactory) {
-        this.connectionFactory = connectionFactory;
-    }
-
     public void init() {
-        if (this.connectionFactory == null) {
-            throw new RuntimeException("无Redis连接工厂，请先指定Redis连接工厂！");
+        if (jedisPool == null) {
+            if (jedisPoolConfig == null) {
+                jedisPoolConfig = new JedisPoolConfig();
+            }
+            jedisPool = new JedisPool(jedisPoolConfig, host, port, timeout, password, database);
         }
+        connectionFactory = new GenericRedisConnectionFactory(jedisPool);
         if (Log.isDebugEnabled()) {
             Log.debug(this.toString());
         }
@@ -48,13 +40,6 @@ public class RedisProvider implements QueueProvider {
 
     public MessageDao createMessageDao(QueueInfo queueInfo) {
         return new RedisMessageDao(context, this.connectionFactory, queueInfo, rootPath);
-    }
-
-    @Override
-    public String toString() {
-        return "RedisProvider{" +
-                "rootPath='" + rootPath + '\'' +
-                '}';
     }
 
     public static RedisProvider create(
@@ -85,8 +70,7 @@ public class RedisProvider implements QueueProvider {
 
     public static RedisProvider create(JedisPool jedisPool) {
         RedisProvider provider = new RedisProvider();
-        RedisConnectionFactory connectionFactory = new GenericRedisConnectionFactory(jedisPool);
-        provider.setConnectionFactory(connectionFactory);
+        provider.setJedisPool(jedisPool);
         return provider;
     }
 }

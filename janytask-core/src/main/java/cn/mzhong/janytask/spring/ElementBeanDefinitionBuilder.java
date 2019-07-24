@@ -4,13 +4,13 @@ import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.w3c.dom.Element;
 
-public class ElementToBeanDefinitionParser {
+public class ElementBeanDefinitionBuilder {
     protected Element element;
     protected BeanDefinitionBuilder beanDefinitionBuilder;
 
-    public ElementToBeanDefinitionParser(Element element, Class<?> _class) {
+    public ElementBeanDefinitionBuilder(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
         this.element = element;
-        this.beanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(_class);
+        this.beanDefinitionBuilder = beanDefinitionBuilder;
     }
 
     public String getStringFromAttr(String name) {
@@ -27,65 +27,65 @@ public class ElementToBeanDefinitionParser {
         return null;
     }
 
-    public ElementToBeanDefinitionParser parseStringConstructorFromAttr(String attributeName) {
+    public ElementBeanDefinitionBuilder parseStringConstructorFromAttr(String attributeName) {
         if (element.hasAttribute(attributeName)) {
             this.beanDefinitionBuilder.addConstructorArgValue(getStringFromAttr(attributeName));
         }
         return this;
     }
 
-    public ElementToBeanDefinitionParser parseIntConstructorFromAttr(String attributeName) {
+    public ElementBeanDefinitionBuilder parseIntConstructorFromAttr(String attributeName) {
         if (element.hasAttribute(attributeName)) {
             this.beanDefinitionBuilder.addConstructorArgValue(getIntegerFromAttr(attributeName));
         }
         return this;
     }
 
-    public ElementToBeanDefinitionParser parseStringPropertyFromAttr(String attributeName) {
+    public ElementBeanDefinitionBuilder parseStringPropertyFromAttr(String attributeName) {
         return parseStringPropertyFromAttr(attributeName, attributeName);
     }
 
-    public ElementToBeanDefinitionParser parseStringPropertyFromAttr(String attributeName, String property) {
+    public ElementBeanDefinitionBuilder parseStringPropertyFromAttr(String attributeName, String property) {
         if (element.hasAttribute(attributeName)) {
             this.beanDefinitionBuilder.addPropertyValue(property, getStringFromAttr(attributeName));
         }
         return this;
     }
 
-    public ElementToBeanDefinitionParser parseIntPropertyFromAttr(String attributeName) {
+    public ElementBeanDefinitionBuilder parseIntPropertyFromAttr(String attributeName) {
         if (element.hasAttribute(attributeName)) {
             this.beanDefinitionBuilder.addPropertyValue(attributeName, getIntegerFromAttr(attributeName));
         }
         return this;
     }
 
-    public ElementToBeanDefinitionParser parseReferencePropertyFromAttr(String property) {
+    public ElementBeanDefinitionBuilder parseReferencePropertyFromAttr(String property) {
         return parseReferencePropertyFromAttr(property + "-ref", property);
     }
 
-    public ElementToBeanDefinitionParser parseReferencePropertyFromAttr(String attributeName, String property) {
+    public ElementBeanDefinitionBuilder parseReferencePropertyFromAttr(String attributeName, String property) {
         if (element.hasAttribute(attributeName)) {
             this.beanDefinitionBuilder.addPropertyReference(property, getStringFromAttr(attributeName));
         }
         return this;
     }
 
-    public ElementToBeanDefinitionParser addConstructorArgValue(Object value) {
+    public ElementBeanDefinitionBuilder addConstructorArgValue(Object value) {
         this.beanDefinitionBuilder.addConstructorArgValue(value);
         return this;
     }
 
-    public ElementToBeanDefinitionParser addConstructorArgReference(String ref) {
+    public ElementBeanDefinitionBuilder addConstructorArgReference(String ref) {
         this.beanDefinitionBuilder.addConstructorArgReference(ref);
         return this;
     }
 
-    public ElementToBeanDefinitionParser addPropertyValue(String name, Object value) {
+    public ElementBeanDefinitionBuilder addPropertyValue(String name, Object value) {
         this.beanDefinitionBuilder.addPropertyValue(name, value);
         return this;
     }
 
-    public ElementToBeanDefinitionParser addPropertyReference(String name, String value) {
+    public ElementBeanDefinitionBuilder addPropertyReference(String name, String value) {
         this.beanDefinitionBuilder.addPropertyReference(name, value);
         return this;
     }

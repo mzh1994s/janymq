@@ -2,6 +2,7 @@ package cn.mzhong.janytask.core;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
+import cn.mzhong.janytask.exception.NoAnyProviderException;
 import cn.mzhong.janytask.producer.TaskNotFoundException;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class TaskApplication extends TaskContext {
         this.taskWorker.setContext(this);
     }
 
-    public void init() {
+    public void start() {
         if (applicationConfig == null) {
             applicationConfig = new ApplicationConfig();
         }
@@ -43,7 +44,7 @@ public class TaskApplication extends TaskContext {
             queueConfig = new QueueConfig();
         }
         if (queueProvider == null) {
-            throw new TaskInitExcepition("未找到提供商，请先指定提供商！");
+            throw new NoAnyProviderException("未找到提供商，请先指定提供商！");
         }
         if (dataSerializer == null) {
             dataSerializer = new JdkDataSerializer();

@@ -1,22 +1,18 @@
 package cn.mzhong.janytask.provider.jdbc;
 
-import cn.mzhong.janytask.spring.ConfigParser;
-import cn.mzhong.janytask.spring.ElementToBeanDefinitionParser;
+import cn.mzhong.janytask.spring.ElementBeanDefinitionBuilder;
+import cn.mzhong.janytask.spring.ProviderParser;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-public class JdbcProviderParser extends ConfigParser {
-
-    public JdbcProviderParser(Element element, BeanDefinitionBuilder beanDefinitionBuilder) {
-        super(element, beanDefinitionBuilder);
-    }
+public class JdbcProviderParser extends ProviderParser {
 
     @Override
-    public void doParser() {
-        // bean JdbcProvider
-        ElementToBeanDefinitionParser elementBeanDefinitionParser = new ElementToBeanDefinitionParser(element, JdbcProvider.class);
+    protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
+        ElementBeanDefinitionBuilder elementBeanDefinitionParser = new ElementBeanDefinitionBuilder(element, builder);
         elementBeanDefinitionParser.parseStringPropertyFromAttr("table");
         elementBeanDefinitionParser.parseReferencePropertyFromAttr("dataSource");
-        this.beanDefinitionBuilder.addPropertyValue("queueProvider", elementBeanDefinitionParser.getBeanDefinition());
+        super.doParse(element, parserContext, builder);
     }
 }

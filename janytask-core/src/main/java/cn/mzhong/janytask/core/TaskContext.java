@@ -12,11 +12,11 @@ public abstract class TaskContext {
     /**
      * 应用程序配置项
      */
-    protected ApplicationConfig applicationConfig;
+    protected ApplicationConfig applicationConfig = new ApplicationConfig();
     /**
      * 流水线配置项
      */
-    protected QueueConfig queueConfig;
+    protected QueueConfig queueConfig = new QueueConfig();
 
     /**
      * Redis、Zookeeper或者数据库都可以作为消息传播或者持久化介质，而queueProvider为这些介质的客服端

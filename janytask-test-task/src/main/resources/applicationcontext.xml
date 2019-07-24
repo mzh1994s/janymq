@@ -35,13 +35,13 @@
     </bean>
 
     <!--redis 实现-->
-    <janytask:application basePackage="cn.mzhong">
-        <janytask:provider-redis host="${janytask.provider.redis.host}" port="6379"/>
-        <!--<janytask:provider-zookeeper connectString="mzhong.cn:2181"/>-->
-        <!--<janytask:provider-jdbc dataSource-ref="oracleDataSource"/>-->
-        <!--<janytask:provider-any ref="jdbc-provider"/>-->
-        <janytask:conf-queue cron="${janytask.conf.queue.cron}"/>
-    </janytask:application>
+    <janytask:application basePackage="cn.mzhong" />
+
+    <janytask:provider-redis host="${janytask.provider.redis.host}" port="6379"/>
+    <!--<janytask:provider-zookeeper connectString="mzhong.cn:2181"/>-->
+    <!--<janytask:provider-jdbc dataSource-ref="oracleDataSource"/>-->
+    <!--<janytask:provider-any ref="jdbc-provider"/>-->
+    <!--<janytask:queue cron="${janytask.conf.queue.cron}"/>-->
 
     <context:component-scan base-package="cn.mzhong"/>
 </beans>

@@ -11,7 +11,7 @@ public class TestMain {
         // 启动消费者
         RedisProvider manager = RedisProvider.create("mzhong.cn", 6379);
         application.setQueueProvider(manager);
-        application.init();
+        application.start();
         // 测试任务
         while (true) {
             TestTask testMQ = application.getProducer(TestTask.class);

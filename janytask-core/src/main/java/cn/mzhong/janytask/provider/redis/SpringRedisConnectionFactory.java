@@ -11,7 +11,6 @@ public class SpringRedisConnectionFactory implements RedisConnectionFactory {
 
     protected JedisConnectionFactory jedisConnectionFactory;
 
-    @Override
     public Jedis getConnection() {
         return (Jedis) jedisConnectionFactory.getConnection().getNativeConnection();
     }

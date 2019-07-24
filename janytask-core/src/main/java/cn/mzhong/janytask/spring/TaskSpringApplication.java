@@ -1,9 +1,13 @@
 package cn.mzhong.janytask.spring;
 
+import cn.mzhong.janytask.config.ApplicationConfig;
+import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.consumer.ConsumerCreator;
 import cn.mzhong.janytask.core.TaskApplication;
+import cn.mzhong.janytask.exception.NoAnyProviderException;
 import cn.mzhong.janytask.producer.ProducerCreator;
 import cn.mzhong.janytask.producer.ProducerFactory;
+import cn.mzhong.janytask.queue.QueueProvider;
 import cn.mzhong.janytask.tool.PInvoker;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -19,12 +23,14 @@ import org.springframework.context.event.ContextRefreshedEvent;
  */
 public class TaskSpringApplication extends TaskApplication implements BeanDefinitionRegistryPostProcessor, ApplicationListener<ContextRefreshedEvent> {
 
-    protected BeanDefinitionRegistry beanDefinitionRegistry;
+
+    protected BeanDefinitionRegistry registry;
     protected ConfigurableListableBeanFactory beanFactory;
 
     // 生产者生成Bean的方式
     private PInvoker<Class<?>> producerPInvoker = new PInvoker<Class<?>>() {
         int cnt = 0;
+
         public void invoke(Class<?> producerClass) throws Exception {
             // 此处使用Spring工厂模式创建生产者
             BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(ProducerFactory.class);
@@ -43,18 +49,19 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
             beanDefinition.setPrimary(true);
             // 注册bean到Spring容器
             String beanName = "janytask-producer#" + (cnt++);
-            beanDefinitionRegistry.registerBeanDefinition(beanName, beanDefinition);
+            registry.registerBeanDefinition(beanName, beanDefinition);
         }
     };
     // 消费者生成Bean的方式
     private PInvoker<Class<?>> consumerPInvoker = new PInvoker<Class<?>>() {
         int cnt = 0;
+
         public void invoke(Class<?> consumerClass) throws Exception {
             BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(consumerClass);
             builder.setScope(BeanDefinition.SCOPE_SINGLETON);
             BeanDefinition beanDefinition = builder.getBeanDefinition();
             String beanName = "janytask-consumer#" + (cnt++);
-            beanDefinitionRegistry.registerBeanDefinition(beanName, beanDefinition);
+            registry.registerBeanDefinition(beanName, beanDefinition);
         }
     };
 
@@ -76,10 +83,18 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
     }
 
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException {
-        this.beanDefinitionRegistry = beanDefinitionRegistry;
+        this.registry = beanDefinitionRegistry;
     }
 
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        this.init();
+        if (!beanFactory.containsBean(BeanNames.BEAN_NAME_QUEUE_PROVIDER)) {
+            throw new NoAnyProviderException("未找到提供商，请指定提供商！如果使用Janytask schema配置应用程序，支持类似于<janytask:provider-xxx ……/>的配置。");
+        }
+        this.setApplicationConfig(beanFactory.getBean(BeanNames.BEAN_NAME_APPLICATION_CONFIG, ApplicationConfig.class));
+        if (beanFactory.containsBean(BeanNames.BEAN_NAME_QUEUE_CONFIG)) {
+            this.setQueueConfig(beanFactory.getBean(BeanNames.BEAN_NAME_QUEUE_CONFIG, QueueConfig.class));
+        }
+        this.setQueueProvider(beanFactory.getBean(BeanNames.BEAN_NAME_QUEUE_PROVIDER, QueueProvider.class));
+        this.start();
     }
 }

@@ -11,7 +11,6 @@ public class GenericRedisConnectionFactory implements RedisConnectionFactory {
         this.jedisPool = jedisPool;
     }
 
-    @Override
     public Jedis getConnection() {
         return jedisPool.getResource();
     }

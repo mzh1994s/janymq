@@ -34,15 +34,6 @@
 
     <!--应用程序配置项和应用程序-->
     <xsd:complexType name="applicationType">
-        <xsd:sequence>
-            <xsd:choice minOccurs="1">
-                <xsd:element ref="provider-any"/>
-                <xsd:element ref="provider-redis"/>
-                <xsd:element ref="provider-zookeeper"/>
-                <xsd:element ref="provider-jdbc"/>
-            </xsd:choice>
-            <xsd:element ref="conf-queue" minOccurs="0"/>
-        </xsd:sequence>
         <xsd:attribute name="id" type="xsd:ID">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The unique identifier for a bean. ]]></xsd:documentation>
@@ -66,7 +57,7 @@
             <xsd:documentation><![CDATA[ 自定义Provider ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
-    <xsd:element name="conf-queue" type="queueConfig">
+    <xsd:element name="queue" type="queueConfig">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ 队列配置项 ]]></xsd:documentation>
         </xsd:annotation>
