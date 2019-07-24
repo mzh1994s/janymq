@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.mzhong.cn/schema/janytask"
+            targetNamespace="http://www.mzhong.cn/schema/janytask">
+
+    <xsd:complexType name="jdbcProviderType">
+        <xsd:attribute name="dataSource-ref" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 数据源引用 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="table" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 表名 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <xsd:element name="provider-redis" type="redisProviderType">
+        <xsd:annotation>
+            <xsd:documentation><![CDATA[ Redis配置 ]]></xsd:documentation>
+        </xsd:annotation>
+    </xsd:element>
+
+</xsd:schema>

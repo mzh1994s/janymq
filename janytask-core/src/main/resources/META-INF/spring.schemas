@@ -1,1 +1,4 @@
 http\://www.mzhong.cn/schema/janytask.xsd=META-INF/janytask.xsd
+http\://www.mzhong.cn/schema/janytask-provider-redis.xsd=META-INF/janytask-provider-redis.xsd
+http\://www.mzhong.cn/schema/janytask-provider-zookeeper.xsd=META-INF/janytask-provider-zookeeper.xsd
+http\://www.mzhong.cn/schema/janytask-provider-jdbc.xsd=META-INF/janytask-provider-jdbc.xsd

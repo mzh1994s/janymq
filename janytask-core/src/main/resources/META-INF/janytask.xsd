@@ -4,81 +4,12 @@
             targetNamespace="http://www.mzhong.cn/schema/janytask">
 
     <xsd:annotation>
-        <xsd:documentation><![CDATA[ JSimpleMQ 配置文件 ]]></xsd:documentation>
+        <xsd:documentation><![CDATA[ Janytask Schema ]]></xsd:documentation>
     </xsd:annotation>
 
-    <xsd:complexType name="redisProviderType">
-        <xsd:attribute name="host" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis Host ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="port" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis port ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="password" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis password ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="database" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis 数据库 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="timeout" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis 超时时间 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="jedisPoolConfig-ref" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis jedisPoolConfig ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="jedisPool-ref" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis jedisPool，有此选项时以上配置无效 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="connectionFactory-ref" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ redis connectionFactory，有此选项时以上配置无效 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="rootPath" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ zookeeper根节点名称 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
-
-    <xsd:complexType name="zookeeperProviderType">
-        <xsd:attribute name="connectString" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ zookeeper连接字符串 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="rootPath" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ zookeeper根节点名称 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
-    <xsd:complexType name="jdbcProviderType">
-        <xsd:attribute name="dataSource-ref" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ 数据源引用 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="table" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ 表名 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
+    <xsd:include schemaLocation="janytask-provider-redis.xsd"/>
+    <xsd:include schemaLocation="janytask-provider-zookeeper.xsd"/>
+    <xsd:include schemaLocation="janytask-provider-jdbc.xsd"/>
 
     <xsd:complexType name="anyProviderType">
         <xsd:attribute name="ref" type="xsd:string">
@@ -128,21 +59,6 @@
     <xsd:element name="application" type="applicationType">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ JSimpleMQ应用程序配置 ]]></xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="provider-redis" type="redisProviderType">
-        <xsd:annotation>
-            <xsd:documentation><![CDATA[ Redis配置 ]]></xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="provider-zookeeper" type="zookeeperProviderType">
-        <xsd:annotation>
-            <xsd:documentation><![CDATA[ Zookeeper配置 ]]></xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="provider-jdbc" type="jdbcProviderType">
-        <xsd:annotation>
-            <xsd:documentation><![CDATA[ 数据库配置 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
     <xsd:element name="provider-any" type="anyProviderType">

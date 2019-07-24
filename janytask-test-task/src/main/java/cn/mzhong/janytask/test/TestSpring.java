@@ -8,6 +8,7 @@ public class TestSpring {
 
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationcontext.xml");
+        ((ClassPathXmlApplicationContext) context).start();
         TestTask testBean = context.getBean(TestTask.class);
         int cnt = 1;
         while (cnt >= 0) {
