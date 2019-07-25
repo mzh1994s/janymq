@@ -4,7 +4,7 @@ import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import cn.mzhong.janytask.queue.QueueManager;
-import cn.mzhong.janytask.queue.QueueProvider;
+import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.schedule.ScheduleManager;
 
 public abstract class TaskContext {

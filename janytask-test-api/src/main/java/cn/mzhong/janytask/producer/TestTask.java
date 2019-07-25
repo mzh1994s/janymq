@@ -1,5 +1,6 @@
 package cn.mzhong.janytask.producer;
 
+import cn.mzhong.janytask.queue.Producer;
 import cn.mzhong.janytask.queue.loopline.Loopline;
 import cn.mzhong.janytask.queue.pipleline.Pipleline;
 

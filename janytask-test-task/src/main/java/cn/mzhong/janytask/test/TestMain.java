@@ -2,7 +2,7 @@ package cn.mzhong.janytask.test;
 
 import cn.mzhong.janytask.core.TaskApplication;
 import cn.mzhong.janytask.producer.TestTask;
-import cn.mzhong.janytask.provider.redis.RedisProvider;
+import cn.mzhong.janytask.queue.provider.redis.RedisProvider;
 
 public class TestMain {
 

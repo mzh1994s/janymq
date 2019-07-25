@@ -2,8 +2,8 @@ package cn.mzhong.janytask.core;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
-import cn.mzhong.janytask.exception.NoAnyProviderException;
-import cn.mzhong.janytask.producer.TaskNotFoundException;
+import cn.mzhong.janytask.queue.provider.NoAnyProviderException;
+import cn.mzhong.janytask.queue.NoSuchProducerException;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +75,7 @@ public class TaskApplication extends TaskContext {
                     return (T) entry.getValue();
                 }
             }
-            throw new TaskNotFoundException("未在当前上下文中找到生产者：" + producerClass.getName());
+            throw new NoSuchProducerException("未在当前上下文中找到生产者：" + producerClass.getName());
         }
         return (T) producer;
     }

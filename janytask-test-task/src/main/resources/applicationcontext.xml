@@ -22,7 +22,7 @@
         <property name="driverClass" value="oracle.jdbc.OracleDriver"/>
     </bean>
 
-    <bean id="jdbc-provider" class="cn.mzhong.janytask.provider.jdbc.JdbcProvider">
+    <bean id="jdbc-provider" class="cn.mzhong.janytask.queue.provider.jdbc.JdbcProvider">
         <property name="dataSource" ref="mysqlDataSource"/>
     </bean>
 

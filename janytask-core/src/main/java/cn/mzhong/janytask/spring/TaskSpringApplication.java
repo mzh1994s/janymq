@@ -2,12 +2,12 @@ package cn.mzhong.janytask.spring;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
-import cn.mzhong.janytask.consumer.ConsumerCreator;
+import cn.mzhong.janytask.queue.ConsumerCreator;
 import cn.mzhong.janytask.core.TaskApplication;
-import cn.mzhong.janytask.exception.NoAnyProviderException;
-import cn.mzhong.janytask.producer.ProducerCreator;
-import cn.mzhong.janytask.producer.ProducerFactory;
-import cn.mzhong.janytask.queue.QueueProvider;
+import cn.mzhong.janytask.queue.provider.NoAnyProviderException;
+import cn.mzhong.janytask.queue.ProducerCreator;
+import cn.mzhong.janytask.queue.ProducerFactory;
+import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.PInvoker;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;

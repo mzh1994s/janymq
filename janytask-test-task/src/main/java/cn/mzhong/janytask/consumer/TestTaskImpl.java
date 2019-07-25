@@ -2,6 +2,7 @@ package cn.mzhong.janytask.consumer;
 
 import cn.mzhong.janytask.bean.TestBean;
 import cn.mzhong.janytask.producer.TestTask;
+import cn.mzhong.janytask.queue.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
