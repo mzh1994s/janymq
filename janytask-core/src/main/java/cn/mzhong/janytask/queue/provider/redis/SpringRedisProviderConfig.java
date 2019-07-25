@@ -2,7 +2,7 @@ package cn.mzhong.janytask.queue.provider.redis;
 
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 
-public class SpringRedisProviderConfig extends RedisProviderConfig {
+public class SpringRedisProviderConfig extends AbstractRedisProvider {
 
     protected JedisConnectionFactory jedisConnectionFactory;
 

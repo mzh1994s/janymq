@@ -1,7 +1,5 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.core.TaskContext;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -15,23 +13,23 @@ import java.util.Map;
  */
 public class ProducerFactory {
 
-    public static Object newInstance(TaskContext context, Class<?> _class) {
+    public static Object newInstance(Map<Method, MessageDao> messageDaoMap, Class<?> _class) {
         return Proxy.newProxyInstance(
                 _class.getClassLoader(),
                 new Class[]{_class},
-                new ProducerInvocationHandler(context));
+                new ProducerInvocationHandler(messageDaoMap));
     }
 }
 
 class ProducerInvocationHandler implements InvocationHandler {
-    Map<Method, MessageDao> methodMessageDaoMap;
+    Map<Method, MessageDao> messageDaoMap;
 
-    ProducerInvocationHandler(TaskContext context) {
-        this.methodMessageDaoMap = context.getQueueManager().getMethodMessageDaoMap();
+    ProducerInvocationHandler(Map<Method, MessageDao> messageDaoMap) {
+        this.messageDaoMap = messageDaoMap;
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        MessageDao messageDao = methodMessageDaoMap.get(method);
+        MessageDao messageDao = messageDaoMap.get(method);
         if (messageDao == null) {
             return method.invoke(proxy, args);
         }

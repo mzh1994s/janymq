@@ -1,11 +1,10 @@
 package cn.mzhong.janytask.queue.provider.redis;
 
+import cn.mzhong.janytask.queue.provider.AbstractProvider;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-import java.io.Serializable;
-
-public class RedisProviderConfig implements Serializable {
+public abstract class AbstractRedisProvider extends AbstractProvider {
     protected String rootPath = "janytask";
     protected String host;
     protected int port;
@@ -82,7 +81,7 @@ public class RedisProviderConfig implements Serializable {
 
     @Override
     public String toString() {
-        return "RedisProviderConfig{" +
+        return "AbstractRedisProvider{" +
                 "rootPath='" + rootPath + '\'' +
                 ", host='" + host + '\'' +
                 ", port=" + port +

@@ -10,7 +10,7 @@ public class TestMain {
         TaskApplication application = new TaskApplication();
         // 启动消费者
         RedisProvider manager = RedisProvider.create("mzhong.cn", 6379);
-        application.setQueueProvider(manager);
+        application.addProvider(manager);
         application.start();
         try {
             Thread.sleep(5000);

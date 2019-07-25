@@ -1,9 +1,6 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.core.TaskComponent;
-import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.core.TaskExecutor;
-import cn.mzhong.janytask.core.TaskWorker;
+import cn.mzhong.janytask.core.*;
 import cn.mzhong.janytask.queue.loopline.LoopLineAnnotationHandler;
 import cn.mzhong.janytask.queue.pipleline.PipleLineAnnotationHandler;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
@@ -16,122 +13,45 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class QueueManager implements TaskComponent {
+public class QueueManager extends AbstractQueueManager {
 
     final static Logger Log = LoggerFactory.getLogger(QueueManager.class);
 
-    protected TaskContext context;
-    protected ConsumerCreator consumerCreator;
-    Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
-    protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
-    protected ProducerCreator producerCreator;
-    protected Set<QueueAnnotationHandler> annotationHandlers = new HashSet<QueueAnnotationHandler>();
-    protected Set<Class<?>> producerClassSet = new HashSet<Class<?>>();
-    protected Set<Class<?>> consumerClassSet = new HashSet<Class<?>>();
-    // 方法与MessageDao映射Map，在生产者代理中会用到此映射来寻找生产者MessageDao
-    protected Map<Method, MessageDao> methodMessageDaoMap = new HashMap<Method, MessageDao>();
-
-    protected Set<QueueProvider> providers = new HashSet<QueueProvider>();
-
-    protected Map<QueueProvider, ProviderInfo> providerInfoMap = new HashMap<QueueProvider, ProviderInfo>();
-
-    public void setContext(TaskContext context) {
-        this.context = context;
-    }
-
-    public ConsumerCreator getConsumerCreator() {
-        return consumerCreator;
-    }
-
-    public void setConsumerCreator(ConsumerCreator consumerCreator) {
-        this.consumerCreator = consumerCreator;
-    }
-
-    public Map<Class<?>, Object> getConsumerMap() {
-        return consumerMap;
-    }
-
-    public void setConsumerMap(Map<Class<?>, Object> consumerMap) {
-        this.consumerMap = consumerMap;
-    }
-
-    public Map<Class<?>, Object> getProducerMap() {
-        return producerMap;
-    }
-
-    public void setProducerMap(Map<Class<?>, Object> producerMap) {
-        this.producerMap = producerMap;
-    }
-
-    public ProducerCreator getProducerCreator() {
-        return producerCreator;
-    }
-
-    public void setProducerCreator(ProducerCreator producerCreator) {
-        this.producerCreator = producerCreator;
-    }
-
-    public Set<QueueAnnotationHandler> getAnnotationHandlers() {
-        return annotationHandlers;
-    }
-
-    public void setAnnotationHandlers(Set<QueueAnnotationHandler> annotationHandlers) {
-        this.annotationHandlers = annotationHandlers;
-    }
-
-    public Map<Method, MessageDao> getMethodMessageDaoMap() {
-        return methodMessageDaoMap;
-    }
-
-    public void setMethodMessageDaoMap(Map<Method, MessageDao> methodMessageDaoMap) {
-        this.methodMessageDaoMap = methodMessageDaoMap;
-    }
-
-    public QueueManager addProvider(QueueProvider provider) {
-        this.providers.add(provider);
-        return this;
-    }
-
-    private void foreachComponentClassSet(
-            Set<Class<?>> classSet,
-            PInvoker<Class<?>> classPInvoker,
-            Class<? extends Annotation> annotationClass) {
-        if (classSet.isEmpty()) {
-            String basePackage = context.getApplicationConfig().getName();
-            classSet.addAll(ClassUtils.scanByAnnotation(basePackage, annotationClass));
-        }
-        Iterator<Class<?>> iterator = classSet.iterator();
-        while (iterator.hasNext()) {
-            try {
-                classPInvoker.invoke(iterator.next());
-            } catch (Exception e) {
-                //
-            }
-        }
-    }
-
-    public void foreachProducerClassSet(PInvoker<Class<?>> classPInvoker) {
-        this.foreachComponentClassSet(producerClassSet, classPInvoker, Producer.class);
-    }
-
-
-    public void foreachConsumerClassSet(PInvoker<Class<?>> classPInvoker) {
-        this.foreachComponentClassSet(consumerClassSet, classPInvoker, Consumer.class);
-    }
-
-    public void init() {
-        if (this.producerCreator == null) {
-            this.producerCreator = new InternalProducerCreator();
-        }
-        if (this.consumerCreator == null) {
-            this.consumerCreator = new InternalConsumerCreator();
-        }
+    public QueueManager(){
         // 注解处理器
         this.annotationHandlers.add(new PipleLineAnnotationHandler());
         this.annotationHandlers.add(new LoopLineAnnotationHandler());
+    }
+
+    /**
+     * 根据提供商指示的package来扫描与此提供商相关联的生产者、消费者等类对象
+     *
+     * @param provider
+     */
+    private void initProvider(QueueProvider provider) {
+
+    }
+
+    /**
+     * 支持多个提供商，需要扫描所有提供商
+     *
+     * @since 2.0.0
+     */
+    private void initProviders() {
+        Iterator<QueueProvider> iterator = this.providers.iterator();
+        while (iterator.hasNext()) {
+            initProvider(iterator.next());
+        }
+    }
+
+    public void init() {
         // 初始化
-        new ProducerInitializer().init();
-        new ConsumerInitializer().init();
+        new QueueManager.ProducerInitializer().init();
+        new QueueManager.ConsumerInitializer().init();
+    }
+
+    public Set<TaskExecutor> getTaskExecutors() {
+        return null;
     }
 
     class ProducerInitializer implements TaskComponent {
@@ -282,23 +202,6 @@ public class QueueManager implements TaskComponent {
         }
     }
 
-    class InternalProducerCreator implements ProducerCreator {
-
-        public Object createProducer(Class<?> _class) {
-            return ProducerFactory.newInstance(context, _class);
-        }
-    }
-
-    class InternalConsumerCreator implements ConsumerCreator {
-
-        public Object createConsumer(Class<?> consumerClass) {
-            try {
-                return consumerClass.getDeclaredConstructor().newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 }
 
 

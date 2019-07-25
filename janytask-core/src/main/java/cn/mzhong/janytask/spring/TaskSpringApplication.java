@@ -5,7 +5,7 @@ import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.queue.ConsumerCreator;
 import cn.mzhong.janytask.core.TaskApplication;
 import cn.mzhong.janytask.queue.provider.NoAnyProviderException;
-import cn.mzhong.janytask.queue.ProducerCreator;
+import cn.mzhong.janytask.queue.InstanceCreator;
 import cn.mzhong.janytask.queue.ProducerFactory;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.PInvoker;
@@ -70,7 +70,7 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
         queueManager.foreachProducerClassSet(producerPInvoker);
         queueManager.foreachConsumerClassSet(consumerPInvoker);
         // 使用Spring生成生产者和消费者
-        queueManager.setProducerCreator(new ProducerCreator() {
+        queueManager.setProducerCreator(new InstanceCreator() {
             public Object createProducer(Class<?> _class) {
                 return beanFactory.getBean(_class);
             }

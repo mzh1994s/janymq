@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class ProviderInfo implements Serializable {
     protected QueueProvider provider;
-    protected Map<Method, MessageDao> methodMessageDaoMap;
+    protected Map<Method, MessageDao> messageDaoMap;
 
     public QueueProvider getProvider() {
         return provider;
@@ -18,11 +18,11 @@ public class ProviderInfo implements Serializable {
         this.provider = provider;
     }
 
-    public Map<Method, MessageDao> getMethodMessageDaoMap() {
-        return methodMessageDaoMap;
+    public Map<Method, MessageDao> getMessageDaoMap() {
+        return messageDaoMap;
     }
 
-    public void setMethodMessageDaoMap(Map<Method, MessageDao> methodMessageDaoMap) {
-        this.methodMessageDaoMap = methodMessageDaoMap;
+    public void setMessageDaoMap(Map<Method, MessageDao> messageDaoMap) {
+        this.messageDaoMap = messageDaoMap;
     }
 }

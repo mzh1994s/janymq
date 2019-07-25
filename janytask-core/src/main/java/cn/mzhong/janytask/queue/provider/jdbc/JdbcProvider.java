@@ -1,12 +1,12 @@
 package cn.mzhong.janytask.queue.provider.jdbc;
 
 import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.QueueInfo;
+import cn.mzhong.janytask.queue.provider.AbstractProvider;
 import cn.mzhong.janytask.queue.provider.jdbc.mapper.MessageMapper;
 import cn.mzhong.janytask.queue.provider.jdbc.mapper.MysqlMessageMapper;
 import cn.mzhong.janytask.queue.provider.jdbc.mapper.OracleMessageMapper;
-import cn.mzhong.janytask.queue.MessageDao;
-import cn.mzhong.janytask.queue.QueueInfo;
-import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.PRInvoker;
 import cn.mzhong.janytask.util.Assert;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.sql.DataSource;
 import java.sql.Connection;
 
-public class JdbcProvider implements QueueProvider {
+public class JdbcProvider extends AbstractProvider {
 
     final static Logger Log = LoggerFactory.getLogger(JdbcProvider.class);
 

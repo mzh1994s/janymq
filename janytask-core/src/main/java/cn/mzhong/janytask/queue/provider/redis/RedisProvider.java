@@ -3,13 +3,12 @@ package cn.mzhong.janytask.queue.provider.redis;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueInfo;
-import cn.mzhong.janytask.queue.provider.QueueProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-public class RedisProvider extends RedisProviderConfig implements QueueProvider {
+public class RedisProvider extends AbstractRedisProvider {
 
     final static Logger Log = LoggerFactory.getLogger(RedisProvider.class);
 

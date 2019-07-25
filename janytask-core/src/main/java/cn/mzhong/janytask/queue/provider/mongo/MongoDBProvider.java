@@ -3,7 +3,7 @@ package cn.mzhong.janytask.queue.provider.mongo;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueInfo;
-import cn.mzhong.janytask.queue.provider.QueueProvider;
+import cn.mzhong.janytask.queue.provider.AbstractProvider;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
@@ -12,7 +12,7 @@ import com.mongodb.client.MongoDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MongoDBProvider implements QueueProvider {
+public class MongoDBProvider extends AbstractProvider {
 
     protected String host;
     protected int port;

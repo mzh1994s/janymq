@@ -1,14 +1,7 @@
 package cn.mzhong.janytask.core;
 
-import cn.mzhong.janytask.config.ApplicationConfig;
-import cn.mzhong.janytask.config.QueueConfig;
-import cn.mzhong.janytask.queue.JdkDataSerializer;
-import cn.mzhong.janytask.queue.NoSuchProducerException;
-import cn.mzhong.janytask.queue.provider.NoAnyProviderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Map;
 
 /**
  * Janytask
@@ -17,71 +10,42 @@ import java.util.Map;
  * @version 2.0.0
  * @date 2019年7月10日
  */
-public class TaskApplication extends TaskContext {
+public class TaskApplication extends AbstractApplication {
+
     final static Logger Log = LoggerFactory.getLogger(TaskApplication.class);
 
-
-    protected void wellcome() {
-        Log.debug(this.applicationConfig.toString());
-        Log.debug(this.queueConfig.toString());
-        Log.debug("janytask application started!");
-    }
-
-    public TaskApplication() {
-        this.queueManager.setContext(this);
-        this.scheduleManager.setContext(this);
-        this.taskWorker.setContext(this);
-    }
-
-    public void start() {
-        if (applicationConfig == null) {
-            applicationConfig = new ApplicationConfig();
-        }
-        if (queueConfig == null) {
-            queueConfig = new QueueConfig();
-        }
-        if (queueProvider == null) {
-            throw new NoAnyProviderException("未找到提供商，请先指定提供商！");
-        }
-        if (dataSerializer == null) {
-            dataSerializer = new JdkDataSerializer();
-        }
-        this.setDataSerializer(dataSerializer);
-        this.queueProvider.setContext(this);
-        // 调用组件初始化程序
-        this.queueProvider.init();
+    /**
+     * <p>
+     * 初始化队列任务管理器，稍后在任务调度器中会使用到此组件初始化之后的数据。
+     * <p/>
+     * <p>
+     * 数据包括：<br/>
+     * 1、一个TaskExecutor列表
+     * <p/>
+     */
+    protected void initQueueManager() {
         this.queueManager.init();
+    }
+
+    /**
+     * <p>
+     * 初始化定时任务管理器，稍后在任务调度器中会使用到此组件初始化之后的数据。
+     * <p/>
+     * <p>
+     * 数据包括：<br/>
+     * 1、一个TaskExecutor列表
+     * <p/>
+     */
+    protected void initScheduleManager() {
         this.scheduleManager.init();
+    }
+
+    /**
+     * <p>
+     * 合并队列任务管理器和定时任务管理器中初始化好的TaskExecutor列表,并加载到任务调度器中，再初始化任务调度器。
+     * <p/>
+     */
+    protected void initTaskWorker() {
         this.taskWorker.init();
-
-        // 正常终结
-        Runtime.getRuntime().addShutdownHook(new TaskShutdownHook(this));
-
-        // 启动worker
-        this.taskWorker.start();
-        this.wellcome();
-    }
-
-    @SuppressWarnings({"SingleStatementInBlock", "unchecked"})
-    public <T> T getProducer(Class<T> producerClass) {
-        Map<Class<?>, Object> producerMap = this.queueManager.getProducerMap();
-        Object producer = producerMap.get(producerClass);
-        if (producer == null) {
-            for (Map.Entry<Class<?>, Object> entry : producerMap.entrySet()) {
-                if (entry.getKey().isAssignableFrom(producerClass)) {
-                    return (T) entry.getValue();
-                }
-            }
-            throw new NoSuchProducerException("未在当前上下文中找到生产者：" + producerClass.getName());
-        }
-        return (T) producer;
-    }
-
-    public void close() {
-        synchronized (this) {
-            if (!isShutdown()) {
-                this.shutdownHook.run();
-            }
-        }
     }
 }

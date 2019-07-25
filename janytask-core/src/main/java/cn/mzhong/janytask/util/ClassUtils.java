@@ -91,10 +91,49 @@ public abstract class ClassUtils {
             while (resources.hasMoreElements()) {
                 URL url = resources.nextElement();
                 String protocolUpperCase = url.getProtocol().toUpperCase();
-                if ("JAR".equals(protocolUpperCase)) {
+                if ("jar".equalsIgnoreCase(protocolUpperCase)) {
                     JarURLConnection urlConnection = (JarURLConnection) url.openConnection();
                     classSet.addAll(scanByPackage(packagePattern, urlConnection.getJarFile()));
-                } else if ("FILE".equals(protocolUpperCase)) {
+                } else if ("file".equalsIgnoreCase(protocolUpperCase)) {
+                    File classpathFile = new File(url.getFile());
+                    int classPathStart = url.getFile().length() - 1;
+                    classSet.addAll(scanByPackage(packagePattern, classpathFile, classPathStart));
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return classSet;
+    }
+
+    private static Set<Class<?>> scanByPackage(JarFile jarFile, Class<? extends Annotation>... annotations) {
+        Set<Class<?>> list = new HashSet<Class<?>>();
+        Enumeration<JarEntry> entries = jarFile.entries();
+        while (entries.hasMoreElements()) {
+            JarEntry jarEntry = entries.nextElement();
+            String name = jarEntry.getName();
+            if (name.endsWith(".class") && name.matches(packagePattern)) {
+                try {
+                    list.add(Class.forName(name.substring(0, name.length() - 6)));
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return list;
+    }
+
+    public static Set<Class<?>> scanByAnnotation(Class<? extends Annotation>... annotations){
+        Set<Class<?>> classSet = new HashSet<Class<?>>();
+        try {
+            Enumeration<URL> resources = Thread.currentThread().getContextClassLoader().getResources("");
+            while (resources.hasMoreElements()) {
+                URL url = resources.nextElement();
+                String protocolUpperCase = url.getProtocol().toUpperCase();
+                if ("jar".equalsIgnoreCase(protocolUpperCase)) {
+                    JarURLConnection urlConnection = (JarURLConnection) url.openConnection();
+                    urlConnection.getJarFile().entries();
+                } else if ("file".equalsIgnoreCase(protocolUpperCase)) {
                     File classpathFile = new File(url.getFile());
                     int classPathStart = url.getFile().length() - 1;
                     classSet.addAll(scanByPackage(packagePattern, classpathFile, classPathStart));

@@ -1,10 +1,11 @@
 package cn.mzhong.janytask.queue.provider.zookeeper;
 
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.provider.QueueProvider;
-import cn.mzhong.janytask.queue.*;
+import cn.mzhong.janytask.queue.MessageDao;
+import cn.mzhong.janytask.queue.QueueInfo;
+import cn.mzhong.janytask.queue.provider.AbstractProvider;
 
-public class ZookeeperProvider implements QueueProvider {
+public class ZookeeperProvider extends AbstractProvider {
 
     protected String connectString;
     protected String root = "janytask";
