@@ -2,6 +2,8 @@ package cn.mzhong.janytask.core;
 
 import cn.mzhong.janytask.tool.PInvoker;
 import cn.mzhong.janytask.util.Arrays;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -14,6 +16,8 @@ import java.util.concurrent.*;
  * @since 2.0.0
  */
 public class TaskWorker extends Thread implements TaskComponent {
+
+    final static Logger Log = LoggerFactory.getLogger(TaskWorker.class);
 
     // 空闲延时
     private final static int IDLE_INTERVAL = 1000;
@@ -199,6 +203,20 @@ public class TaskWorker extends Thread implements TaskComponent {
     }
 
     public void init() {
-        // empty
+        context.addShutdownHook(new Runnable() {
+            public void run() {
+                Log.debug("TaskWorker Terminating...");
+                try {
+                    if (shutdownAndAwait()) {
+                        Log.debug("TaskWorker terminated.");
+                    } else {
+                        Log.debug("TaskWorker terminate was not full.");
+                    }
+                } catch (InterruptedException e) {
+                    Log.debug("TaskWorker terminate field.");
+                    Log.error(e.getLocalizedMessage(), e);
+                }
+            }
+        });
     }
 }

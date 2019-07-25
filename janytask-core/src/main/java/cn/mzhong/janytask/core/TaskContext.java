@@ -7,6 +7,8 @@ import cn.mzhong.janytask.queue.QueueManager;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.schedule.ScheduleManager;
 
+import java.util.Set;
+
 public abstract class TaskContext {
 
     /**
@@ -53,6 +55,8 @@ public abstract class TaskContext {
      * @since 1.0.0
      */
     protected volatile boolean shutdown = false;
+
+    protected TaskShutdownHook shutdownHook = new TaskShutdownHook(this);
 
     public ApplicationConfig getApplicationConfig() {
         return applicationConfig;
@@ -108,5 +112,9 @@ public abstract class TaskContext {
 
     public void setShutdown(boolean shutdown) {
         this.shutdown = shutdown;
+    }
+
+    public void addShutdownHook(Runnable runnable) {
+        shutdownHook.add(runnable);
     }
 }
