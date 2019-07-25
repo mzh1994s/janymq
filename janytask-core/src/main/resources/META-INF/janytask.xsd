@@ -34,14 +34,9 @@
 
     <!--应用程序配置项和应用程序-->
     <xsd:complexType name="applicationType">
-        <xsd:attribute name="id" type="xsd:ID">
+        <xsd:attribute name="name" type="xsd:ID">
             <xsd:annotation>
-                <xsd:documentation><![CDATA[ The unique identifier for a bean. ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="basePackage" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ 基本包路径，支持通配符* ]]></xsd:documentation>
+                <xsd:documentation><![CDATA[ 应用程序名 ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>

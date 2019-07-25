@@ -23,7 +23,7 @@ public class ApplicationParser extends AbstractConfigParser {
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
         BeanDefinitionBuilder configBuilder = BeanDefinitionBuilder.genericBeanDefinition(ApplicationConfig.class);
         ElementBeanDefinitionBuilder builderPlus = new ElementBeanDefinitionBuilder(element, configBuilder);
-        builderPlus.parseStringPropertyFromAttr("basePackage");
+        builderPlus.parseStringPropertyFromAttr("name");
         parserContext.getRegistry().registerBeanDefinition(BeanNames.BEAN_NAME_APPLICATION_CONFIG, builderPlus.getBeanDefinition());
     }
 }

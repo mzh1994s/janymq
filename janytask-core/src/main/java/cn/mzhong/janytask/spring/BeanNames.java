@@ -4,8 +4,8 @@ public abstract class BeanNames {
     private BeanNames() {
     }
 
-    public final static String BEAN_NAME_APPLICATION = "onlyJanytaskApplication";
-    public final static String BEAN_NAME_QUEUE_PROVIDER = "onlyJanytaskQueueProviderBean";
-    public final static String BEAN_NAME_QUEUE_CONFIG = "onlyJanytaskQueueConfigBean";
-    public final static String BEAN_NAME_APPLICATION_CONFIG = "onlyJanytaskApplicationConfigBean";
+    public final static String BEAN_NAME_APPLICATION = "JanytaskApplicationBean";
+    public final static String BEAN_NAME_QUEUE_PROVIDER = "JanytaskQueueProviderBean";
+    public final static String BEAN_NAME_QUEUE_CONFIG = "JanytaskQueueConfigBean";
+    public final static String BEAN_NAME_APPLICATION_CONFIG = "JanytaskApplicationConfigBean";
 }

@@ -3,17 +3,23 @@
             xmlns="http://www.mzhong.cn/schema/janytask"
             targetNamespace="http://www.mzhong.cn/schema/janytask">
 
+    <xsd:include schemaLocation="janytask-provider.xsd"/>
+
     <xsd:complexType name="zookeeperProviderType">
-        <xsd:attribute name="connectString" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ zookeeper连接字符串 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="rootPath" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ zookeeper根节点名称 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <xsd:complexContent>
+            <xsd:extension base="providerType">
+                <xsd:attribute name="connectString" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[ zookeeper连接字符串 ]]></xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+                <xsd:attribute name="rootPath" type="xsd:string">
+                    <xsd:annotation>
+                        <xsd:documentation><![CDATA[ zookeeper根节点名称 ]]></xsd:documentation>
+                    </xsd:annotation>
+                </xsd:attribute>
+            </xsd:extension>
+        </xsd:complexContent>
     </xsd:complexType>
 
     <xsd:element name="provider-zookeeper" type="zookeeperProviderType">

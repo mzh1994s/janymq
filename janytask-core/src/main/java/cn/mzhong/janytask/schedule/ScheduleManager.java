@@ -24,7 +24,7 @@ public class ScheduleManager implements TaskComponent {
 
     @SuppressWarnings("unchecked")
     public void init() {
-        String basePackage = context.getApplicationConfig().getBasePackage();
+        String basePackage = context.getApplicationConfig().getName();
         Set<Class<?>> scheduleClassSet = ClassUtils.scanByAnnotation(basePackage, Schedule.class);
         Iterator<Class<?>> iterator = scheduleClassSet.iterator();
         while (iterator.hasNext()) {

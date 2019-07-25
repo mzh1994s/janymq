@@ -2,9 +2,9 @@ package cn.mzhong.janytask.core;
 
 import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
-import cn.mzhong.janytask.queue.provider.NoAnyProviderException;
-import cn.mzhong.janytask.queue.NoSuchProducerException;
 import cn.mzhong.janytask.queue.JdkDataSerializer;
+import cn.mzhong.janytask.queue.NoSuchProducerException;
+import cn.mzhong.janytask.queue.provider.NoAnyProviderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,15 +12,18 @@ import java.util.Map;
 
 /**
  * Janytask的核心思想就是让异步调用变得容易。就像调用一个同步方法一样去实现消息队列的异步操作，
- * 您可以直接用new关键字创建一个或多个相互不干扰的janytask应用程序,使用时直接使用创建的Application
- * 获取生产者，再进行生产者相关的调用，调用时与普通方法调用一样。在janytask中，消费者及生产者，
- * 你只需编写消费者代码即可由janytask应用程序获取到生产者的代理，而且编写一个消费者也特别容易。
+ * 使用{@link TaskApplication#getInctance()}获取Janytask应用程序,使用创建的Application获取生产者<br/>
+ * 日记：<br/>
+ * 2019年7月25日15:54:39 将应用程序修改为单例模式，一个Jvm中只存在一个Janytask应用程序，但可以支持多个提供商.<br/>
  *
  * @author mzhong
  * @version 2.0.0
  * @date 2019年7月10日
  */
 public class TaskApplication extends TaskContext {
+
+    private static TaskApplication instance = null;
+    private boolean started;
 
     final static Logger Log = LoggerFactory.getLogger(TaskApplication.class);
 
@@ -30,13 +33,30 @@ public class TaskApplication extends TaskContext {
         Log.debug("janytask application started!");
     }
 
-    public TaskApplication() {
+    public static TaskApplication getInctance() {
+        if (instance == null) {
+            synchronized (TaskApplication.class) {
+                if (instance == null) {
+                    instance = new TaskApplication();
+                }
+            }
+        }
+        return instance;
+    }
+
+    protected TaskApplication() {
         this.queueManager.setContext(this);
         this.scheduleManager.setContext(this);
         this.taskWorker.setContext(this);
     }
 
     public void start() {
+        synchronized (instance) {
+            if (started) {
+                throw new RuntimeException("Janytask应用程序已经启动！");
+            }
+            started = true;
+        }
         if (applicationConfig == null) {
             applicationConfig = new ApplicationConfig();
         }

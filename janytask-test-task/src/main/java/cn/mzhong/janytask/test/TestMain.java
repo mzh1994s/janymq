@@ -7,7 +7,7 @@ import cn.mzhong.janytask.queue.provider.redis.RedisProvider;
 public class TestMain {
 
     public static void main(String[] args) {
-        TaskApplication application = new TaskApplication();
+        TaskApplication application = TaskApplication.getInctance();
         // 启动消费者
         RedisProvider manager = RedisProvider.create("mzhong.cn", 6379);
         application.setQueueProvider(manager);

@@ -88,7 +88,7 @@ spring-janymq.xml
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
             http://www.mzhong.cn/schema/janytask http://www.mzhong.cn/schema/janymq.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"&gt;
     &lt;!--redis 实现--&gt;
-    &lt;janytask:application basePackage="cn.mzhong"&gt;
+    &lt;janytask:application name="cn.mzhong"&gt;
         &lt;janytask:redis hostName="mzhong.cn" port="6379"/&gt;
     &lt;/janytask:application&gt;
 &lt;/beans&gt;

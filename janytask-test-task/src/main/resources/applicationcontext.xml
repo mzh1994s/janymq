@@ -34,10 +34,9 @@
         </property>
     </bean>
 
-    <!--redis 实现-->
-    <janytask:application basePackage="cn.mzhong" />
+    <janytask:application name="test-application" />
 
-    <janytask:provider-redis host="${janytask.provider.redis.host}" port="6379"/>
+    <janytask:provider-redis package="cn.mzhong.janytask" host="${janytask.provider.redis.host}" port="6379" />
     <!--<janytask:provider-zookeeper connectString="mzhong.cn:2181"/>-->
     <!--<janytask:provider-jdbc dataSource-ref="oracleDataSource"/>-->
     <!--<janytask:provider-any ref="jdbc-provider"/>-->

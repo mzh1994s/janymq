@@ -6,6 +6,7 @@ import cn.mzhong.janytask.core.TaskExecutor;
 import cn.mzhong.janytask.core.TaskWorker;
 import cn.mzhong.janytask.queue.loopline.LoopLineAnnotationHandler;
 import cn.mzhong.janytask.queue.pipleline.PipleLineAnnotationHandler;
+import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.PInvoker;
 import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
@@ -29,6 +30,10 @@ public class QueueManager implements TaskComponent {
     protected Set<Class<?>> consumerClassSet = new HashSet<Class<?>>();
     // 方法与MessageDao映射Map，在生产者代理中会用到此映射来寻找生产者MessageDao
     protected Map<Method, MessageDao> methodMessageDaoMap = new HashMap<Method, MessageDao>();
+
+    protected Set<QueueProvider> providers = new HashSet<QueueProvider>();
+
+    protected Map<QueueProvider, ProviderInfo> providerInfoMap = new HashMap<QueueProvider, ProviderInfo>();
 
     public void setContext(TaskContext context) {
         this.context = context;
@@ -82,12 +87,17 @@ public class QueueManager implements TaskComponent {
         this.methodMessageDaoMap = methodMessageDaoMap;
     }
 
+    public QueueManager addProvider(QueueProvider provider) {
+        this.providers.add(provider);
+        return this;
+    }
+
     private void foreachComponentClassSet(
             Set<Class<?>> classSet,
             PInvoker<Class<?>> classPInvoker,
             Class<? extends Annotation> annotationClass) {
         if (classSet.isEmpty()) {
-            String basePackage = context.getApplicationConfig().getBasePackage();
+            String basePackage = context.getApplicationConfig().getName();
             classSet.addAll(ClassUtils.scanByAnnotation(basePackage, annotationClass));
         }
         Iterator<Class<?>> iterator = classSet.iterator();
@@ -256,7 +266,6 @@ public class QueueManager implements TaskComponent {
         /**
          * 创建线程列表（一个消费者消息队列一个线程）
          *
-         * @param context
          * @return
          */
 
