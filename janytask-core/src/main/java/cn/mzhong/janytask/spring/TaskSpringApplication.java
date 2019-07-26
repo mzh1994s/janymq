@@ -67,19 +67,19 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
 
     public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory) throws BeansException {
         this.beanFactory = beanFactory;
-        queueManager.foreachProducerClassSet(producerPInvoker);
-        queueManager.foreachConsumerClassSet(consumerPInvoker);
-        // 使用Spring生成生产者和消费者
-        queueManager.setProducerCreator(new InstanceCreator() {
-            public Object createProducer(Class<?> _class) {
-                return beanFactory.getBean(_class);
-            }
-        });
-        queueManager.setConsumerCreator(new ConsumerCreator() {
-            public Object createConsumer(Class<?> consumerClass) {
-                return beanFactory.getBean(consumerClass);
-            }
-        });
+//        queueManager.foreachProducerClassSet(producerPInvoker);
+//        queueManager.foreachConsumerClassSet(consumerPInvoker);
+//        // 使用Spring生成生产者和消费者
+//        queueManager.setProducerCreator(new InstanceCreator() {
+//            public Object createProducer(Class<?> _class) {
+//                return beanFactory.getBean(_class);
+//            }
+//        });
+//        queueManager.setConsumerCreator(new ConsumerCreator() {
+//            public Object createConsumer(Class<?> consumerClass) {
+//                return beanFactory.getBean(consumerClass);
+//            }
+//        });
     }
 
     public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry beanDefinitionRegistry) throws BeansException {
@@ -87,14 +87,14 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
     }
 
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        if (!beanFactory.containsBean(BeanNames.BEAN_NAME_QUEUE_PROVIDER)) {
-            throw new NoAnyProviderException("未找到提供商，请指定提供商！如果使用Janytask schema配置应用程序，支持类似于<janytask:provider-xxx ……/>的配置。");
-        }
-        this.setApplicationConfig(beanFactory.getBean(BeanNames.BEAN_NAME_APPLICATION_CONFIG, ApplicationConfig.class));
-        if (beanFactory.containsBean(BeanNames.BEAN_NAME_QUEUE_CONFIG)) {
-            this.setQueueConfig(beanFactory.getBean(BeanNames.BEAN_NAME_QUEUE_CONFIG, QueueConfig.class));
-        }
-        this.setQueueProvider(beanFactory.getBean(BeanNames.BEAN_NAME_QUEUE_PROVIDER, QueueProvider.class));
-        this.start();
+//        if (!beanFactory.containsBean(BeanNames.BEAN_NAME_QUEUE_PROVIDER)) {
+//            throw new NoAnyProviderException("未找到提供商，请指定提供商！如果使用Janytask schema配置应用程序，支持类似于<janytask:provider-xxx ……/>的配置。");
+//        }
+//        this.setApplicationConfig(beanFactory.getBean(BeanNames.BEAN_NAME_APPLICATION_CONFIG, ApplicationConfig.class));
+//        if (beanFactory.containsBean(BeanNames.BEAN_NAME_QUEUE_CONFIG)) {
+//            this.setQueueConfig(beanFactory.getBean(BeanNames.BEAN_NAME_QUEUE_CONFIG, QueueConfig.class));
+//        }
+//        this.setQueueProvider(beanFactory.getBean(BeanNames.BEAN_NAME_QUEUE_PROVIDER, QueueProvider.class));
+//        this.start();
     }
 }

@@ -21,7 +21,7 @@ public class JdbcMessageDao extends LockedMessageDao {
 
     public void push(Message message) {
         BytesMessage jdbcMessage = new BytesMessage(message);
-        jdbcMessage.setContentBytes(this.dataSerializer.serialize(message.getContent()));
+        jdbcMessage.setContentBytes(this.serializer.serialize(message.getContent()));
         jdbcMessage.setPushTime(new Date());
         jdbcMessage.setQueueId(ID);
         this.messageMapper.save(jdbcMessage);
@@ -51,7 +51,7 @@ public class JdbcMessageDao extends LockedMessageDao {
     @Override
     protected Message get(String id) {
         BytesMessage jdbcMessage = this.messageMapper.get(id);
-        Object[] content = (Object[]) this.dataSerializer.deserialize(jdbcMessage.getContentBytes());
+        Object[] content = (Object[]) this.serializer.deserialize(jdbcMessage.getContentBytes());
         jdbcMessage.setContent(content);
         return jdbcMessage;
     }

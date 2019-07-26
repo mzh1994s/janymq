@@ -1,12 +1,7 @@
 package cn.mzhong.janytask.queue.loopline;
 
-import cn.mzhong.janytask.queue.QueueAnnotationHandler;
 import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.queue.QueueExecutor;
-import cn.mzhong.janytask.queue.Message;
-import cn.mzhong.janytask.queue.MessageDao;
-import cn.mzhong.janytask.queue.QueueInfo;
-import cn.mzhong.janytask.util.ValueUtils;
+import cn.mzhong.janytask.queue.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +13,7 @@ public class LoopLineAnnotationHandler implements QueueAnnotationHandler<Looplin
         return Loopline.class;
     }
 
-    public void handleProducer(TaskContext context, QueueInfo<Loopline> queueInfo) {
+    public void handleProducer(TaskContext context, QueueManager queueManager, QueueInfo<Loopline> queueInfo) {
         // 返回值判断
         Method method = queueInfo.getProducerMethod();
         Class<?> returnType = method.getReturnType();
@@ -27,8 +22,8 @@ public class LoopLineAnnotationHandler implements QueueAnnotationHandler<Looplin
         }
     }
 
-    public QueueExecutor<Loopline> handleConsumer(TaskContext context, QueueInfo<Loopline> queueInfo) {
-        return new LooplineTaskExecutor(context, queueInfo);
+    public QueueExecutor<Loopline> handleConsumer(TaskContext context, QueueManager queueManager, QueueInfo<Loopline> queueInfo) {
+        return new LooplineTaskExecutor(context, queueManager, queueInfo);
     }
 }
 
@@ -38,8 +33,8 @@ class LooplineTaskExecutor extends QueueExecutor<Loopline> {
 
     Loopline loopline;
 
-    public LooplineTaskExecutor(TaskContext context, QueueInfo<Loopline> queueInfo) {
-        super(context, queueInfo);
+    public LooplineTaskExecutor(TaskContext context, QueueManager queueManager, QueueInfo<Loopline> queueInfo) {
+        super(context, queueManager, queueInfo);
         this.loopline = queueInfo.getAnnotation();
     }
 

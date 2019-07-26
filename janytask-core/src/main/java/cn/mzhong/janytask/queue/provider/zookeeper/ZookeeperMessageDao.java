@@ -51,7 +51,7 @@ public class ZookeeperMessageDao extends LockedMessageDao {
 
     protected void push(String parent, Message message) {
         try {
-            byte[] data = dataSerializer.serialize(message);
+            byte[] data = serializer.serialize(message);
             String path = parent + "/" + message.getId();
             zkClient.create(path, data, CreateMode.PERSISTENT);
         } catch (Exception e) {
@@ -95,7 +95,7 @@ public class ZookeeperMessageDao extends LockedMessageDao {
     protected Message get(String id) {
         byte[] data = zkClient.getData(waitPath + "/" + id);
         try {
-            return (Message) dataSerializer.deserialize(data);
+            return (Message) serializer.deserialize(data);
         } catch (Exception e) {
             Log.error("消息反序列化出错，消息已被忽略！消息ID:" + id, e);
         }

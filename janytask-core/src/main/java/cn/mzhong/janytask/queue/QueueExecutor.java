@@ -19,13 +19,15 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
     protected MessageDao messageDao;
     protected Method method;
     protected Object consumer;
+    protected QueueManager queueManager;
     protected long cnt = 0;
 
-    public QueueExecutor(TaskContext context, QueueInfo<A> queueInfo) {
+    public QueueExecutor(TaskContext context, QueueManager queueManager, QueueInfo<A> queueInfo) {
         super(context, new JanyTask$CronSequenceGenerator(
-                ValueUtils.uEmptyStr(queueInfo.cron, context.getQueueConfig().getCron()),
-                ValueUtils.uEmptyStr(queueInfo.zone, context.getQueueConfig().getZone())
+                ValueUtils.uEmptyStr(queueInfo.cron),
+                ValueUtils.uEmptyStr(queueInfo.zone)
         ));
+        this.queueManager = queueManager;
         this.queueInfo = queueInfo;
         this.messageDao = queueInfo.getMessageDao();
         this.ID = messageDao.ID();

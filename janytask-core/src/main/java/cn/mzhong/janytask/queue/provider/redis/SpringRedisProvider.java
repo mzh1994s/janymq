@@ -6,16 +6,18 @@ import cn.mzhong.janytask.queue.QueueInfo;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-public class SpringRedisProvider extends SpringRedisProviderConfig implements QueueProvider {
+public class SpringRedisProvider extends RedisProvider implements QueueProvider {
 
     final static Logger Log = LoggerFactory.getLogger(RedisProvider.class);
 
     // redis连接工厂
-    RedisConnectionFactory connectionFactory;
+    protected RedisConnectionFactory connectionFactory;
     protected TaskContext context;
+    protected JedisConnectionFactory jedisConnectionFactory;
 
     public void setContext(TaskContext context) {
         this.context = context;
@@ -23,6 +25,14 @@ public class SpringRedisProvider extends SpringRedisProviderConfig implements Qu
 
     public RedisConnectionFactory getConnectionFactory() {
         return connectionFactory;
+    }
+
+    public JedisConnectionFactory getJedisConnectionFactory() {
+        return jedisConnectionFactory;
+    }
+
+    public void setJedisConnectionFactory(JedisConnectionFactory jedisConnectionFactory) {
+        this.jedisConnectionFactory = jedisConnectionFactory;
     }
 
     public MessageDao createMessageDao(QueueInfo queueInfo) {

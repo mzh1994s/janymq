@@ -3,14 +3,11 @@ package cn.mzhong.janytask.schedule;
 import cn.mzhong.janytask.core.TaskComponent;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.core.TaskExecutor;
-import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
-import cn.mzhong.janytask.util.ClassUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 
 import java.lang.reflect.Method;
-import java.util.Iterator;
-import java.util.Set;
 
 public class ScheduleManager implements TaskComponent {
 
@@ -24,23 +21,23 @@ public class ScheduleManager implements TaskComponent {
 
     @SuppressWarnings("unchecked")
     public void init() {
-        String basePackage = context.getApplicationConfig().getName();
-        Set<Class<?>> scheduleClassSet = ClassUtils.scanByAnnotation(basePackage, Schedule.class);
-        Iterator<Class<?>> iterator = scheduleClassSet.iterator();
-        while (iterator.hasNext()) {
-            Class<?> _class = iterator.next();
-            Object schedule = createSchedule(_class);
-            Method[] methods = _class.getMethods();
-            int len = methods.length;
-            for (int i = 0; i < len; i++) {
-                Method method = methods[i];
-                Scheduled scheduled = method.getAnnotation(Scheduled.class);
-                if (scheduled != null) {
-                    JanyTask$CronSequenceGenerator cronSequenceGenerator = new JanyTask$CronSequenceGenerator(scheduled.cron(), scheduled.zone());
-                    context.getTaskWorker().addExecutor(new ScheduleExecutor(context, schedule, method, cronSequenceGenerator));
-                }
-            }
-        }
+//        String basePackage = context.getApplicationConfig().getName();
+//        Set<Class<?>> scheduleClassSet = ClassUtils.scanByAnnotation(basePackage, Schedule.class);
+//        Iterator<Class<?>> iterator = scheduleClassSet.iterator();
+//        while (iterator.hasNext()) {
+//            Class<?> _class = iterator.next();
+//            Object schedule = createSchedule(_class);
+//            Method[] methods = _class.getMethods();
+//            int len = methods.length;
+//            for (int i = 0; i < len; i++) {
+//                Method method = methods[i];
+//                Scheduled scheduled = method.getAnnotation(Scheduled.class);
+//                if (scheduled != null) {
+//                    JanyTask$CronSequenceGenerator cronSequenceGenerator = new JanyTask$CronSequenceGenerator(scheduled.cron(), scheduled.zone());
+//                    context.getTaskWorker().addExecutor(new ScheduleExecutor(context, schedule, method, cronSequenceGenerator));
+//                }
+//            }
+//        }
     }
 
     protected Object createSchedule(Class<?> _class) {

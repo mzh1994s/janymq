@@ -34,7 +34,7 @@ public class RedisMessageDao extends LockedMessageDao {
     public void push(final Message message) {
         this.redisClient.execute(new PRInvoker<Jedis, Long>() {
             public Long invoke(Jedis jedis) throws Exception {
-                byte[] data = dataSerializer.serialize(message);
+                byte[] data = serializer.serialize(message);
                 return jedis.hset(waitKey, message.getId().getBytes(), data);
             }
         });
@@ -45,7 +45,7 @@ public class RedisMessageDao extends LockedMessageDao {
         return this.redisClient.execute(new PRInvoker<Jedis, Message>() {
             public Message invoke(Jedis jedis) throws Exception {
                 byte[] messageByes = jedis.hget(waitKey, id.getBytes());
-                return (Message) dataSerializer.deserialize(messageByes);
+                return (Message) serializer.deserialize(messageByes);
             }
         });
     }
@@ -53,7 +53,7 @@ public class RedisMessageDao extends LockedMessageDao {
     private void complete(final byte[] key, final Message message) {
         this.redisClient.execute(new PRInvoker<Jedis, Boolean>() {
             public Boolean invoke(Jedis jedis) throws Exception {
-                byte[] data = dataSerializer.serialize(message);
+                byte[] data = serializer.serialize(message);
                 String field = message.getId();
                 byte[] fieldBytes = message.getId().getBytes();
                 // 转入新表

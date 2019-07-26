@@ -1,8 +1,8 @@
-package cn.mzhong.janytask.queue;
+package cn.mzhong.janytask.serialize;
 
 import java.io.*;
 
-public class JdkDataSerializer {
+public class JdkDataSerializer implements Serializer {
 
     public byte[] serialize(Object data) {
         try {
