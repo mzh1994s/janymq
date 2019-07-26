@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.test;
 
-import cn.mzhong.janytask.producer.TestTask;
+import cn.mzhong.janytask.tproducer.TestTask;
 
 import java.lang.reflect.Proxy;
 

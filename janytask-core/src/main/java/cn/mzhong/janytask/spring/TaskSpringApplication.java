@@ -48,7 +48,7 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
             // 当在一个应用中需要同步实现时可通过Resource或者Autowired + Qualifier的方式实现。
             beanDefinition.setPrimary(true);
             // 注册bean到Spring容器
-            String beanName = "janytask-producer#" + (cnt++);
+            String beanName = "janytask-tproducer#" + (cnt++);
             registry.registerBeanDefinition(beanName, beanDefinition);
         }
     };
@@ -60,7 +60,7 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
             BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(consumerClass);
             builder.setScope(BeanDefinition.SCOPE_SINGLETON);
             BeanDefinition beanDefinition = builder.getBeanDefinition();
-            String beanName = "janytask-consumer#" + (cnt++);
+            String beanName = "janytask-tconsumer#" + (cnt++);
             registry.registerBeanDefinition(beanName, beanDefinition);
         }
     };

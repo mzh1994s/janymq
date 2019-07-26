@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.test;
 
-import cn.mzhong.janytask.producer.TestTask;
+import cn.mzhong.janytask.tproducer.TestTask;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

@@ -1,4 +1,4 @@
-package cn.mzhong.janytask.producer;
+package cn.mzhong.janytask.tproducer;
 
 import cn.mzhong.janytask.queue.Producer;
 import cn.mzhong.janytask.queue.loopline.Loopline;

@@ -1,7 +1,7 @@
-package cn.mzhong.janytask.consumer;
+package cn.mzhong.janytask.tconsumer;
 
 import cn.mzhong.janytask.bean.TestBean;
-import cn.mzhong.janytask.producer.TestTask;
+import cn.mzhong.janytask.tproducer.TestTask;
 import cn.mzhong.janytask.queue.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 

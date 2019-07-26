@@ -87,7 +87,7 @@ public class QueueManager extends AbstractQueueManager {
 //                        //noinspection SingleStatementInBlock,unchecked
 //                        annotationProcessor.handleProducer(context, queueInfo);
 //                        if (Log.isDebugEnabled()) {
-//                            Log.debug("producer:'" + queueInfo.ID() + "'inited.");
+//                            Log.debug("tproducer:'" + queueInfo.ID() + "'inited.");
 //                        }
 //                    }
 //                }
@@ -100,8 +100,8 @@ public class QueueManager extends AbstractQueueManager {
 //            QueueManager.this.foreachProducerClassSet(new PInvoker<Class<?>>() {
 //                public void invoke(Class<?> producerClass) throws Exception {
 //                    // 注册生产者代理
-//                    Object producer = producerCreator.createProducer(producerClass);
-//                    producerMap.put(producerClass, producer);
+//                    Object tproducer = producerCreator.createProducer(producerClass);
+//                    producerMap.put(producerClass, tproducer);
 //                    ProducerInitializer.this.processProducer(context, producerClass);
 //                }
 //            });
@@ -121,7 +121,7 @@ public class QueueManager extends AbstractQueueManager {
 //         * @param method
 //         * @return
 //         */
-//        private <A extends Annotation> QueueInfo<A> findQueueInfo(Object consumer, Class<?> consumerClass, Method method, Class<A> annotationType) {
+//        private <A extends Annotation> QueueInfo<A> findQueueInfo(Object tconsumer, Class<?> consumerClass, Method method, Class<A> annotationType) {
 //            Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
 //            QueueInfo<A> queueInfo = null;
 //            for (Class<?> _interface : interfaces) {
@@ -134,7 +134,7 @@ public class QueueManager extends AbstractQueueManager {
 //                                    annotation,
 //                                    _interface,
 //                                    pMethod,
-//                                    consumer,
+//                                    tconsumer,
 //                                    consumerClass,
 //                                    method);
 //                            break;
@@ -152,7 +152,7 @@ public class QueueManager extends AbstractQueueManager {
 //         * 处理消费者
 //         *
 //         * @param context
-//         * @param consumer
+//         * @param tconsumer
 //         * @param consumerClass
 //         * @param <A>
 //         * @return
@@ -160,7 +160,7 @@ public class QueueManager extends AbstractQueueManager {
 //        @SuppressWarnings("unchecked")
 //        protected <A extends Annotation> Set<TaskExecutor> handleConsumer(
 //                TaskContext context,
-//                Object consumer,
+//                Object tconsumer,
 //                Class<?> consumerClass) {
 //            Set<TaskExecutor> taskExecutos = new HashSet<TaskExecutor>();
 //            for (Method method : consumerClass.getMethods()) {
@@ -168,7 +168,7 @@ public class QueueManager extends AbstractQueueManager {
 //                while (iterator.hasNext()) {
 //                    QueueAnnotationHandler annotationProcessor = iterator.next();
 //                    QueueInfo<A> queueInfo = findQueueInfo(
-//                            consumer,
+//                            tconsumer,
 //                            consumerClass,
 //                            method,
 //                            annotationProcessor.getAnnotationClass());
@@ -178,7 +178,7 @@ public class QueueManager extends AbstractQueueManager {
 //                        // 创建消费者线程
 //                        taskExecutos.add(annotationProcessor.handleConsumer(context, queueInfo));
 //                        if (Log.isDebugEnabled()) {
-//                            Log.debug("consumer:'" + queueInfo.ID() + "'inited.");
+//                            Log.debug("tconsumer:'" + queueInfo.ID() + "'inited.");
 //                        }
 //                    }
 //                }
@@ -197,9 +197,9 @@ public class QueueManager extends AbstractQueueManager {
 //            final TaskWorker taskWorker = context.getTaskWorker();
 //            QueueManager.this.foreachConsumerClassSet(new PInvoker<Class<?>>() {
 //                public void invoke(Class<?> consumerClass) throws Exception {
-//                    Object consumer = consumerCreator.createConsumer(consumerClass);
-//                    QueueManager.this.consumerMap.put(consumerClass, consumer);
-//                    taskWorker.addExecutors(ConsumerInitializer.this.handleConsumer(context, consumer, consumerClass));
+//                    Object tconsumer = consumerCreator.createConsumer(consumerClass);
+//                    QueueManager.this.consumerMap.put(consumerClass, tconsumer);
+//                    taskWorker.addExecutors(ConsumerInitializer.this.handleConsumer(context, tconsumer, consumerClass));
 //                }
 //            });
 //        }
