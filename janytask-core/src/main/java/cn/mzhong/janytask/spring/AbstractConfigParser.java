@@ -14,6 +14,11 @@ public abstract class AbstractConfigParser extends AbstractSingleBeanDefinitionP
 
     @Override
     protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException {
+        int cnt = 0;
+        String beanName = beanName();
+        while (parserContext.getRegistry().containsBeanDefinition(beanName)) {
+            beanName = beanName + "#" + (cnt++);
+        }
         element.setAttribute("id", beanName());
         return super.resolveId(element, definition, parserContext);
     }

@@ -4,6 +4,7 @@ import cn.mzhong.janytask.config.ApplicationConfig;
 import cn.mzhong.janytask.config.QueueConfig;
 import cn.mzhong.janytask.queue.ConsumerCreator;
 import cn.mzhong.janytask.core.TaskApplication;
+import cn.mzhong.janytask.queue.QueueManager;
 import cn.mzhong.janytask.queue.provider.NoAnyProviderException;
 import cn.mzhong.janytask.queue.InstanceCreator;
 import cn.mzhong.janytask.queue.ProducerFactory;
@@ -17,6 +18,9 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProcessor;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Spring janytask应用程序
@@ -87,14 +91,11 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
     }
 
     public void onApplicationEvent(ContextRefreshedEvent event) {
-//        if (!beanFactory.containsBean(BeanNames.BEAN_NAME_QUEUE_PROVIDER)) {
-//            throw new NoAnyProviderException("未找到提供商，请指定提供商！如果使用Janytask schema配置应用程序，支持类似于<janytask:provider-xxx ……/>的配置。");
-//        }
-//        this.setApplicationConfig(beanFactory.getBean(BeanNames.BEAN_NAME_APPLICATION_CONFIG, ApplicationConfig.class));
-//        if (beanFactory.containsBean(BeanNames.BEAN_NAME_QUEUE_CONFIG)) {
-//            this.setQueueConfig(beanFactory.getBean(BeanNames.BEAN_NAME_QUEUE_CONFIG, QueueConfig.class));
-//        }
-//        this.setQueueProvider(beanFactory.getBean(BeanNames.BEAN_NAME_QUEUE_PROVIDER, QueueProvider.class));
-//        this.start();
+        Map<String, QueueProvider> beansOfType = beanFactory.getBeansOfType(QueueProvider.class);
+        Iterator<QueueProvider> iterator = beansOfType.values().iterator();
+        while (iterator.hasNext()) {
+            this.addProvider(iterator.next());
+        }
+        this.start();
     }
 }

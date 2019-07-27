@@ -10,7 +10,7 @@ import cn.mzhong.janytask.queue.QueueInfo;
  */
 public interface QueueProvider extends TaskComponent {
 
-    String getPackage();
+    String[] getPackages();
 
     MessageDao createMessageDao(QueueInfo queueInfo);
 }

@@ -8,19 +8,25 @@ import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+/**
+ * 队列型任务管理器，管理Pipleline、Loopline等
+ */
 public class QueueManager extends AbstractQueueManager {
 
     final static Logger Log = LoggerFactory.getLogger(QueueManager.class);
+    final Set<Class<?>> classes = new HashSet<Class<?>>();
 
     /**
      * 用于扫描当前classpath*下包含指定注解的所有类，并在这些类的基础上再次筛选。
      */
     final AnnotationPatternClassScanner scanner = new AnnotationPatternClassScanner();
 
-    public QueueManager(){
+    public QueueManager() {
         // 注解处理器
         this.annotationHandlers.add(new PipleLineAnnotationHandler());
         this.annotationHandlers.add(new LoopLineAnnotationHandler());
@@ -31,23 +37,41 @@ public class QueueManager extends AbstractQueueManager {
      *
      * @param provider
      */
-    private void initProvider(QueueProvider provider) {
+    private void initProvider(QueueProvider provider) throws ClassNotFoundException {
+        Set<Class<?>> select = scanner.select(provider.getPackages());
+        System.out.println(select);
+    }
 
+    private void initScanner() {
+        Iterator<QueueProvider> iterator = this.providers.iterator();
+        while (iterator.hasNext()) {
+            scanner.addPackages(iterator.next().getPackages());
+        }
+        // 预备消费者和生产者注解
+        scanner.addAnnotation(Consumer.class, Producer.class);
+        scanner.scan();
     }
 
     /**
-     * 支持多个提供商，需要扫描所有提供商
+     * 支持多个提供商，需要扫描所有提供商，并准备预扫描所有提供商需要的类文件
      *
      * @since 2.0.0
      */
-    private void initProviders() {
+    private void initProviders() throws ClassNotFoundException {
+        initScanner();
         Iterator<QueueProvider> iterator = this.providers.iterator();
         while (iterator.hasNext()) {
             initProvider(iterator.next());
         }
+
     }
 
     public void init() {
+        try {
+            initProviders();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         // 初始化
 //        new QueueManager.ProducerInitializer().init();
 //        new QueueManager.ConsumerInitializer().init();

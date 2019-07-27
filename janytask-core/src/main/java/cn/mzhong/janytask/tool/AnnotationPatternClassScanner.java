@@ -13,20 +13,37 @@ import java.util.jar.JarFile;
 
 /**
  * 类扫描器，先通过预定义注解、预定义包将当前classpath*下的所有满足条件的类扫描出来，然后通过一些匹配模式进一步筛选出新的类列表
+ * <p>
+ * <i>非线程安全</i>
+ * <p/>
  *
  * @author mzhong
  * @since 2.0.0
  */
 public class AnnotationPatternClassScanner {
 
+    /**
+     * 预备注解列表，当执行{@link #scan()}时，会将此列表中的注解修饰的类扫描出来。如果注解列表为空，则不会扫描到任何类
+     *
+     * @since 2.0.0
+     */
     final private Set<Class<? extends Annotation>> annotations = new HashSet<Class<? extends Annotation>>();
 
+    /**
+     * 预备包列表（已转换为类名正则匹配器），当执行{@link #scan()}时，会将类名与此列表中的匹配器匹配，满足任何一个匹配器时，类就会被收集。
+     * 如果此列表为空，则会默认扫描当前classpath（不会扫描到jar）中的所有类。
+     *
+     * @since 2.0.0
+     */
     final private Set<String> classPatterns = new HashSet<String>();
 
+    /**
+     * 保存每次执行{@link #scan()}扫描出来的符合扫描条件的类。
+     */
     final private Set<String> resources = new HashSet<String>();
 
     /**
-     * 清除当前扫描过的类，重新执行{@link #select()}方法会执行新的扫描
+     * 清除当前扫描过的类列表{@link #resources}
      *
      * @since 2.0.0
      */
@@ -151,6 +168,9 @@ public class AnnotationPatternClassScanner {
      * @since 2.0.0
      */
     private boolean packageMatch(String classname) {
+        if (this.classPatterns.isEmpty()) {
+            return true;
+        }
         Iterator<String> iterator = this.classPatterns.iterator();
         while (iterator.hasNext()) {
             String next = iterator.next();
@@ -171,6 +191,9 @@ public class AnnotationPatternClassScanner {
      */
     private boolean packageMatch(String classname, String[] packages) {
         int index = packages.length;
+        if (index == 0) {
+            return true;
+        }
         while (index-- > 0) {
             if (packageMatch(classname, coverToClassPattern(packages[index]))) {
                 return true;
@@ -202,18 +225,18 @@ public class AnnotationPatternClassScanner {
      * 扫描classpath下的包含注解列表中的注解的类
      *
      * @param file  resource文件
-     * @param start 包的开始
+     * @param packageStart 包的开始
      */
-    private void scanInFile(File file, int start) {
+    private void scanInFile(File file, int packageStart) {
         File[] children = file.listFiles();
         if (children != null) {
             int index = children.length;
             while (index-- != 0) {
                 File child = children[index];
                 if (child.isDirectory()) {
-                    scanInFile(child, start);
+                    scanInFile(child, packageStart);
                 } else if (child.getName().endsWith(".class")) {
-                    String name = child.getAbsolutePath().substring(start);
+                    String name = child.getAbsolutePath().substring(packageStart);
                     String classname = name.replace(File.separator, ".").substring(0, name.length() - 6);
                     if (packageMatch(classname)) {
                         resources.add(classname);
@@ -242,8 +265,10 @@ public class AnnotationPatternClassScanner {
                 } else if ("file".equalsIgnoreCase(protocolUpperCase)) {
                     File classpathFile = new File(url.getFile());
                     String filepath = classpathFile.getAbsolutePath();
-                    int classPathStart = filepath.length() - packageHead.length();
-                    scanInFile(classpathFile, classPathStart);
+                    // 计算包开始的偏移量
+                    int packageRel = packageHead.length() == 0 ? -1 : packageHead.length();
+                    int packageStart = filepath.length() - packageRel;
+                    scanInFile(classpathFile, packageStart);
                 }
             }
         } catch (IOException e) {
@@ -313,7 +338,7 @@ public class AnnotationPatternClassScanner {
      */
     private String[] getSamePackageHead() {
         if (classPatterns.isEmpty()) {
-            return new String[]{"."};
+            return new String[]{""};
         }
         // 只有一个包的情况
         else if (classPatterns.size() == 1) {
@@ -355,15 +380,15 @@ public class AnnotationPatternClassScanner {
     }
 
     /**
-     * 执行扫描操作
+     * 执行扫描操作，会清除原本扫描到的类
      *
      * @since 2.0.0
      */
     public void scan() {
+        this.clear();
         String[] packageHeads = getSamePackageHead();
         int index = packageHeads.length;
         while (index-- != 0) {
-            System.out.println(packageHeads[index]);
             scanByPackageHead(packageHeads[index]);
         }
     }
@@ -398,6 +423,18 @@ public class AnnotationPatternClassScanner {
         while (iterator.hasNext()) {
             Class<?> _class = iterator.next();
             if (!(annotationMatch(_class, annotations) && packageMatch(_class.getName(), packages))) {
+                iterator.remove();
+            }
+        }
+        return classes;
+    }
+
+    public Set<Class<?>> select(String[] packages) throws ClassNotFoundException {
+        Set<Class<?>> classes = select();
+        Iterator<Class<?>> iterator = classes.iterator();
+        while (iterator.hasNext()) {
+            Class<?> _class = iterator.next();
+            if (!(annotationMatch(_class) && packageMatch(_class.getName(), packages))) {
                 iterator.remove();
             }
         }
