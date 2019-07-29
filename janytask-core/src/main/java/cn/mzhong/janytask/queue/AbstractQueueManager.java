@@ -14,15 +14,11 @@ import java.util.Set;
 public abstract class AbstractQueueManager implements TaskManager {
 
     protected TaskContext context;
-    final Map<Class<?>, Object> consumerMap = new HashMap<Class<?>, Object>();
-    final protected Map<Class<?>, Object> producerMap = new HashMap<Class<?>, Object>();
+    final Map<Class<?>, Object> consumers = new HashMap<Class<?>, Object>();
+    final protected Map<Class<?>, Object> producers = new HashMap<Class<?>, Object>();
     final protected Set<QueueAnnotationHandler> annotationHandlers = new HashSet<QueueAnnotationHandler>();
-
     final protected Set<QueueProvider> providers = new HashSet<QueueProvider>();
-
-    final protected Map<QueueProvider, ProviderInfo> providerInfoMap = new HashMap<QueueProvider, ProviderInfo>();
-
-    final Map<Method, MessageDao> messageDaoMap = new HashMap<Method, MessageDao>();
+    final protected Map<Method, MessageDao> messageDaoMap = new HashMap<Method, MessageDao>();
 
     protected ProducerCreator producerCreator = new InternalProducerCreator();
     protected ConsumerCreator consumerCreator = new InternalConsumerCreator();
@@ -32,16 +28,16 @@ public abstract class AbstractQueueManager implements TaskManager {
         this.context = context;
     }
 
-    public Map<Class<?>, Object> getConsumerMap() {
-        return consumerMap;
+    public Map<Class<?>, Object> getConsumers() {
+        return consumers;
     }
 
-    public Map<Class<?>, Object> getProducerMap() {
-        return producerMap;
+    public Map<Class<?>, Object> getProducers() {
+        return producers;
     }
 
     protected void registryProducer(Class<?> producerClass) {
-        producerMap.put(producerClass, producerCreator.create(producerClass, messageDaoMap));
+        producers.put(producerClass, producerCreator.create(producerClass, messageDaoMap));
     }
 
     public void addProvider(QueueProvider provider) {

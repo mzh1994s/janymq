@@ -6,7 +6,7 @@ public class ComponentConfig implements Serializable {
 
     private static final long serialVersionUID = -8720584708083603412L;
 
-    protected String _package;
+    protected String _package = "";
 
     public String getPackage() {
         return _package;

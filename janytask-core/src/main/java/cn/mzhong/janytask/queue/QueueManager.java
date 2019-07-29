@@ -33,28 +33,47 @@ public class QueueManager extends AbstractQueueManager {
         this.annotationHandlers.add(new LoopLineAnnotationHandler());
     }
 
-    private void initProducer(Class<?> producerClass, QueueProvider provider) {
-        for (Method method : producerClass.getMethods()) {
-            Iterator<QueueAnnotationHandler> iterator = annotationHandlers.iterator();
-            while (iterator.hasNext()) {
-                QueueAnnotationHandler annotationProcessor = iterator.next();
-                Annotation annotation = method.getAnnotation(annotationProcessor.getAnnotationClass());
-                if (annotation != null) {
-                    QueueInfo queueInfo = new QueueInfo<Annotation>(annotation, producerClass, method, provider);
-                    MessageDao messageDao = queueInfo.getMessageDao();
+    /**
+     * 初始化生产者执行者（生产者方法）
+     *
+     * @param producerClass
+     * @param method
+     * @param provider
+     */
+    private void initProducerInvoker(Class<?> producerClass, Method method, QueueProvider provider) {
+        // 将所有注解处理器匹配
+        Iterator<QueueAnnotationHandler> iterator = annotationHandlers.iterator();
+        while (iterator.hasNext()) {
+            QueueAnnotationHandler annotationProcessor = iterator.next();
+            Annotation annotation = method.getAnnotation(annotationProcessor.getAnnotationClass());
+            if (annotation != null) {
+                // 生产线
+                QueueInfo queueInfo = new QueueInfo<Annotation>(annotation, producerClass, method, provider);
+                MessageDao messageDao = queueInfo.getMessageDao();
 
-                    // 映射Producer的MessageDao
-                    if (messageDaoMap.containsKey(queueInfo.getProducerMethod())) {
-                        throw new RuntimeException("重复的消费者线程！");
-                    }
-                    messageDaoMap.put(queueInfo.getProducerMethod(), messageDao);
-                    //noinspection SingleStatementInBlock,unchecked
-                    annotationProcessor.handleProducer(context, this, queueInfo);
-                    if (Log.isDebugEnabled()) {
-                        Log.debug("producer:'" + queueInfo.ID() + "'inited.");
-                    }
+                // 映射Producer的MessageDao
+                if (messageDaoMap.containsKey(queueInfo.getProducerMethod())) {
+                    throw new RuntimeException("重复的生产线：" + queueInfo.getProducerMethod());
+                }
+                messageDaoMap.put(queueInfo.getProducerMethod(), messageDao);
+                //noinspection SingleStatementInBlock,unchecked
+                annotationProcessor.handleProducer(context, this, queueInfo);
+                if (Log.isDebugEnabled()) {
+                    Log.debug("producer:'" + queueInfo.ID() + "'inited.");
                 }
             }
+        }
+    }
+
+    /**
+     * 初始化生产者
+     *
+     * @param producerClass
+     * @param provider
+     */
+    private void initProducer(Class<?> producerClass, QueueProvider provider) {
+        for (Method method : producerClass.getMethods()) {
+            initProducerInvoker(producerClass, method, provider);
         }
         registryProducer(producerClass);
     }
@@ -66,7 +85,8 @@ public class QueueManager extends AbstractQueueManager {
      * @param method
      * @return
      */
-    private <A extends Annotation> QueueInfo<A> findQueueInfo(Object consumer, Class<?> consumerClass, Method method, Class<A> annotationType, QueueProvider provider) {
+    private <A extends Annotation> QueueInfo<A> findQueueInfo(Object consumer, Class<?> consumerClass, Method method,
+                                                              Class<A> annotationType, QueueProvider provider) {
         Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
         Iterator<Class<?>> iterator = interfaces.iterator();
         while (iterator.hasNext()) {
@@ -86,26 +106,40 @@ public class QueueManager extends AbstractQueueManager {
         return null;
     }
 
+    /**
+     * 初始化消费者执行者
+     *
+     * @param consumerClass
+     * @param consumer
+     * @param method
+     * @param provider
+     */
+    private void initConsumerInvoker(Class<?> consumerClass, Object consumer, Method method, QueueProvider provider) {
+        Iterator<QueueAnnotationHandler> iterator = annotationHandlers.iterator();
+        while (iterator.hasNext()) {
+            QueueAnnotationHandler annotationProcessor = iterator.next();
+            QueueInfo queueInfo = findQueueInfo(consumer, consumerClass, method,
+                    annotationProcessor.getAnnotationClass(), provider);
+            if (queueInfo != null) {
+                // 创建消费者线程
+                executors.add(annotationProcessor.handleConsumer(context, this, queueInfo));
+                if (Log.isDebugEnabled()) {
+                    Log.debug("consumer:'" + queueInfo.ID() + "'inited.");
+                }
+            }
+        }
+    }
+
+    /**
+     * 初始化消费者
+     *
+     * @param consumerClass
+     * @param provider
+     */
     private void initConsumer(Class<?> consumerClass, QueueProvider provider) {
         Object consumer = consumerCreator.createConsumer(consumerClass);
         for (Method method : consumerClass.getMethods()) {
-            Iterator<QueueAnnotationHandler> iterator = annotationHandlers.iterator();
-            while (iterator.hasNext()) {
-                QueueAnnotationHandler annotationProcessor = iterator.next();
-                QueueInfo queueInfo = findQueueInfo(
-                        consumer,
-                        consumerClass,
-                        method,
-                        annotationProcessor.getAnnotationClass(),
-                        provider);
-                if (queueInfo != null) {
-                    // 创建消费者线程
-                    executors.add(annotationProcessor.handleConsumer(context, this, queueInfo));
-                    if (Log.isDebugEnabled()) {
-                        Log.debug("consumer:'" + queueInfo.ID() + "'inited.");
-                    }
-                }
-            }
+            initConsumerInvoker(consumerClass, consumer, method, provider);
         }
     }
 
@@ -135,6 +169,10 @@ public class QueueManager extends AbstractQueueManager {
         }
     }
 
+    /**
+     * 初始化类扫描器，将所有提供商的包收集起来，扫描所有提供商的类，稍后使用{@link #scanner}的
+     * {@link AnnotationPatternClassScanner#select(String[])}方法可进行进一波的筛选
+     */
     private void initScanner() {
         Iterator<QueueProvider> iterator = this.providers.iterator();
         while (iterator.hasNext()) {
@@ -166,9 +204,6 @@ public class QueueManager extends AbstractQueueManager {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        // 初始化
-//        new QueueManager.ProducerInitializer().init();
-//        new QueueManager.ConsumerInitializer().init();
     }
 
     public Set<TaskExecutor> getTaskExecutors() {
@@ -178,9 +213,9 @@ public class QueueManager extends AbstractQueueManager {
 
     @SuppressWarnings({"SingleStatementInBlock", "unchecked"})
     public <T> T getProducer(Class<T> producerClass) {
-        Object producer = producerMap.get(producerClass);
+        Object producer = producers.get(producerClass);
         if (producer == null) {
-            for (Map.Entry<Class<?>, Object> entry : producerMap.entrySet()) {
+            for (Map.Entry<Class<?>, Object> entry : producers.entrySet()) {
                 if (entry.getKey().isAssignableFrom(producerClass)) {
                     return (T) entry.getValue();
                 }
@@ -189,154 +224,6 @@ public class QueueManager extends AbstractQueueManager {
         }
         return (T) producer;
     }
-//
-//    class ProducerInitializer implements TaskComponent {
-//
-//        public void setContext(TaskContext context) {
-//        }
-//
-//        protected void processProducer(TaskContext context, Class<?> producerClass) {
-//            // 处理生产者
-//            for (Method method : producerClass.getMethods()) {
-//                Iterator<QueueAnnotationHandler> iterator = annotationHandlers.iterator();
-//                while (iterator.hasNext()) {
-//                    QueueAnnotationHandler annotationProcessor = iterator.next();
-//                    Annotation annotation = method.getAnnotation(annotationProcessor.getAnnotationClass());
-//                    if (annotation != null) {
-//                        QueueInfo queueInfo = new QueueInfo<Annotation>(
-//                                annotation,
-//                                producerClass,
-//                                method,
-//                                null,
-//                                null,
-//                                null
-//                        );
-//                        // 注册messageDao
-//                        MessageDao messageDao = context.getQueueProvider().createMessageDao(queueInfo);
-//                        queueInfo.setMessageDao(messageDao);
-//
-//                        // 映射Producer的MessageDao
-//                        methodMessageDaoMap.put(queueInfo.getProducerMethod(), messageDao);
-//                        //noinspection SingleStatementInBlock,unchecked
-//                        annotationProcessor.handleProducer(context, queueInfo);
-//                        if (Log.isDebugEnabled()) {
-//                            Log.debug("tproducer:'" + queueInfo.ID() + "'inited.");
-//                        }
-//                    }
-//                }
-//            }
-//
-//        }
-//
-//        @SuppressWarnings("unchecked")
-//        public void init() {
-//            QueueManager.this.foreachProducerClassSet(new PInvoker<Class<?>>() {
-//                public void invoke(Class<?> producerClass) throws Exception {
-//                    // 注册生产者代理
-//                    Object tproducer = producerCreator.createProducer(producerClass);
-//                    producerMap.put(producerClass, tproducer);
-//                    ProducerInitializer.this.processProducer(context, producerClass);
-//                }
-//            });
-//        }
-//
-//    }
-//
-//    class ConsumerInitializer implements TaskComponent {
-//        public void setContext(TaskContext context) {
-//
-//        }
-//
-//        /**
-//         * 消费者是提供者的实现，所以扫描消费者Class的接口，目的是找到提供者中的Pipleline、Loopline等注解
-//         *
-//         * @param consumerClass
-//         * @param method
-//         * @return
-//         */
-//        private <A extends Annotation> QueueInfo<A> findQueueInfo(Object tconsumer, Class<?> consumerClass, Method method, Class<A> annotationType) {
-//            Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
-//            QueueInfo<A> queueInfo = null;
-//            for (Class<?> _interface : interfaces) {
-//                try {
-//                    Method pMethod = _interface.getMethod(method.getName(), method.getParameterTypes());
-//                    if (pMethod != null) {
-//                        A annotation = pMethod.getAnnotation(annotationType);
-//                        if (annotation != null) {
-//                            queueInfo = new QueueInfo<A>(
-//                                    annotation,
-//                                    _interface,
-//                                    pMethod,
-//                                    tconsumer,
-//                                    consumerClass,
-//                                    method);
-//                            break;
-//                        }
-//                    }
-//                } catch (NoSuchMethodException e) {
-//                    // pass
-//                }
-//            }
-//            return queueInfo;
-//        }
-//
-//
-//        /**
-//         * 处理消费者
-//         *
-//         * @param context
-//         * @param tconsumer
-//         * @param consumerClass
-//         * @param <A>
-//         * @return
-//         */
-//        @SuppressWarnings("unchecked")
-//        protected <A extends Annotation> Set<TaskExecutor> handleConsumer(
-//                TaskContext context,
-//                Object tconsumer,
-//                Class<?> consumerClass) {
-//            Set<TaskExecutor> taskExecutos = new HashSet<TaskExecutor>();
-//            for (Method method : consumerClass.getMethods()) {
-//                Iterator<QueueAnnotationHandler> iterator = annotationHandlers.iterator();
-//                while (iterator.hasNext()) {
-//                    QueueAnnotationHandler annotationProcessor = iterator.next();
-//                    QueueInfo<A> queueInfo = findQueueInfo(
-//                            tconsumer,
-//                            consumerClass,
-//                            method,
-//                            annotationProcessor.getAnnotationClass());
-//                    if (queueInfo != null) {
-//                        // 注册messageDao
-//                        queueInfo.setMessageDao(context.getQueueProvider().createMessageDao(queueInfo));
-//                        // 创建消费者线程
-//                        taskExecutos.add(annotationProcessor.handleConsumer(context, queueInfo));
-//                        if (Log.isDebugEnabled()) {
-//                            Log.debug("tconsumer:'" + queueInfo.ID() + "'inited.");
-//                        }
-//                    }
-//                }
-//            }
-//            return taskExecutos;
-//        }
-//
-//        /**
-//         * 创建线程列表（一个消费者消息队列一个线程）
-//         *
-//         * @return
-//         */
-//
-//        @SuppressWarnings("unchecked")
-//        public void init() {
-//            final TaskWorker taskWorker = context.getTaskWorker();
-//            QueueManager.this.foreachConsumerClassSet(new PInvoker<Class<?>>() {
-//                public void invoke(Class<?> consumerClass) throws Exception {
-//                    Object tconsumer = consumerCreator.createConsumer(consumerClass);
-//                    QueueManager.this.consumerMap.put(consumerClass, tconsumer);
-//                    taskWorker.addExecutors(ConsumerInitializer.this.handleConsumer(context, tconsumer, consumerClass));
-//                }
-//            });
-//        }
-//    }
 
 }
 
