@@ -5,6 +5,6 @@ package cn.mzhong.janytask.core;
  *
  * @since 2.0.0
  */
-public class InternalContext extends TaskContext {
+class InternalContext extends TaskContext {
 
 }

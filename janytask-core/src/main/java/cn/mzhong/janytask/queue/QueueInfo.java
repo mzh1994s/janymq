@@ -1,7 +1,6 @@
 package cn.mzhong.janytask.queue;
 
-
-import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
+import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.IDGenerator;
 import cn.mzhong.janytask.util.AnnotationUtils;
 import cn.mzhong.janytask.util.StringUtils;
@@ -22,14 +21,21 @@ public class QueueInfo<A extends Annotation> {
     protected Object consumer;
     protected Class<?> consumerClass;
     protected Method consumerMethod;
+    protected QueueProvider provider;
 
-    public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, Object consumer, Class<?> consumerClass, Method consumerMethod) {
+    public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, QueueProvider provider) {
+        this(annotation, producerClass, producerMethod, null, null, null, provider);
+    }
+
+    public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, Object consumer, Class<?> consumerClass, Method consumerMethod, QueueProvider provider) {
         this.annotation = annotation;
         this.producerClass = producerClass;
         this.producerMethod = producerMethod;
         this.consumer = consumer;
         this.consumerClass = consumerClass;
         this.consumerMethod = consumerMethod;
+        this.provider = provider;
+        this.messageDao = provider.createMessageDao(this);
         String annotationValue = AnnotationUtils.getAnnotationValue(annotation, "value");
         this.value = value(producerClass, producerMethod, annotationValue);
         this.version = AnnotationUtils.getAnnotationValue(annotation, "version");
@@ -70,6 +76,9 @@ public class QueueInfo<A extends Annotation> {
         return consumerMethod;
     }
 
+    public QueueProvider getProvider() {
+        return provider;
+    }
 
     public String ID() {
         return this.ID;

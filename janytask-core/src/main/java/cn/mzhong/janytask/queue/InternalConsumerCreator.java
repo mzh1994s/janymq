@@ -1,8 +1,8 @@
 package cn.mzhong.janytask.queue;
 
-public class InternalConsumerCreator implements InstanceCreator<Object> {
+public class InternalConsumerCreator implements ConsumerCreator {
 
-    public Object create(Class<Object> consumerClass) {
+    public Object createConsumer(Class<?> consumerClass) {
         try {
             return consumerClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {

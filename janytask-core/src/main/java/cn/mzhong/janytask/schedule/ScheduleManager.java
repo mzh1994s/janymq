@@ -1,52 +1,83 @@
 package cn.mzhong.janytask.schedule;
 
-import cn.mzhong.janytask.core.TaskComponent;
 import cn.mzhong.janytask.core.TaskContext;
 import cn.mzhong.janytask.core.TaskExecutor;
+import cn.mzhong.janytask.core.TaskManager;
+import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
-public class ScheduleManager implements TaskComponent {
+public class ScheduleManager implements TaskManager {
 
     Logger Log = LoggerFactory.getLogger(ScheduleManager.class);
 
+    protected ScheduleConfig config;
+
     protected TaskContext context;
+
+    protected ScheduleObjectCreator scheduleObjectCreator = new InternalScheduleObjectCreator();
+
+    protected Set<TaskExecutor> executors = new HashSet<TaskExecutor>();
+
+    protected AnnotationPatternClassScanner scanner = new AnnotationPatternClassScanner();
 
     public void setContext(TaskContext context) {
         this.context = context;
     }
 
-    @SuppressWarnings("unchecked")
-    public void init() {
-//        String basePackage = context.getApplicationConfig().getName();
-//        Set<Class<?>> scheduleClassSet = ClassUtils.scanByAnnotation(basePackage, Schedule.class);
-//        Iterator<Class<?>> iterator = scheduleClassSet.iterator();
-//        while (iterator.hasNext()) {
-//            Class<?> _class = iterator.next();
-//            Object schedule = createSchedule(_class);
-//            Method[] methods = _class.getMethods();
-//            int len = methods.length;
-//            for (int i = 0; i < len; i++) {
-//                Method method = methods[i];
-//                Scheduled scheduled = method.getAnnotation(Scheduled.class);
-//                if (scheduled != null) {
-//                    JanyTask$CronSequenceGenerator cronSequenceGenerator = new JanyTask$CronSequenceGenerator(scheduled.cron(), scheduled.zone());
-//                    context.getTaskWorker().addExecutor(new ScheduleExecutor(context, schedule, method, cronSequenceGenerator));
-//                }
-//            }
-//        }
+    public ScheduleConfig getConfig() {
+        return config;
     }
 
-    protected Object createSchedule(Class<?> _class) {
-        try {
-            return _class.getDeclaredConstructor().newInstance();
-        } catch (Exception e) {
-            Log.error(e.getLocalizedMessage(), e);
+    public void setConfig(ScheduleConfig config) {
+        this.config = config;
+    }
+
+    private Set<Class<?>> scanSchedule() throws ClassNotFoundException {
+        scanner.addPackages(config.getPackage());
+        scanner.addAnnotation(Schedule.class);
+        scanner.scan();
+        return scanner.select();
+    }
+
+    private void initSchedule() throws ClassNotFoundException {
+        Set<Class<?>> classes = scanSchedule();
+        Iterator<Class<?>> iterator = classes.iterator();
+        while (iterator.hasNext()) {
+            Class<?> _class = iterator.next();
+            Object schedule = scheduleObjectCreator.createScheduleObject(_class);
+            Method[] methods = _class.getMethods();
+            int len = methods.length;
+            for (int i = 0; i < len; i++) {
+                Method method = methods[i];
+                Scheduled scheduled = method.getAnnotation(Scheduled.class);
+                if (scheduled != null) {
+                    JanyTask$CronSequenceGenerator cronSequenceGenerator = new JanyTask$CronSequenceGenerator(scheduled.cron(), scheduled.zone());
+                    executors.add(new ScheduleExecutor(context, schedule, method, cronSequenceGenerator));
+                }
+            }
         }
-        return null;
+    }
+
+    public void init() {
+        if (config == null) {
+            config = new ScheduleConfig();
+        }
+        try {
+            initSchedule();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Set<TaskExecutor> getTaskExecutors() {
+        return executors;
     }
 
     class ScheduleExecutor extends TaskExecutor {

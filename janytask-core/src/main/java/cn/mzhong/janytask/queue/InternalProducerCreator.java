@@ -6,15 +6,9 @@ import java.util.Map;
 /**
  * 内部生产者实例创建者
  */
-class InternalProducerCreator implements InstanceCreator<Object> {
+class InternalProducerCreator implements ProducerCreator {
 
-    Map<Method, MessageDao> messageDaoMap;
-
-    public InternalProducerCreator(Map<Method, MessageDao> messageDaoMap) {
-        this.messageDaoMap = messageDaoMap;
-    }
-
-    public Object create(Class<Object> _class) {
+    public Object create(Class<?> _class, Map<Method, MessageDao> messageDaoMap) {
         return ProducerFactory.newInstance(messageDaoMap, _class);
     }
 }

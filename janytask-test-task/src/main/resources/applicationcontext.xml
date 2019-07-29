@@ -22,9 +22,10 @@
         <property name="driverClass" value="oracle.jdbc.OracleDriver"/>
     </bean>
 
-    <bean id="jdbc-provider" class="cn.mzhong.janytask.queue.provider.jdbc.JdbcProvider">
-        <property name="dataSource" ref="mysqlDataSource"/>
-    </bean>
+    <!--<bean id="jdbc-provider" class="cn.mzhong.janytask.queue.provider.jdbc.JdbcProvider">-->
+        <!--<property name="package" value=""/>-->
+        <!--<property name="dataSource" ref="mysqlDataSource"/>-->
+    <!--</bean>-->
 
     <bean id="configurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
