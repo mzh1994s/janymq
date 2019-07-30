@@ -36,13 +36,16 @@
                              host="${janytask.provider.redis.host}"
                              port="6379" />
 
-    <!--<bean id="jdbc-provider" class="cn.mzhong.janytask.queue.provider.jdbc.JdbcProvider">-->
-        <!--<property name="package" value="cn.mzhong.janytask.test.jdbc"/>-->
-        <!--<property name="dataSource" ref="mysqlDataSource"/>-->
-    <!--</bean>-->
-    <!--<janytask:provider-zookeeper connectString="mzhong.cn:2181"/>-->
+    <janytask:provider-zookeeper package="cn.mzhong.janytask.test.zk"
+                                 connectString="mzhong.cn:2181"/>
+
     <janytask:provider-jdbc package="cn.mzhong.janytask.test.jdbc"
                             dataSource-ref="mysqlDataSource"/>
+
+    <!--<bean id="jdbc-provider" class="cn.mzhong.janytask.queue.provider.jdbc.JdbcProvider">-->
+    <!--<property name="package" value="cn.mzhong.janytask.test.jdbc"/>-->
+    <!--<property name="dataSource" ref="mysqlDataSource"/>-->
+    <!--</bean>-->
 
     <context:component-scan base-package="cn.mzhong"/>
 </beans>
