@@ -13,27 +13,28 @@ import java.util.Set;
 public class TaskShutdownHook extends Thread {
     final static Logger Log = LoggerFactory.getLogger(TaskShutdownHook.class);
 
-    private Set<Runnable> runnables = new HashSet<Runnable>();
+    private Application application;
     private TaskContext context;
 
-    public TaskShutdownHook(TaskContext context) {
+    public TaskShutdownHook(Application application, TaskContext context) {
+        this.application = application;
         this.context = context;
     }
 
     @Override
     public void run() {
-        Log.debug("janytask应用程序正在终结...");
+        if (Log.isDebugEnabled()) {
+            Log.debug("janytask application[" + application.getName() + "] Terminating...");
+        }
         // 写终结
         context.setShutdown(true);
         // 执行所有的ShutdownRunnable
-        Iterator<Runnable> iterator = runnables.iterator();
+        Iterator<Runnable> iterator = context.getShutdownHooks().iterator();
         while (iterator.hasNext()) {
             iterator.next().run();
         }
-        Log.debug("janytask应用程序已终结，拜拜!");
-    }
-
-    public void add(Runnable runnable) {
-        runnables.add(runnable);
+        if (Log.isDebugEnabled()) {
+            Log.debug("janytask application[" + application.getName() + "] terminated, bye bye!");
+        }
     }
 }

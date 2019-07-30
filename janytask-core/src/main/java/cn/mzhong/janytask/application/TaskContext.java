@@ -3,6 +3,9 @@ package cn.mzhong.janytask.application;
 import cn.mzhong.janytask.serialize.JdkDataSerializer;
 import cn.mzhong.janytask.serialize.Serializer;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * 上下文空间可以理解为一个公共储存对象的区域，存放着一个公共的组件、配置、标志等，
  */
@@ -16,7 +19,7 @@ public abstract class TaskContext {
      *
      * @since 2.0.0
      */
-    final protected TaskShutdownHook shutdownHook = new TaskShutdownHook(this);
+    final protected Set<Runnable> shutdownHooks = new HashSet<Runnable>();
 
     /**
      * 应用程序终结标志
@@ -33,12 +36,12 @@ public abstract class TaskContext {
         this.serializer = serializer;
     }
 
-    public TaskShutdownHook getShutdownHook() {
-        return shutdownHook;
+    public void addShutdownHook(Runnable runnable) {
+        shutdownHooks.add(runnable);
     }
 
-    public void addShutdownHook(Runnable runnable) {
-        shutdownHook.add(runnable);
+    public Set<Runnable> getShutdownHooks() {
+        return shutdownHooks;
     }
 
     public boolean isShutdown() {

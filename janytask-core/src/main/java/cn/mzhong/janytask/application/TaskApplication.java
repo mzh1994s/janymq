@@ -13,10 +13,10 @@ import java.util.Set;
  * @version 2.0.0
  * @date 2019年7月10日
  */
-public class TaskApplication extends AbstractApplication {
+public class TaskApplication extends Application {
 
     protected void wellcome() {
-        System.out.println("janytask application started!");
+        System.out.println("janytask application[" + name + "] started!");
     }
 
     public TaskApplication() {
@@ -40,7 +40,7 @@ public class TaskApplication extends AbstractApplication {
         // 初始化线程调度器
         this.taskWorker.init();
         // 正常终结
-        Runtime.getRuntime().addShutdownHook(new TaskShutdownHook(context));
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
 
         // 启动线程调度器
         this.taskWorker.start();
@@ -56,7 +56,7 @@ public class TaskApplication extends AbstractApplication {
     public void close() {
         synchronized (context) {
             if (!context.isShutdown()) {
-                context.shutdownHook.run();
+                shutdownHook.run();
             }
         }
     }

@@ -1,5 +1,6 @@
 package cn.mzhong.janytask.test.main;
 
+import cn.mzhong.janytask.application.TaskApplication;
 import cn.mzhong.janytask.test.jdbc.producer.JdbcTestTask;
 import cn.mzhong.janytask.test.redis.producer.RedisTaskTask;
 import cn.mzhong.janytask.test.zk.producer.ZkTestTask;
@@ -11,6 +12,8 @@ public class TestSpring {
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationcontext.xml");
         ((ClassPathXmlApplicationContext) context).start();
+        TaskApplication application = context.getBean(TaskApplication.class);
+        System.out.println(application.getName());
         RedisTaskTask redisTaskTask = context.getBean(RedisTaskTask.class);
         JdbcTestTask jdbcTestTask = context.getBean(JdbcTestTask.class);
         ZkTestTask zkTestTask = context.getBean(ZkTestTask.class);

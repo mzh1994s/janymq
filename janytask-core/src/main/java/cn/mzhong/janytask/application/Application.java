@@ -4,7 +4,7 @@ import cn.mzhong.janytask.queue.QueueManager;
 import cn.mzhong.janytask.schedule.ScheduleManager;
 import cn.mzhong.janytask.worker.TaskWorker;
 
-public abstract class AbstractApplication {
+public abstract class Application {
 
     /**
      * 应用程序配置
@@ -34,6 +34,13 @@ public abstract class AbstractApplication {
      * @since 2.0.0
      */
     final protected TaskWorker taskWorker = new TaskWorker();
+
+    /**
+     * 正常终结者
+     *
+     * @since 2.0.0
+     */
+    final protected TaskShutdownHook shutdownHook = new TaskShutdownHook(this, context);
 
     public String getName() {
         return name;
