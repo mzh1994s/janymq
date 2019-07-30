@@ -4,6 +4,7 @@ import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.IDGenerator;
 import cn.mzhong.janytask.util.AnnotationUtils;
 import cn.mzhong.janytask.util.StringUtils;
+import cn.mzhong.janytask.util.ValueUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -33,12 +34,21 @@ public class QueueInfo<A extends Annotation> {
         this.consumerClass = consumerClass;
         this.consumerMethod = consumerMethod;
         this.provider = provider;
+
         String annotationValue = AnnotationUtils.getAnnotationValue(annotation, "value");
         this.value = value(producerClass, producerMethod, annotationValue);
+
         this.version = AnnotationUtils.getAnnotationValue(annotation, "version");
-        this.cron = AnnotationUtils.getAnnotationValue(annotation, "cron");
-        this.zone = AnnotationUtils.getAnnotationValue(annotation, "zone");
+
+        String annotationCron = AnnotationUtils.getAnnotationValue(annotation, "cron");
+        this.cron = ValueUtils.uBlankStr(annotationCron, provider.getCron());
+
+        String annotationZone = AnnotationUtils.getAnnotationValue(annotation, "zone");
+        this.zone = ValueUtils.uBlankStr(annotationZone, provider.getZone());
+
         this.id = generateId(this.value, this.version);
+
+        // 创建MessageDao（放在最后）
         this.messageDao = provider.createMessageDao(this);
     }
 

@@ -11,27 +11,6 @@
     <xsd:include schemaLocation="janytask-provider-zookeeper.xsd"/>
     <xsd:include schemaLocation="janytask-provider-jdbc.xsd"/>
 
-    <xsd:complexType name="anyProviderType">
-        <xsd:attribute name="ref" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ 自定义Provider引用 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
-
-    <xsd:complexType name="queueConfig">
-        <xsd:attribute name="cron" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ 计划任务时间表达式 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="zone" type="xsd:string">
-            <xsd:annotation>
-                <xsd:documentation><![CDATA[ 计划任务时间时区 ]]></xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
-
     <!--应用程序配置项和应用程序-->
     <xsd:complexType name="applicationType">
         <xsd:attribute name="name" type="xsd:ID">
@@ -45,16 +24,6 @@
     <xsd:element name="application" type="applicationType">
         <xsd:annotation>
             <xsd:documentation><![CDATA[ JSimpleMQ应用程序配置 ]]></xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="provider-any" type="anyProviderType">
-        <xsd:annotation>
-            <xsd:documentation><![CDATA[ 自定义Provider ]]></xsd:documentation>
-        </xsd:annotation>
-    </xsd:element>
-    <xsd:element name="queue" type="queueConfig">
-        <xsd:annotation>
-            <xsd:documentation><![CDATA[ 队列配置项 ]]></xsd:documentation>
         </xsd:annotation>
     </xsd:element>
 </xsd:schema>

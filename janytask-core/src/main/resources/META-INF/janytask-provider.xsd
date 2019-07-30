@@ -9,6 +9,16 @@
                 <xsd:documentation><![CDATA[ 扫描的包路径，多个用逗号隔开，支持通配符*、** ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="cron" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 时间表达式，规定此提供商的运行时间 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="zone" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ 时间表达式时区，默认为当前操作系统时区 ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
 </xsd:schema>

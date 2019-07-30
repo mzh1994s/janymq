@@ -12,5 +12,9 @@ public interface QueueProvider extends TaskComponent {
 
     String[] getPackages();
 
+    String getCron();
+
+    String getZone();
+
     MessageDao createMessageDao(QueueInfo queueInfo);
 }

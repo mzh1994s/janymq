@@ -11,11 +11,30 @@ public abstract class AbstractProvider implements QueueProvider {
      */
     protected String[] packages = new String[0];
 
+    protected String cron = "* * * * * ?";
+    protected String zone;
+
     public String[] getPackages() {
         return packages;
     }
 
     public void setPackage(String _package) {
         this.packages = PackageUtils.parseMultiple(_package);
+    }
+
+    public String getCron() {
+        return cron;
+    }
+
+    public void setCron(String cron) {
+        this.cron = cron;
+    }
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
     }
 }
