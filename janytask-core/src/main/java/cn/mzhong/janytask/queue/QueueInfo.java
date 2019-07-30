@@ -9,7 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 public class QueueInfo<A extends Annotation> {
-    protected String ID;
+    protected String id;
     protected String value;
     protected String version;
     protected String cron;
@@ -18,30 +18,28 @@ public class QueueInfo<A extends Annotation> {
     protected MessageDao messageDao;
     protected Class<?> producerClass;
     protected Method producerMethod;
-    protected Object consumer;
     protected Class<?> consumerClass;
     protected Method consumerMethod;
     protected QueueProvider provider;
 
     public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, QueueProvider provider) {
-        this(annotation, producerClass, producerMethod, null, null, null, provider);
+        this(annotation, producerClass, producerMethod, null, null, provider);
     }
 
-    public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, Object consumer, Class<?> consumerClass, Method consumerMethod, QueueProvider provider) {
+    public QueueInfo(A annotation, Class<?> producerClass, Method producerMethod, Class<?> consumerClass, Method consumerMethod, QueueProvider provider) {
         this.annotation = annotation;
         this.producerClass = producerClass;
         this.producerMethod = producerMethod;
-        this.consumer = consumer;
         this.consumerClass = consumerClass;
         this.consumerMethod = consumerMethod;
         this.provider = provider;
-        this.messageDao = provider.createMessageDao(this);
         String annotationValue = AnnotationUtils.getAnnotationValue(annotation, "value");
         this.value = value(producerClass, producerMethod, annotationValue);
         this.version = AnnotationUtils.getAnnotationValue(annotation, "version");
         this.cron = AnnotationUtils.getAnnotationValue(annotation, "cron");
         this.zone = AnnotationUtils.getAnnotationValue(annotation, "zone");
-        this.ID = ID(this.value, this.version);
+        this.id = generateId(this.value, this.version);
+        this.messageDao = provider.createMessageDao(this);
     }
 
     public A getAnnotation() {
@@ -64,10 +62,6 @@ public class QueueInfo<A extends Annotation> {
         return producerMethod;
     }
 
-    public Object getConsumer() {
-        return consumer;
-    }
-
     public Class<?> getConsumerClass() {
         return consumerClass;
     }
@@ -80,8 +74,8 @@ public class QueueInfo<A extends Annotation> {
         return provider;
     }
 
-    public String ID() {
-        return this.ID;
+    public String getId() {
+        return this.id;
     }
 
     protected static String parameterTypeString(Method method) {
@@ -104,7 +98,7 @@ public class QueueInfo<A extends Annotation> {
         return lineName;
     }
 
-    protected static String ID(String value, String... items) {
+    protected static String generateId(String value, String... items) {
         IDGenerator generator = new IDGenerator(value, "-");
         if (items != null) {
             int len = items.length;

@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue.loopline;
 
-import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.application.TaskContext;
 import cn.mzhong.janytask.queue.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class LoopLineAnnotationHandler implements QueueAnnotationHandler<Looplin
         Method method = queueInfo.getProducerMethod();
         Class<?> returnType = method.getReturnType();
         if (returnType != Boolean.class && returnType != boolean.class) {
-            throw new RuntimeException("环线" + queueInfo.ID() + "对应的方法" + method.getName() + "返回值应为Boolean");
+            throw new RuntimeException("环线" + queueInfo.getId() + "对应的方法" + method.getName() + "返回值应为Boolean");
         }
     }
 
@@ -39,7 +39,6 @@ class LooplineTaskExecutor extends QueueExecutor<Loopline> {
     }
 
     protected void invoke(Message message) {
-        Object consumer = queueInfo.getConsumer();
         Method method = queueInfo.getConsumerMethod();
         MessageDao messageDao = queueInfo.getMessageDao();
         try {

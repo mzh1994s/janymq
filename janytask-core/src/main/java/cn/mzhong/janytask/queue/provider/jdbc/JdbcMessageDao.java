@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue.provider.jdbc;
 
-import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.application.TaskContext;
 import cn.mzhong.janytask.queue.provider.jdbc.mapper.MessageMapper;
 import cn.mzhong.janytask.queue.LockedMessageDao;
 import cn.mzhong.janytask.queue.Message;
@@ -23,7 +23,7 @@ public class JdbcMessageDao extends LockedMessageDao {
         BytesMessage jdbcMessage = new BytesMessage(message);
         jdbcMessage.setContentBytes(this.serializer.serialize(message.getContent()));
         jdbcMessage.setPushTime(new Date());
-        jdbcMessage.setQueueId(ID);
+        jdbcMessage.setQueueId(id);
         this.messageMapper.save(jdbcMessage);
     }
 
@@ -40,7 +40,7 @@ public class JdbcMessageDao extends LockedMessageDao {
     }
 
     public long length() {
-        return this.messageMapper.length(ID);
+        return this.messageMapper.length(id);
     }
 
     @Override

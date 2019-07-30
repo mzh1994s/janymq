@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue.provider.zookeeper;
 
-import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.application.TaskContext;
 import cn.mzhong.janytask.queue.LockedMessageDao;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.QueueInfo;
@@ -26,7 +26,7 @@ public class ZookeeperMessageDao extends LockedMessageDao {
     }
 
     public void initParentPath() {
-        String parentPath = rootPath + "/" + queueInfo.ID();
+        String parentPath = rootPath + "/" + queueInfo.getId();
         this.waitPath = parentPath + "/wait";
         this.donePath = parentPath + "/done";
         this.errorPath = parentPath + "/error";

@@ -1,8 +1,9 @@
 package cn.mzhong.janytask.schedule;
 
-import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.core.TaskExecutor;
-import cn.mzhong.janytask.core.TaskManager;
+import cn.mzhong.janytask.application.TaskContext;
+import cn.mzhong.janytask.util.PackageUtils;
+import cn.mzhong.janytask.worker.TaskExecutor;
+import cn.mzhong.janytask.application.TaskManager;
 import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,7 @@ public class ScheduleManager implements TaskManager {
 
     Logger Log = LoggerFactory.getLogger(ScheduleManager.class);
 
-    protected ScheduleConfig config;
+    protected String[] packages = new String[0];
 
     protected TaskContext context;
 
@@ -31,16 +32,16 @@ public class ScheduleManager implements TaskManager {
         this.context = context;
     }
 
-    public ScheduleConfig getConfig() {
-        return config;
+    public String[] getPackages() {
+        return packages;
     }
 
-    public void setConfig(ScheduleConfig config) {
-        this.config = config;
+    public void setPackage(String packages) {
+        this.packages = PackageUtils.parseMultiple(packages);
     }
 
     private Set<Class<?>> scanSchedule() throws ClassNotFoundException {
-        scanner.addPackages(config.getPackage());
+        scanner.addPackages(packages);
         scanner.addAnnotation(Schedule.class);
         scanner.scan();
         return scanner.select();
@@ -66,9 +67,6 @@ public class ScheduleManager implements TaskManager {
     }
 
     public void init() {
-        if (config == null) {
-            config = new ScheduleConfig();
-        }
         try {
             initSchedule();
         } catch (ClassNotFoundException e) {

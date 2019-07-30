@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue.provider;
 
-import cn.mzhong.janytask.core.TaskComponent;
+import cn.mzhong.janytask.application.TaskComponent;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueInfo;
 

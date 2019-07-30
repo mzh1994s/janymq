@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue.provider.redis;
 
-import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.application.TaskContext;
 import cn.mzhong.janytask.queue.LockedMessageDao;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.QueueInfo;
@@ -18,7 +18,7 @@ public class RedisMessageDao extends LockedMessageDao {
     protected RedisClient redisClient;
 
     private static String key(String rootPath, QueueInfo queueInfo) {
-        return rootPath + ":" + queueInfo.ID();
+        return rootPath + ":" + queueInfo.getId();
     }
 
     public RedisMessageDao(TaskContext context, RedisConnectionFactory connectionFactory, QueueInfo queueInfo, String rootPath) {

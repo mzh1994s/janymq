@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue.provider.jdbc.mapper;
 
-import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.application.TaskContext;
 import cn.mzhong.janytask.queue.provider.jdbc.BytesMessage;
 import cn.mzhong.janytask.queue.provider.jdbc.DataSourceHelper;
 import cn.mzhong.janytask.queue.Message;

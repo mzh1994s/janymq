@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue.provider.mongo;
 
-import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.application.TaskContext;
 import cn.mzhong.janytask.queue.LockedMessageDao;
 import cn.mzhong.janytask.queue.Message;
 import cn.mzhong.janytask.queue.QueueInfo;

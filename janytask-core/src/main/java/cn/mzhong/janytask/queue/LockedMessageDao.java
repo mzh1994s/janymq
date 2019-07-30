@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.application.TaskContext;
 
 import java.util.LinkedList;
 

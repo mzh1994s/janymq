@@ -1,6 +1,6 @@
 package cn.mzhong.janytask.queue.provider.mongo;
 
-import cn.mzhong.janytask.core.TaskContext;
+import cn.mzhong.janytask.application.TaskContext;
 import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.QueueInfo;
 import cn.mzhong.janytask.queue.provider.AbstractProvider;
@@ -27,7 +27,7 @@ public class MongoDBProvider extends AbstractProvider {
     }
 
     public MessageDao createMessageDao(QueueInfo queueInfo) {
-        return new MongoDbMessageDao(context, queueInfo, mongoDatabase.getCollection(queueInfo.ID()));
+        return new MongoDbMessageDao(context, queueInfo, mongoDatabase.getCollection(queueInfo.getId()));
     }
 
     public void init() {

@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.core.TaskContext;
-import cn.mzhong.janytask.core.TaskExecutor;
+import cn.mzhong.janytask.application.TaskContext;
+import cn.mzhong.janytask.worker.TaskExecutor;
 import cn.mzhong.janytask.util.ValueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
 
     final static Logger Log = LoggerFactory.getLogger(QueueExecutor.class);
 
-    protected String ID;
+    protected String id;
     protected QueueInfo<A> queueInfo;
     protected MessageDao messageDao;
     protected Method method;
@@ -30,9 +30,16 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
         this.queueManager = queueManager;
         this.queueInfo = queueInfo;
         this.messageDao = queueInfo.getMessageDao();
-        this.ID = messageDao.ID();
+        this.id = queueInfo.getId();
         this.method = queueInfo.getConsumerMethod();
-        this.consumer = queueInfo.getConsumer();
+    }
+
+    public void run() {
+        if (this.consumer == null) {
+            ConsumerFactory consumerFactory = queueManager.getConsumerFactory();
+            this.consumer = consumerFactory.getObject(queueInfo.getConsumerClass());
+        }
+        super.run();
     }
 
     protected abstract void invoke(Message message);
@@ -52,7 +59,7 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
         long length = messageDao.length();
         long startTimeMillis = 0;
         if (Log.isDebugEnabled()) {
-            Log.debug("'{}'：第{}轮消息处理开始, 本次目标长度:{}", ID, cnt, length);
+            Log.debug("'{}'：第{}轮消息处理开始, 本次目标长度:{}", id, cnt, length);
             startTimeMillis = System.currentTimeMillis();
         }
         long done = 0;
@@ -76,7 +83,7 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
             if (done > 0) {
                 speed = (int) (time / done);
             }
-            Log.debug("'{}'：第{}轮消息处理完毕，数量:{}，总耗时:{}秒，单条耗时:{}毫秒", ID, cnt, done, seconds, speed);
+            Log.debug("'{}'：第{}轮消息处理完毕，数量:{}，总耗时:{}秒，单条耗时:{}毫秒", id, cnt, done, seconds, speed);
         }
     }
 

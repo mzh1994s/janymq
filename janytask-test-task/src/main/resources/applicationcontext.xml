@@ -22,11 +22,6 @@
         <property name="driverClass" value="oracle.jdbc.OracleDriver"/>
     </bean>
 
-    <!--<bean id="jdbc-provider" class="cn.mzhong.janytask.queue.provider.jdbc.JdbcProvider">-->
-        <!--<property name="package" value=""/>-->
-        <!--<property name="dataSource" ref="mysqlDataSource"/>-->
-    <!--</bean>-->
-
     <bean id="configurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
@@ -37,11 +32,17 @@
 
     <janytask:application name="test-application" />
 
-    <janytask:provider-redis package="cn.mzhong.janytask" host="${janytask.provider.redis.host}" port="6379" />
+    <janytask:provider-redis package="cn.mzhong.janytask.test.redis"
+                             host="${janytask.provider.redis.host}"
+                             port="6379" />
+
+    <!--<bean id="jdbc-provider" class="cn.mzhong.janytask.queue.provider.jdbc.JdbcProvider">-->
+        <!--<property name="package" value="cn.mzhong.janytask.test.jdbc"/>-->
+        <!--<property name="dataSource" ref="mysqlDataSource"/>-->
+    <!--</bean>-->
     <!--<janytask:provider-zookeeper connectString="mzhong.cn:2181"/>-->
-    <!--<janytask:provider-jdbc dataSource-ref="oracleDataSource"/>-->
-    <!--<janytask:provider-any ref="jdbc-provider"/>-->
-    <!--<janytask:queue cron="${janytask.conf.queue.cron}"/>-->
+    <janytask:provider-jdbc package="cn.mzhong.janytask.test.jdbc"
+                            dataSource-ref="mysqlDataSource"/>
 
     <context:component-scan base-package="cn.mzhong"/>
 </beans>

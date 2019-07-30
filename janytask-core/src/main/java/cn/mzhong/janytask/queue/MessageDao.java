@@ -7,7 +7,7 @@ public interface MessageDao {
      *
      * @return
      */
-    String ID();
+    String getId();
 
     /**
      * 推送消息

@@ -1,11 +1,11 @@
 package cn.mzhong.janytask.queue;
 
-import cn.mzhong.janytask.core.TaskExecutor;
 import cn.mzhong.janytask.queue.loopline.LoopLineAnnotationHandler;
 import cn.mzhong.janytask.queue.pipleline.PipleLineAnnotationHandler;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import cn.mzhong.janytask.util.ClassUtils;
+import cn.mzhong.janytask.worker.TaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class QueueManager extends AbstractQueueManager {
     /**
      * 用于扫描当前classpath*下包含指定注解的所有类，并在这些类的基础上再次筛选。
      */
-    final AnnotationPatternClassScanner scanner = new AnnotationPatternClassScanner();
+    final protected AnnotationPatternClassScanner scanner = new AnnotationPatternClassScanner();
 
     public QueueManager() {
         // 注解处理器
@@ -59,7 +59,7 @@ public class QueueManager extends AbstractQueueManager {
                 //noinspection SingleStatementInBlock,unchecked
                 annotationProcessor.handleProducer(context, this, queueInfo);
                 if (Log.isDebugEnabled()) {
-                    Log.debug("producer:'" + queueInfo.ID() + "'inited.");
+                    Log.debug("producer:'" + queueInfo.getId() + "'inited.");
                 }
             }
         }
@@ -72,10 +72,10 @@ public class QueueManager extends AbstractQueueManager {
      * @param provider
      */
     private void initProducer(Class<?> producerClass, QueueProvider provider) {
+        producerFactory.registryProducer(producerClass, messageDaoMap);
         for (Method method : producerClass.getMethods()) {
             initProducerInvoker(producerClass, method, provider);
         }
-        registryProducer(producerClass);
     }
 
     /**
@@ -85,7 +85,7 @@ public class QueueManager extends AbstractQueueManager {
      * @param method
      * @return
      */
-    private <A extends Annotation> QueueInfo<A> findQueueInfo(Object consumer, Class<?> consumerClass, Method method,
+    private <A extends Annotation> QueueInfo<A> findQueueInfo(Class<?> consumerClass, Method method,
                                                               Class<A> annotationType, QueueProvider provider) {
         Set<Class<?>> interfaces = ClassUtils.getInterfaces(consumerClass);
         Iterator<Class<?>> iterator = interfaces.iterator();
@@ -96,7 +96,7 @@ public class QueueManager extends AbstractQueueManager {
                 if (pMethod != null) {
                     A annotation = pMethod.getAnnotation(annotationType);
                     if (annotation != null) {
-                        return new QueueInfo<A>(annotation, _interface, pMethod, consumer, consumerClass, method, provider);
+                        return new QueueInfo<A>(annotation, _interface, pMethod, consumerClass, method, provider);
                     }
                 }
             } catch (NoSuchMethodException e) {
@@ -110,21 +110,19 @@ public class QueueManager extends AbstractQueueManager {
      * 初始化消费者执行者
      *
      * @param consumerClass
-     * @param consumer
      * @param method
      * @param provider
      */
-    private void initConsumerInvoker(Class<?> consumerClass, Object consumer, Method method, QueueProvider provider) {
+    private void initConsumerInvoker(Class<?> consumerClass, Method method, QueueProvider provider) {
         Iterator<QueueAnnotationHandler> iterator = annotationHandlers.iterator();
         while (iterator.hasNext()) {
             QueueAnnotationHandler annotationProcessor = iterator.next();
-            QueueInfo queueInfo = findQueueInfo(consumer, consumerClass, method,
-                    annotationProcessor.getAnnotationClass(), provider);
+            QueueInfo queueInfo = findQueueInfo(consumerClass, method, annotationProcessor.getAnnotationClass(), provider);
             if (queueInfo != null) {
                 // 创建消费者线程
                 executors.add(annotationProcessor.handleConsumer(context, this, queueInfo));
                 if (Log.isDebugEnabled()) {
-                    Log.debug("consumer:'" + queueInfo.ID() + "'inited.");
+                    Log.debug("consumer:'" + queueInfo.getId() + "'inited.");
                 }
             }
         }
@@ -137,9 +135,9 @@ public class QueueManager extends AbstractQueueManager {
      * @param provider
      */
     private void initConsumer(Class<?> consumerClass, QueueProvider provider) {
-        Object consumer = consumerCreator.createConsumer(consumerClass);
+        consumerFactory.registryConsumer(consumerClass);
         for (Method method : consumerClass.getMethods()) {
-            initConsumerInvoker(consumerClass, consumer, method, provider);
+            initConsumerInvoker(consumerClass, method, provider);
         }
     }
 
@@ -189,7 +187,6 @@ public class QueueManager extends AbstractQueueManager {
      * @since 2.0.0
      */
     private void initProviders() throws ClassNotFoundException {
-        initScanner();
         Map<Class<?>, QueueProvider> containsMap = new HashMap<Class<?>, QueueProvider>();
         Iterator<QueueProvider> iterator = this.providers.iterator();
         while (iterator.hasNext()) {
@@ -200,7 +197,8 @@ public class QueueManager extends AbstractQueueManager {
 
     public void init() {
         try {
-            initProviders();
+            this.initScanner();
+            this.initProviders();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
@@ -210,19 +208,9 @@ public class QueueManager extends AbstractQueueManager {
         return executors;
     }
 
-
     @SuppressWarnings({"SingleStatementInBlock", "unchecked"})
     public <T> T getProducer(Class<T> producerClass) {
-        Object producer = producers.get(producerClass);
-        if (producer == null) {
-            for (Map.Entry<Class<?>, Object> entry : producers.entrySet()) {
-                if (entry.getKey().isAssignableFrom(producerClass)) {
-                    return (T) entry.getValue();
-                }
-            }
-            throw new NoSuchProducerException("未找到生产者：" + producerClass.getName());
-        }
-        return (T) producer;
+        return (T) producerFactory.getObject(producerClass);
     }
 
 }

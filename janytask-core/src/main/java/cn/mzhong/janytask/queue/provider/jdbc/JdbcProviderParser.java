@@ -9,6 +9,11 @@ import org.w3c.dom.Element;
 public class JdbcProviderParser extends ProviderParser {
 
     @Override
+    protected Class<?> getBeanClass(Element element) {
+        return JdbcProvider.class;
+    }
+
+    @Override
     protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
         ElementBeanDefinitionBuilder elementBeanDefinitionParser = new ElementBeanDefinitionBuilder(element, builder);
         elementBeanDefinitionParser.parseStringPropertyFromAttr("table");

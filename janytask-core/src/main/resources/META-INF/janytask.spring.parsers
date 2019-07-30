@@ -1,6 +1,4 @@
-application=cn.mzhong.janytask.spring.ApplicationParser
-queue=cn.mzhong.janytask.spring.QueueConfigParser
-provider-any=cn.mzhong.janytask.queue.provider.any.AnyProviderParser
+application=cn.mzhong.janytask.application.SpringApplicationParser
 provider-redis=cn.mzhong.janytask.queue.provider.redis.RedisProviderParser
 provider-zookeeper=cn.mzhong.janytask.queue.provider.zookeeper.ZookeeperProviderParser
 provider-jdbc=cn.mzhong.janytask.queue.provider.jdbc.JdbcProviderParser
