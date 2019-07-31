@@ -100,11 +100,12 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
      * @param event
      */
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        TaskSpringApplication application = beanFactory.getBean(TaskSpringApplication.class);
         Map<String, QueueProvider> beansOfType = beanFactory.getBeansOfType(QueueProvider.class);
         Iterator<QueueProvider> iterator = beansOfType.values().iterator();
         while (iterator.hasNext()) {
-            this.addProvider(iterator.next());
+            application.addProvider(iterator.next());
         }
-        this.start();
+        application.start();
     }
 }
