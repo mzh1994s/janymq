@@ -1,4 +1,4 @@
-package cn.mzhong.janytask.queue.ack;
+package cn.mzhong.janytask.queue.future;
 
 import java.io.Serializable;
 import java.util.concurrent.ExecutionException;
@@ -6,12 +6,12 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-public class ACK implements Future<Serializable>, Serializable {
+public class ObjectFuture implements Future<Serializable>, Serializable {
 
     private static final long serialVersionUID = -2512420127598685806L;
     protected Serializable object;
 
-    public ACK(Serializable object) {
+    public ObjectFuture(Serializable object) {
         this.object = object;
     }
 

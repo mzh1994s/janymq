@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.application.TaskContext;
-import cn.mzhong.janytask.queue.ack.FutureHandler;
+import cn.mzhong.janytask.queue.future.FutureHandler;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;

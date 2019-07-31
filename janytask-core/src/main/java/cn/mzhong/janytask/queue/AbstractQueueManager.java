@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.application.TaskContext;
-import cn.mzhong.janytask.queue.ack.FutureHandler;
+import cn.mzhong.janytask.queue.future.FutureHandler;
 import cn.mzhong.janytask.worker.TaskExecutor;
 import cn.mzhong.janytask.application.TaskManager;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
