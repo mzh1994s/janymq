@@ -10,6 +10,8 @@ import java.util.Set;
  * 上下文空间可以理解为一个公共储存对象的区域，存放着一个公共的组件、配置、标志等，
  */
 public abstract class TaskContext {
+
+    protected Application application;
     /**
      * 全局的序列化接口
      */
@@ -27,6 +29,14 @@ public abstract class TaskContext {
      * @since 1.0.0
      */
     protected volatile boolean shutdown = false;
+
+    public TaskContext(Application application) {
+        this.application = application;
+    }
+
+    public Application getApplication() {
+        return application;
+    }
 
     public Serializer getSerializer() {
         return serializer;

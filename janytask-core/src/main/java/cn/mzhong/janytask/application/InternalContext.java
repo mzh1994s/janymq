@@ -7,4 +7,7 @@ package cn.mzhong.janytask.application;
  */
 class InternalContext extends TaskContext {
 
+    public InternalContext(Application application) {
+        super(application);
+    }
 }

@@ -1,11 +1,10 @@
 package cn.mzhong.janytask.queue;
 
-import java.lang.reflect.Method;
-import java.util.Map;
+import cn.mzhong.janytask.application.TaskContextAware;
 
-public interface ProducerFactory {
+public interface ProducerFactory extends TaskContextAware {
 
-    void registryProducer(Class<?> _class, Map<Method, MessageDao> messageDaoMap);
+    void registryProducer(Class<?> _class);
 
     Object getObject(Class<?> _class);
 }

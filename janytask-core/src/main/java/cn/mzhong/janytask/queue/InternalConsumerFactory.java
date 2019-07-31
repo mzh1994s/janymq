@@ -1,11 +1,17 @@
 package cn.mzhong.janytask.queue;
 
+import cn.mzhong.janytask.application.TaskContext;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class InternalConsumerFactory implements ConsumerFactory {
 
     Map<Class<?>, Object> objectMap = new HashMap<Class<?>, Object>();
+
+    public void setContext(TaskContext context) {
+        // do nothing
+    }
 
     public void registryConsumer(Class<?> _class) {
         try {

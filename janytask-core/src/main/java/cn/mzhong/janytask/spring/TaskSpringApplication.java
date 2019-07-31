@@ -1,8 +1,8 @@
 package cn.mzhong.janytask.spring;
 
 import cn.mzhong.janytask.application.TaskApplication;
+import cn.mzhong.janytask.application.TaskContext;
 import cn.mzhong.janytask.queue.ConsumerFactory;
-import cn.mzhong.janytask.queue.MessageDao;
 import cn.mzhong.janytask.queue.ProducerFactory;
 import cn.mzhong.janytask.queue.ProducerProxyFactory;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -34,14 +33,18 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
         // 使用Spring生成生产者和消费者
         this.queueManager.setProducerFactory(new ProducerFactory() {
 
-            public void registryProducer(Class<?> _class, Map<Method, MessageDao> messageDaoMap) {
+            public void setContext(TaskContext context) {
+                // do nothing
+            }
+
+            public void registryProducer(Class<?> _class) {
                 // 此处使用Spring工厂模式创建生产者
                 BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(ProducerProxyFactory.class);
                 // 工厂方法为newInstance
                 builder.setFactoryMethod("newInstance");
                 // 工厂方法的两个参数
                 builder.addConstructorArgValue(_class);
-                builder.addConstructorArgValue(messageDaoMap);
+                builder.addConstructorArgValue(context);
                 // 单例
                 builder.setScope(BeanDefinition.SCOPE_SINGLETON);
                 BeanDefinition beanDefinition = builder.getBeanDefinition();
@@ -68,6 +71,10 @@ public class TaskSpringApplication extends TaskApplication implements BeanDefini
      */
     private void initConsumerFactory() {
         this.queueManager.setConsumerFactory(new ConsumerFactory() {
+
+            public void setContext(TaskContext context) {
+                //do noting
+            }
 
             public void registryConsumer(Class<?> _class) {
                 BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(_class);

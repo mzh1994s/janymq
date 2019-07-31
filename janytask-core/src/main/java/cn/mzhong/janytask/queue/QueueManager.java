@@ -72,7 +72,7 @@ public class QueueManager extends AbstractQueueManager {
      * @param provider
      */
     private void initProducer(Class<?> producerClass, QueueProvider provider) {
-        producerFactory.registryProducer(producerClass, messageDaoMap);
+        producerFactory.registryProducer(producerClass);
         for (Method method : producerClass.getMethods()) {
             initProducerInvoker(producerClass, method, provider);
         }

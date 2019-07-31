@@ -1,5 +1,7 @@
 package cn.mzhong.janytask.queue;
 
+import cn.mzhong.janytask.application.TaskContext;
+
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,10 +10,15 @@ import java.util.Map;
  * 内部生产者实例创建者
  */
 class InternalProducerFactory implements ProducerFactory {
-    Map<Class<?>, Object> objectMap = new HashMap<Class<?>, Object>();
+    private Map<Class<?>, Object> objectMap = new HashMap<Class<?>, Object>();
+    private TaskContext context;
 
-    public void registryProducer(Class<?> _class, Map<Method, MessageDao> messageDaoMap) {
-        objectMap.put(_class, ProducerProxyFactory.newInstance(_class, messageDaoMap));
+    public void setContext(TaskContext context) {
+        this.context = context;
+    }
+
+    public void registryProducer(Class<?> _class) {
+        objectMap.put(_class, ProducerProxyFactory.newInstance(_class, context));
     }
 
     public Object getObject(Class<?> _class) {

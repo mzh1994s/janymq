@@ -1,6 +1,5 @@
 package cn.mzhong.janytask.application;
 
-public interface TaskComponent {
-    void setContext(TaskContext context);
+public interface TaskComponent extends TaskContextAware {
     void init();
 }

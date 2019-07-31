@@ -14,7 +14,7 @@ public abstract class Application {
     /**
      * 应用程序上下文
      */
-    final protected TaskContext context = new InternalContext();
+    final protected TaskContext context = new InternalContext(this);
 
     /**
      * 队列型任务管理器
