@@ -1,4 +1,4 @@
-package cn.mzhong.janytask.queue.pipleline;
+package cn.mzhong.janytask.queue.pipeline;
 
 import java.lang.annotation.*;
 

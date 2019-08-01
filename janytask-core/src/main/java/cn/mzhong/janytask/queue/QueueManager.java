@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.application.Application;
-import cn.mzhong.janytask.queue.pipleline.PipelineAnnotationHandler;
+import cn.mzhong.janytask.queue.pipeline.PipelineAnnotationHandler;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import cn.mzhong.janytask.util.ClassUtils;

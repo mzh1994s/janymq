@@ -1,7 +1,7 @@
 package cn.mzhong.janytask.test.redis.producer;
 
 import cn.mzhong.janytask.queue.Producer;
-import cn.mzhong.janytask.queue.pipleline.Pipeline;
+import cn.mzhong.janytask.queue.pipeline.Pipeline;
 
 @Producer
 public interface RedisTaskTask {

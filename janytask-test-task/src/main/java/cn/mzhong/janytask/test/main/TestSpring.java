@@ -20,7 +20,7 @@ public class TestSpring {
         while (true) {
             try {
 //            redisTaskTask.testLoopline("loopline");
-//            redisTaskTask.testPipleline("pipleline");
+//            redisTaskTask.testPipleline("pipeline");
                 Ack<String> ack = jdbcTestTask.testForJdbc("jdbccc")
                         .listen(new DoneListener<String>() {
                             public void done(String result) {
