@@ -92,7 +92,7 @@ public class ZookeeperMessageDao extends LockedMessageDao {
         return true;
     }
 
-    protected Message get(String id) {
+    public Message get(String id) {
         byte[] data = zkClient.getData(waitPath + "/" + id);
         try {
             return (Message) serializer.deserialize(data);
@@ -102,7 +102,7 @@ public class ZookeeperMessageDao extends LockedMessageDao {
         return null;
     }
 
-    protected LinkedList<String> queueIdList() {
+    protected LinkedList<String> keys() {
         return new LinkedList<String>(zkClient.getChildren(waitPath));
     }
 }

@@ -23,7 +23,7 @@ public class MongoDbMessageDao extends LockedMessageDao {
         this.collection = collection;
     }
 
-    protected LinkedList<String> queueIdList() {
+    protected LinkedList<String> keys() {
         MongoCursor iterator = this.collection.find().projection(new Bson() {
             public <TDocument> BsonDocument toBsonDocument(Class<TDocument> tDocumentClass, CodecRegistry codecRegistry) {
                 BsonDocument bsonDocument = new BsonDocument();
@@ -41,7 +41,7 @@ public class MongoDbMessageDao extends LockedMessageDao {
         return cacheKeys;
     }
 
-    protected Message get(final String id) {
+    public Message get(final String id) {
         MongoCursor iterator = this.collection.find(new Bson() {
             public <TDocument> BsonDocument toBsonDocument(Class<TDocument> tDocumentClass, CodecRegistry codecRegistry) {
                 BsonDocument bsonDocument = new BsonDocument();

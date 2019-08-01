@@ -39,10 +39,8 @@ class LooplineTaskExecutor extends QueueExecutor<Loopline> {
     }
 
     protected void invoke(Message message) {
-        Method method = queueInfo.getConsumerMethod();
-        MessageDao messageDao = queueInfo.getMessageDao();
         try {
-            Boolean result = (Boolean) method.invoke(consumer, message.getContent());
+            Boolean result = (Boolean) method.invoke(consumer, message.getArgs());
             if (result != null && result) {
                 messageDao.done(message);
             } else {

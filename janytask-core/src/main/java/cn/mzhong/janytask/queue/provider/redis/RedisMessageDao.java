@@ -40,12 +40,21 @@ public class RedisMessageDao extends LockedMessageDao {
         });
     }
 
-    @Override
-    protected Message get(final String id) {
+    public Message get(final String id) {
         return this.redisClient.execute(new PRInvoker<Jedis, Message>() {
             public Message invoke(Jedis jedis) throws Exception {
-                byte[] messageByes = jedis.hget(waitKey, id.getBytes());
-                return (Message) serializer.deserialize(messageByes);
+                byte[] idBytes = id.getBytes();
+                byte[] messageByes = jedis.hget(waitKey, idBytes);
+                if (messageByes == null) {
+                    messageByes = jedis.hget(doneKey, idBytes);
+                    if (messageByes == null) {
+                        messageByes = jedis.hget(errorKey, idBytes);
+                    }
+                }
+                if (messageByes != null) {
+                    return (Message) serializer.deserialize(messageByes);
+                }
+                return null;
             }
         });
     }
@@ -102,7 +111,7 @@ public class RedisMessageDao extends LockedMessageDao {
         });
     }
 
-    protected LinkedList<String> queueIdList() {
+    protected LinkedList<String> keys() {
         return this.redisClient.execute(new PRInvoker<Jedis, LinkedList<String>>() {
             public LinkedList<String> invoke(Jedis jedis) throws Exception {
                 LinkedList<String> list = new LinkedList<String>();

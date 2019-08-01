@@ -19,15 +19,18 @@ public class Message implements Serializable {
     protected String id;
     protected String queueId;
     protected String status;
+    protected Date createTime;
     protected Date pushTime;
     protected Date doneTime;
     protected Date errorTime;
     protected Throwable throwable;
-    protected Object[] content;
+    protected Object[] args;
+    protected Object result;
 
     public Message() {
         // 生成22位key 就像：31814797796271-R795801
         id = System.currentTimeMillis() + "-R" + Math.round((Math.random() * 9 + 1) * 1000000);
+        createTime = new Date();
     }
 
     public String getId() {
@@ -52,6 +55,14 @@ public class Message implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Date getPushTime() {
@@ -86,12 +97,20 @@ public class Message implements Serializable {
         this.throwable = throwable;
     }
 
-    public Object[] getContent() {
-        return content;
+    public Object[] getArgs() {
+        return args;
     }
 
-    public void setContent(Object[] content) {
-        this.content = content;
+    public void setArgs(Object[] args) {
+        this.args = args;
+    }
+
+    public Object getResult() {
+        return result;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
     }
 
     @Override
@@ -119,7 +138,7 @@ public class Message implements Serializable {
                 ", doneTime=" + doneTime +
                 ", errorTime=" + errorTime +
                 ", throwable=" + throwable +
-                ", content=" + Arrays.toString(content) +
+                ", args=" + Arrays.toString(args) +
                 '}';
     }
 }

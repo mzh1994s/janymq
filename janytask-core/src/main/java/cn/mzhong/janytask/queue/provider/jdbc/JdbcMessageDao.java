@@ -21,48 +21,60 @@ public class JdbcMessageDao extends LockedMessageDao {
 
     public void push(Message message) {
         BytesMessage jdbcMessage = new BytesMessage(message);
-        jdbcMessage.setContentBytes(this.serializer.serialize(message.getContent()));
+        jdbcMessage.setArgsBytes(serializer.serialize(message.getArgs()));
         jdbcMessage.setPushTime(new Date());
         jdbcMessage.setQueueId(id);
-        this.messageMapper.save(jdbcMessage);
+        messageMapper.save(jdbcMessage);
     }
 
     public void done(Message message) {
         BytesMessage jdbcMessage = new BytesMessage(message);
         jdbcMessage.setDoneTime(new Date());
-        this.messageMapper.done(jdbcMessage);
+        if (jdbcMessage.getResult() != null) {
+            jdbcMessage.setResultBytes(serializer.serialize(jdbcMessage.getResult()));
+        }
+        messageMapper.done(jdbcMessage);
     }
 
     public void error(Message message) {
         BytesMessage jdbcMessage = new BytesMessage(message);
         jdbcMessage.setErrorTime(new Date());
-        this.messageMapper.error(jdbcMessage);
+        if (message.getThrowable() != null) {
+            jdbcMessage.setThrowableBytes(serializer.serialize(message.getThrowable()));
+        }
+        messageMapper.error(jdbcMessage);
     }
 
     public long length() {
-        return this.messageMapper.length(id);
+        return messageMapper.length(id);
     }
 
     @Override
-    protected LinkedList<String> queueIdList() {
-        return this.messageMapper.keys();
+    protected LinkedList<String> keys() {
+        return messageMapper.keys(id);
     }
 
-    @Override
-    protected Message get(String id) {
-        BytesMessage jdbcMessage = this.messageMapper.get(id);
-        Object[] content = (Object[]) this.serializer.deserialize(jdbcMessage.getContentBytes());
-        jdbcMessage.setContent(content);
-        return jdbcMessage;
+    public Message get(String id) {
+        BytesMessage bytesMessage = messageMapper.get(id);
+        if (bytesMessage.getArgsBytes() != null) {
+            bytesMessage.setArgs((Object[]) serializer.deserialize(bytesMessage.getArgsBytes()));
+        }
+        if (bytesMessage.getResultBytes() != null) {
+            bytesMessage.setResult(serializer.deserialize(bytesMessage.getResultBytes()));
+        }
+        if (bytesMessage.getThrowableBytes() != null) {
+            bytesMessage.setThrowable((Throwable) serializer.deserialize(bytesMessage.getThrowableBytes()));
+        }
+        return bytesMessage;
     }
 
     @Override
     protected boolean lock(String id) {
-        return this.messageMapper.lock(id);
+        return messageMapper.lock(id);
     }
 
     @Override
     protected boolean unLock(String id) {
-        return this.messageMapper.unLock(id);
+        return messageMapper.unLock(id);
     }
 }

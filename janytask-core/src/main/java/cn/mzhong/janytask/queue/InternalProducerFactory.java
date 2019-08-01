@@ -22,17 +22,18 @@ class InternalProducerFactory implements ProducerFactory {
     }
 
     public Object getObject(Class<?> _class) {
-        Object consumer = objectMap.get(_class);
-        if (consumer == null) {
+        Object producer = objectMap.get(_class);
+        if (producer == null) {
             for (Map.Entry<Class<?>, Object> entry : objectMap.entrySet()) {
-                if (entry.getKey().isAssignableFrom(_class)) {
-                    consumer = entry.getValue();
+                if (_class.isAssignableFrom(entry.getKey())) {
+                    producer = entry.getValue();
+                    objectMap.put(_class, producer);
                 }
             }
-            if (consumer == null) {
+            if (producer == null) {
                 throw new RuntimeException("未找到生产者：" + _class.getName());
             }
         }
-        return consumer;
+        return producer;
     }
 }

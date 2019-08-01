@@ -18,11 +18,13 @@ public class MysqlMessageMapper extends AbstractMessageMapper {
                 "CREATE TABLE `" + table + "` " +
                         "(`MESSAGE_ID` CHAR(22) NOT NULL," +
                         "`QUEUE_ID` VARCHAR(255) NOT NULL," +
+                        "`CREATE_TIME` TIMESTAMP NOT NULL," +
                         "`PUSH_TIME` TIMESTAMP NOT NULL," +
                         "`DONE_TIME` TIMESTAMP," +
                         "`ERROR_TIME` TIMESTAMP," +
                         "`THROWABLE` BLOB," +
-                        "`CONTENT` BLOB," +
+                        "`ARGS` BLOB," +
+                        "`RESULT` BLOB," +
                         "`STATUS` CHAR(1)," +
                         "PRIMARY KEY (`MESSAGE_ID`)," +
                         "INDEX `" + table + "_QUEUE_ID` (`QUEUE_ID`)" +

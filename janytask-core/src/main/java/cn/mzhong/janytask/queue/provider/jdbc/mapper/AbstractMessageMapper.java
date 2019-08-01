@@ -29,18 +29,20 @@ public abstract class AbstractMessageMapper implements MessageMapper {
 
     public void save(BytesMessage message) {
         this.sqlExecutor.update("INSERT INTO " + table +
-                        "(MESSAGE_ID,QUEUE_ID,PUSH_TIME,CONTENT,STATUS) VALUES (?,?,?,?,?)",
+                        "(MESSAGE_ID,QUEUE_ID,CREATE_TIME,PUSH_TIME,ARGS,RESULT,STATUS) VALUES (?,?,?,?,?,?,?)",
                 message.getId(),
                 message.getQueueId(),
+                new Timestamp(message.getCreateTime().getTime()),
                 new Timestamp(message.getPushTime().getTime()),
-                message.getContentBytes(),
+                message.getArgsBytes(),
+                message.getResultBytes(),
                 Message.STATUS_WAIT);
     }
 
-    public LinkedList<String> keys() {
+    public LinkedList<String> keys(String queueId) {
         return this.sqlExecutor.queryList(
-                "SELECT MESSAGE_ID FROM " + table + " WHERE STATUS=?",
-                new Object[]{Message.STATUS_WAIT},
+                "SELECT MESSAGE_ID FROM " + table + " WHERE QUEUE_ID=? AND STATUS=?",
+                new Object[]{queueId, Message.STATUS_WAIT},
                 new PRInvoker<ResultSet, String>() {
                     public String invoke(ResultSet resultSet) throws Exception {
                         return resultSet.getString(1);
@@ -62,13 +64,16 @@ public abstract class AbstractMessageMapper implements MessageMapper {
 
     public BytesMessage get(final String key) {
         return this.sqlExecutor.query(
-                "SELECT CONTENT FROM " + table + " WHERE MESSAGE_ID=?",
+                "SELECT ARGS,RESULT,THROWABLE,STATUS FROM " + table + " WHERE MESSAGE_ID=?",
                 new Object[]{key},
                 new PRInvoker<ResultSet, BytesMessage>() {
                     public BytesMessage invoke(ResultSet resultSet) throws Exception {
                         BytesMessage message = new BytesMessage();
                         message.setId(key);
-                        message.setContentBytes(resultSet.getBytes(1));
+                        message.setArgsBytes(resultSet.getBytes(1));
+                        message.setResultBytes(resultSet.getBytes(2));
+                        message.setThrowableBytes(resultSet.getBytes(3));
+                        message.setStatus(resultSet.getString(4));
                         return message;
                     }
                 });
@@ -78,10 +83,12 @@ public abstract class AbstractMessageMapper implements MessageMapper {
         this.sqlExecutor.update(
                 "UPDATE " + table + " SET " +
                         "STATUS=?, " +
-                        "DONE_TIME=? " +
+                        "DONE_TIME=?, " +
+                        "RESULT=? " +
                         "WHERE MESSAGE_ID=?",
                 Message.STATUS_DONE,
                 new Timestamp(message.getDoneTime().getTime()),
+                message.getResultBytes(),
                 message.getId());
     }
 

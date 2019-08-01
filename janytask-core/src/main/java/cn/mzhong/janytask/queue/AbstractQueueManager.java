@@ -1,10 +1,11 @@
 package cn.mzhong.janytask.queue;
 
+import cn.mzhong.janytask.application.Application;
 import cn.mzhong.janytask.application.TaskContext;
-import cn.mzhong.janytask.queue.future.FutureHandler;
-import cn.mzhong.janytask.worker.TaskExecutor;
-import cn.mzhong.janytask.application.TaskManager;
+import cn.mzhong.janytask.application.TaskContextAware;
+import cn.mzhong.janytask.queue.ack.AckHandler;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
+import cn.mzhong.janytask.worker.TaskExecutor;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -12,21 +13,26 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class AbstractQueueManager implements TaskManager {
+public abstract class AbstractQueueManager implements TaskContextAware {
 
     protected TaskContext context;
+    final protected Application application;
     final protected Set<QueueAnnotationHandler> annotationHandlers = new HashSet<QueueAnnotationHandler>();
     final protected Set<QueueProvider> providers = new HashSet<QueueProvider>();
     final protected Map<Method, MessageDao> messageDaoMap = new HashMap<Method, MessageDao>();
     final protected Set<TaskExecutor> executors = new HashSet<TaskExecutor>();
-    final protected FutureHandler futureHandler = new FutureHandler();
+    final protected AckHandler ackHandler = new AckHandler();
 
     protected ProducerFactory producerFactory = new InternalProducerFactory();
     protected ConsumerFactory consumerFactory = new InternalConsumerFactory();
 
+    public AbstractQueueManager(Application application) {
+        this.application = application;
+    }
+
     public void setContext(TaskContext context) {
         this.context = context;
-        this.futureHandler.setContext(context);
+        this.ackHandler.setContext(context);
         this.producerFactory.setContext(context);
         this.consumerFactory.setContext(context);
     }
@@ -39,8 +45,8 @@ public abstract class AbstractQueueManager implements TaskManager {
         return messageDaoMap;
     }
 
-    public FutureHandler getFutureHandler() {
-        return futureHandler;
+    public AckHandler getAckHandler() {
+        return ackHandler;
     }
 
     public ProducerFactory getProducerFactory() {

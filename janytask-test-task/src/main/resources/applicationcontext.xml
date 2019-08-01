@@ -32,12 +32,12 @@
 
     <janytask:application name="test-application" />
 
-    <janytask:provider-redis package="cn.mzhong.janytask.test.redis"
-                             host="${janytask.provider.redis.host}"
-                             port="6379" />
+    <!--<janytask:provider-redis package="cn.mzhong.janytask.test.redis"-->
+                             <!--host="${janytask.provider.redis.host}"-->
+                             <!--port="6379" />-->
 
-    <janytask:provider-zookeeper package="cn.mzhong.janytask.test.zk"
-                                 connectString="mzhong.cn:2181"/>
+    <!--<janytask:provider-zookeeper package="cn.mzhong.janytask.test.zk"-->
+                                 <!--connectString="mzhong.cn:2181"/>-->
 
     <janytask:provider-jdbc package="cn.mzhong.janytask.test.jdbc"
                             dataSource-ref="mysqlDataSource"/>

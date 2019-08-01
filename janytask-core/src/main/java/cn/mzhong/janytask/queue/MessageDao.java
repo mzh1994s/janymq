@@ -25,6 +25,17 @@ public interface MessageDao {
     Message poll();
 
     /**
+     * 通过ID获取Message
+     * <p>
+     * FutureHandler中会用到，用于获取后期的result
+     * <p/>
+     *
+     * @param id
+     * @return
+     */
+    Message get(String id);
+
+    /**
      * 归还一个消息<br/>
      * 将一个消息还原为等待状态，可以被再次消费，一般loopline会用到此功能
      *

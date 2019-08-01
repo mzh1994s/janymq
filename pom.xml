@@ -41,7 +41,7 @@
     </developers>
 
     <properties>
-        <sonatypeOssDistMgmtSnapshotsUrl>http://maven.aliyun.com/nexus/content/repositories/snapshots/
+        <sonatypeOssDistMgmtSnapshotsUrl>http://maven.aliyun.com/nexus/args/repositories/snapshots/
         </sonatypeOssDistMgmtSnapshotsUrl>
     </properties>
 

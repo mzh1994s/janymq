@@ -1,10 +1,6 @@
 package cn.mzhong.janytask.application;
 
 import cn.mzhong.janytask.queue.provider.QueueProvider;
-import cn.mzhong.janytask.worker.TaskExecutor;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Janytask
@@ -30,13 +26,6 @@ public class TaskApplication extends Application {
         this.queueManager.init();
         // 初始化定时任务管理器
         this.scheduleManager.init();
-
-        // 收集执行者
-        Set<TaskExecutor> executors = new HashSet<TaskExecutor>();
-        executors.addAll(this.queueManager.getTaskExecutors());
-        executors.addAll(this.scheduleManager.getTaskExecutors());
-        this.taskWorker.addExecutors(executors);
-
         // 初始化线程调度器
         this.taskWorker.init();
         // 正常终结

@@ -1,11 +1,11 @@
 package cn.mzhong.janytask.queue;
 
+import cn.mzhong.janytask.application.Application;
 import cn.mzhong.janytask.queue.loopline.LoopLineAnnotationHandler;
 import cn.mzhong.janytask.queue.pipleline.PipleLineAnnotationHandler;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import cn.mzhong.janytask.util.ClassUtils;
-import cn.mzhong.janytask.worker.TaskExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,8 @@ public class QueueManager extends AbstractQueueManager {
      */
     final protected AnnotationPatternClassScanner scanner = new AnnotationPatternClassScanner();
 
-    public QueueManager() {
+    public QueueManager(Application application) {
+        super(application);
         // 注解处理器
         this.annotationHandlers.add(new PipleLineAnnotationHandler());
         this.annotationHandlers.add(new LoopLineAnnotationHandler());
@@ -61,6 +62,7 @@ public class QueueManager extends AbstractQueueManager {
                 if (Log.isDebugEnabled()) {
                     Log.debug("producer:'" + queueInfo.getId() + "'inited.");
                 }
+                break;
             }
         }
     }
@@ -124,6 +126,7 @@ public class QueueManager extends AbstractQueueManager {
                 if (Log.isDebugEnabled()) {
                     Log.debug("consumer:'" + queueInfo.getId() + "'inited.");
                 }
+                break;
             }
         }
     }
@@ -199,13 +202,11 @@ public class QueueManager extends AbstractQueueManager {
         try {
             this.initScanner();
             this.initProviders();
+            this.executors.add(ackHandler);
+            this.application.getTaskWorker().addExecutors(executors);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Set<TaskExecutor> getTaskExecutors() {
-        return executors;
     }
 
     @SuppressWarnings({"SingleStatementInBlock", "unchecked"})

@@ -3,9 +3,7 @@ package cn.mzhong.janytask.application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 /**
  * 正常终结、安全关闭消费者线程

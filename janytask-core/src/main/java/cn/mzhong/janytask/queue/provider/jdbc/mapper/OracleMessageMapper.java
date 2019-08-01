@@ -27,10 +27,12 @@ public class OracleMessageMapper extends AbstractMessageMapper {
                 "(MESSAGE_ID CHAR(22) NOT NULL," +
                 "QUEUE_ID VARCHAR2(255) NOT NULL," +
                 "PUSH_TIME TIMESTAMP NOT NULL," +
+                "PUSH_TIME TIMESTAMP NOT NULL," +
                 "DONE_TIME TIMESTAMP," +
                 "ERROR_TIME TIMESTAMP," +
                 "THROWABLE BLOB," +
-                "CONTENT BLOB," +
+                "ARGS BLOB," +
+                "RESULT BLOB," +
                 "STATUS CHAR(1)," +
                 "CONSTRAINT " + table + "_PK PRIMARY KEY(MESSAGE_ID)" +
                 ")");

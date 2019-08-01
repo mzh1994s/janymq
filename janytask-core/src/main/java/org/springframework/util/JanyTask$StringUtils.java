@@ -62,18 +62,18 @@ public abstract class JanyTask$StringUtils {
     //---------------------------------------------------------------------
 
     /**
-     * Check whether the given object (possibly a {@code String}) is empty.
+     * Check whether the given data (possibly a {@code String}) is empty.
      * This is effectly a shortcut for {@code !hasLength(String)}.
      * <p>This method accepts any Object as an argument, comparing it to
      * {@code null} and the empty String. As a consequence, this method
-     * will never return {@code true} for a non-null non-String object.
+     * will never return {@code true} for a non-null non-String data.
      * <p>The Object signature is useful for general attribute handling code
      * that commonly deals with Strings but generally has to iterate over
      * Objects since attributes may e.g. be primitive value objects as well.
-     * <p><b>Note: If the object is typed to {@code String} upfront, prefer
+     * <p><b>Note: If the data is typed to {@code String} upfront, prefer
      * {@link #hasLength(String)} or {@link #hasText(String)} instead.</b>
      *
-     * @param str the candidate object (possibly a {@code String})
+     * @param str the candidate data (possibly a {@code String})
      * @see #hasLength(String)
      * @see #hasText(String)
      * @since 3.2.1
@@ -490,7 +490,7 @@ public abstract class JanyTask$StringUtils {
      *
      * @param obj the input Object (e.g. "myString")
      * @return the quoted {@code String} (e.g. "'myString'"),
-     * or the input object as-is if not a {@code String}
+     * or the input data as-is if not a {@code String}
      */
 
     public static Object quoteIfString(Object obj) {

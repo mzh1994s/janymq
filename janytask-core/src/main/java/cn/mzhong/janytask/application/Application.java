@@ -21,13 +21,13 @@ public abstract class Application {
      *
      * @since 2.0.0
      */
-    final protected QueueManager queueManager = new QueueManager();
+    final protected QueueManager queueManager = new QueueManager(this);
     /**
      * 定时型任务管理器
      *
      * @since 2.0.0
      */
-    final protected ScheduleManager scheduleManager = new ScheduleManager();
+    final protected ScheduleManager scheduleManager = new ScheduleManager(this);
     /**
      * 任务调度器
      *

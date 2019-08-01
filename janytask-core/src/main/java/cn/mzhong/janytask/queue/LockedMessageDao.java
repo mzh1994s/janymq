@@ -14,7 +14,7 @@ public abstract class LockedMessageDao extends AbstractMessageDao {
 
     public final Message poll() {
         if (cacheKeys.isEmpty()) {
-            cacheKeys = this.queueIdList();
+            cacheKeys = this.keys();
         }
         while (!cacheKeys.isEmpty()) {
             // ShutdownBreak;
@@ -33,9 +33,7 @@ public abstract class LockedMessageDao extends AbstractMessageDao {
         this.unLock(message.getId());
     }
 
-    protected abstract LinkedList<String> queueIdList();
-
-    protected abstract Message get(String id);
+    protected abstract LinkedList<String> keys();
 
     protected abstract boolean lock(String id);
 

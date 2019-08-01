@@ -9,9 +9,11 @@ import cn.mzhong.janytask.queue.Message;
  */
 public class BytesMessage extends Message {
     private static final long serialVersionUID = -744128535422190869L;
+
     public BytesMessage() {
 
     }
+
     public BytesMessage(Message message) {
         this.id = message.getId();
         this.queueId = message.getQueueId();
@@ -19,11 +21,13 @@ public class BytesMessage extends Message {
         this.doneTime = message.getDoneTime();
         this.errorTime = message.getErrorTime();
         this.throwable = message.getThrowable();
-        this.content = message.getContent();
+        this.args = message.getArgs();
+        this.result = message.getResult();
     }
 
     protected byte[] throwableBytes;
-    protected byte[] contentBytes;
+    protected byte[] argsBytes;
+    protected byte[] resultBytes;
 
     public byte[] getThrowableBytes() {
         return throwableBytes;
@@ -33,11 +37,19 @@ public class BytesMessage extends Message {
         this.throwableBytes = throwableBytes;
     }
 
-    public byte[] getContentBytes() {
-        return contentBytes;
+    public byte[] getArgsBytes() {
+        return argsBytes;
     }
 
-    public void setContentBytes(byte[] contentBytes) {
-        this.contentBytes = contentBytes;
+    public void setArgsBytes(byte[] argsBytes) {
+        this.argsBytes = argsBytes;
+    }
+
+    public byte[] getResultBytes() {
+        return resultBytes;
+    }
+
+    public void setResultBytes(byte[] resultBytes) {
+        this.resultBytes = resultBytes;
     }
 }

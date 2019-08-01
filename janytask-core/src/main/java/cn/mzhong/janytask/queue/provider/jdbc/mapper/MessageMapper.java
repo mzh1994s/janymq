@@ -35,7 +35,7 @@ public interface MessageMapper {
      *
      * @return
      */
-    LinkedList<String> keys();
+    LinkedList<String> keys(String queueId);
 
     /**
      * 将一个key锁定

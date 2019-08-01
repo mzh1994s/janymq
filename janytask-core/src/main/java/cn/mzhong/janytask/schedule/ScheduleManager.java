@@ -1,10 +1,11 @@
 package cn.mzhong.janytask.schedule;
 
+import cn.mzhong.janytask.application.Application;
 import cn.mzhong.janytask.application.TaskContext;
+import cn.mzhong.janytask.application.TaskContextAware;
+import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import cn.mzhong.janytask.util.PackageUtils;
 import cn.mzhong.janytask.worker.TaskExecutor;
-import cn.mzhong.janytask.application.TaskManager;
-import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
@@ -14,19 +15,25 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ScheduleManager implements TaskManager {
+public class ScheduleManager implements TaskContextAware {
 
     Logger Log = LoggerFactory.getLogger(ScheduleManager.class);
 
     protected String[] packages = new String[0];
 
+    final protected Application application;
+
     protected TaskContext context;
 
     protected ScheduleObjectCreator scheduleObjectCreator = new InternalScheduleObjectCreator();
 
-    protected Set<TaskExecutor> executors = new HashSet<TaskExecutor>();
+    final protected Set<TaskExecutor> executors = new HashSet<TaskExecutor>();
 
-    protected AnnotationPatternClassScanner scanner = new AnnotationPatternClassScanner();
+    final protected AnnotationPatternClassScanner scanner = new AnnotationPatternClassScanner();
+
+    public ScheduleManager(Application application) {
+        this.application = application;
+    }
 
     public void setContext(TaskContext context) {
         this.context = context;
@@ -69,13 +76,10 @@ public class ScheduleManager implements TaskManager {
     public void init() {
         try {
             initSchedule();
+            application.getTaskWorker().addExecutors(executors);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public Set<TaskExecutor> getTaskExecutors() {
-        return executors;
     }
 
     class ScheduleExecutor extends TaskExecutor {

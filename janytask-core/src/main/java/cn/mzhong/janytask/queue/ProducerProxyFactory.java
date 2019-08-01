@@ -1,7 +1,9 @@
 package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.application.TaskContext;
-import cn.mzhong.janytask.queue.future.FutureHandler;
+import cn.mzhong.janytask.queue.ack.Ack;
+import cn.mzhong.janytask.queue.ack.AckHandler;
+import cn.mzhong.janytask.queue.ack.AckListener;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
@@ -9,9 +11,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * 使用工厂方式创建消费者代理。
@@ -32,39 +32,37 @@ public class ProducerProxyFactory {
 class ProducerInvocationHandler implements InvocationHandler {
 
     private Map<Method, MessageDao> messageDaoMap;
-    private FutureHandler futureHandler;
+    private AckHandler ackHandler;
 
     ProducerInvocationHandler(TaskContext context) {
         QueueManager queueManager = context.getApplication().getQueueManager();
         this.messageDaoMap = queueManager.getMessageDaoMap();
-        this.futureHandler = queueManager.getFutureHandler();
+        this.ackHandler = queueManager.getAckHandler();
     }
 
-    private Object handleAckChannel(final Message message, MessageDao messageDao) {
-        // 先发送
-        messageDao.push(message);
+    private Object handleAckChannel(final Message message, final MessageDao messageDao) {
         // 加入AckHandler
-        this.futureHandler.add(message, messageDao);
-        return new Future<Serializable>() {
+        this.ackHandler.add(message, messageDao);
+        return new Ack<Serializable>(null) {
 
-            public boolean cancel(boolean mayInterruptIfRunning) {
-                return futureHandler.cancel(message, mayInterruptIfRunning);
+            private static final long serialVersionUID = -4662066970080391522L;
+
+            public Ack<Serializable> addListener(AckListener<Serializable> listener) {
+                ackHandler.addListener(message, listener);
+                return this;
             }
 
-            public boolean isCancelled() {
-                return futureHandler.isCancelled(message);
-            }
-
-            public boolean isDone() {
-                return futureHandler.isDone(message);
+            public Ack<Serializable> push() {
+                messageDao.push(message);
+                return this;
             }
 
             public Serializable get() throws InterruptedException, ExecutionException {
-                return futureHandler.get(message);
+                return ackHandler.get(message);
             }
 
-            public Serializable get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-                return futureHandler.get(message, timeout, unit);
+            public Serializable get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException {
+                return ackHandler.get(message, timeout, unit);
             }
         };
     }
@@ -80,16 +78,21 @@ class ProducerInvocationHandler implements InvocationHandler {
     }
 
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // 查找MessageDao
         MessageDao messageDao = messageDaoMap.get(method);
         if (messageDao == null) {
             return method.invoke(proxy, args);
         }
+
+        // 准备消息
         Message message = new Message();
-        message.setContent(args);
+        message.setArgs(args);
+
+        // 选择消息发送器
         Class<?> returnType = method.getReturnType();
-        if (returnType.isAssignableFrom(Future.class)) {
+        if (Ack.class.isAssignableFrom(returnType)) {
             return handleAckChannel(message, messageDao);
-        } else if (returnType.isAssignableFrom(Boolean.class)) {
+        } else if (returnType == Boolean.class || returnType == boolean.class) {
             return handleBoolean(message, messageDao);
         } else {
             return handleVoid(message, messageDao);
