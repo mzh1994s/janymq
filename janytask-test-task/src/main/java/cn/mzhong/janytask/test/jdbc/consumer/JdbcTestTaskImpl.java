@@ -22,9 +22,4 @@ public class JdbcTestTaskImpl implements JdbcTestTask {
             return Ack.back();
         }
     }
-
-    public boolean testForJdbcLoopline(String data) {
-        System.out.println("testForJdbcLoopline：" + data);
-        return true;
-    }
 }
