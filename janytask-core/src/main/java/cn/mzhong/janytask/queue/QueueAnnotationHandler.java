@@ -15,5 +15,5 @@ public interface QueueAnnotationHandler<A extends Annotation> {
 
     void handleProducer(TaskContext context, QueueManager queueManager, QueueInfo<A> queueInfo);
 
-    QueueExecutor<A> handleConsumer(TaskContext context, QueueManager queueManager, QueueInfo<A> queueInfo);
+    QueueTaskExecutor<A> handleConsumer(TaskContext context, QueueManager queueManager, QueueInfo<A> queueInfo);
 }

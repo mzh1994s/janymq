@@ -22,12 +22,12 @@ public class LoopLineAnnotationHandler implements QueueAnnotationHandler<Looplin
         }
     }
 
-    public QueueExecutor<Loopline> handleConsumer(TaskContext context, QueueManager queueManager, QueueInfo<Loopline> queueInfo) {
+    public QueueTaskExecutor<Loopline> handleConsumer(TaskContext context, QueueManager queueManager, QueueInfo<Loopline> queueInfo) {
         return new LooplineTaskExecutor(context, queueManager, queueInfo);
     }
 }
 
-class LooplineTaskExecutor extends QueueExecutor<Loopline> {
+class LooplineTaskExecutor extends QueueTaskExecutor<Loopline> {
 
     Logger Log = LoggerFactory.getLogger(LoopLineAnnotationHandler.class);
 

@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Pipleline {
+public @interface Pipeline {
     /**
      * 列表名称，默认为接口全名 + 方法名
      *

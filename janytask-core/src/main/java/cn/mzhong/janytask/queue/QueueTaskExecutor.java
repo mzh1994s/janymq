@@ -10,9 +10,9 @@ import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
+public abstract class QueueTaskExecutor<A extends Annotation> extends TaskExecutor {
 
-    final static Logger Log = LoggerFactory.getLogger(QueueExecutor.class);
+    final static Logger Log = LoggerFactory.getLogger(QueueTaskExecutor.class);
 
     protected String id;
     protected QueueInfo<A> queueInfo;
@@ -22,7 +22,7 @@ public abstract class QueueExecutor<A extends Annotation> extends TaskExecutor {
     protected QueueManager queueManager;
     protected long cnt = 0;
 
-    public QueueExecutor(TaskContext context, QueueManager queueManager, QueueInfo<A> queueInfo) {
+    public QueueTaskExecutor(TaskContext context, QueueManager queueManager, QueueInfo<A> queueInfo) {
         super(context, new JanyTask$CronSequenceGenerator(
                 ValueUtils.uEmptyStr(queueInfo.cron),
                 ValueUtils.uEmptyStr(queueInfo.zone)

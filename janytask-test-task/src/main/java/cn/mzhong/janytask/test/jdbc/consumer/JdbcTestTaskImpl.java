@@ -7,6 +7,8 @@ import cn.mzhong.janytask.test.jdbc.producer.JdbcTestTask;
 @Consumer
 public class JdbcTestTaskImpl implements JdbcTestTask {
 
+    private boolean flag;
+
     public Ack<String> testForJdbc(String data) {
         System.out.println("testForJdbcPipleline：" + data);
         try {
@@ -14,7 +16,11 @@ public class JdbcTestTaskImpl implements JdbcTestTask {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return new Ack<String>("收到：" + data);
+        if(flag = !flag){
+            return new Ack<String>("收到：" + data);
+        } else {
+            return Ack.back();
+        }
     }
 
     public boolean testForJdbcLoopline(String data) {

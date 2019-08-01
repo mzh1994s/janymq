@@ -2,7 +2,7 @@ package cn.mzhong.janytask.queue;
 
 import cn.mzhong.janytask.application.Application;
 import cn.mzhong.janytask.queue.loopline.LoopLineAnnotationHandler;
-import cn.mzhong.janytask.queue.pipleline.PipleLineAnnotationHandler;
+import cn.mzhong.janytask.queue.pipleline.PipelineAnnotationHandler;
 import cn.mzhong.janytask.queue.provider.QueueProvider;
 import cn.mzhong.janytask.tool.AnnotationPatternClassScanner;
 import cn.mzhong.janytask.util.ClassUtils;
@@ -30,7 +30,7 @@ public class QueueManager extends AbstractQueueManager {
     public QueueManager(Application application) {
         super(application);
         // 注解处理器
-        this.annotationHandlers.add(new PipleLineAnnotationHandler());
+        this.annotationHandlers.add(new PipelineAnnotationHandler());
         this.annotationHandlers.add(new LoopLineAnnotationHandler());
     }
 
