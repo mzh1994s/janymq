@@ -98,6 +98,7 @@ class InternalAck<T extends Serializable> extends Ack<T> implements HandlerAck {
 
     private static final long serialVersionUID = 8428868438000651270L;
 
+    private AckStatus status = AckStatus.WAIT;
     private T result;
     private Throwable throwable;
     final private Message message;
@@ -125,16 +126,15 @@ class InternalAck<T extends Serializable> extends Ack<T> implements HandlerAck {
      */
     public synchronized Ack<T> listen(AckListener<T> listener) {
         // 如果执行结果都已经返回了，直接执行监听函数
-        if (result != null) {
-            listener.done(result);
-        }
-        // 如果异常已发生，直接响应异常到监听函数
-        else if (throwable != null) {
-            listener.error(throwable);
-        }
-        // 否则将监听方法加入监听列表
-        else {
-            listeners.add(listener);
+        switch (status) {
+            case DONE:
+                listener.done(result);
+                break;
+            case ERROR:
+                listener.error(throwable);
+                break;
+            default:
+                listeners.add(listener);
         }
         return this;
     }
@@ -142,8 +142,8 @@ class InternalAck<T extends Serializable> extends Ack<T> implements HandlerAck {
     /**
      * 获取任务执行的结果，调用此方法会阻塞，直到任务执行完成后才会返回结果。
      * <p style="color:red">
-     * 注意：结果不是实时返回的，它由任务调度器{@link cn.mzhong.janytask.worker.TaskWorker}统一调度，
-     * 并且对任务的检测周期是1秒钟，如果不是特殊情况请慎用{@link #listen(AckListener)}、{@link #get()}、
+     * 注意：此方法并非同步调用，结果不是实时返回的，它由任务调度器{@link cn.mzhong.janytask.worker.TaskWorker}
+     * 统一调度，并且对任务的检测周期是1秒钟，如果不是特殊情况请慎用{@link #listen(AckListener)}、{@link #get()}、
      * {@link #get(long, TimeUnit)}这三个方法，他们可能会让你的线程浪费更多的无用时间去等待结果返回。
      * <p/>
      *
@@ -153,7 +153,7 @@ class InternalAck<T extends Serializable> extends Ack<T> implements HandlerAck {
      */
     public T get() throws InterruptedException, ExecutionException {
         this.countDownLatch.await();
-        if (this.result == null && this.throwable != null) {
+        if (status == AckStatus.ERROR) {
             throw new ExecutionException(this.throwable);
         }
         return this.result;
@@ -175,7 +175,7 @@ class InternalAck<T extends Serializable> extends Ack<T> implements HandlerAck {
      */
     public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException {
         this.countDownLatch.await(timeout, unit);
-        if (this.result == null && this.throwable != null) {
+        if (status == AckStatus.ERROR) {
             throw new ExecutionException(this.throwable);
         }
         return this.result;
@@ -188,6 +188,7 @@ class InternalAck<T extends Serializable> extends Ack<T> implements HandlerAck {
      * @param message
      */
     public synchronized void setDone(Message message) {
+        this.status = AckStatus.DONE;
         this.countDownLatch.countDown();
         this.result = (T) message.getResult();
         this.message.setResult(result);
@@ -204,6 +205,7 @@ class InternalAck<T extends Serializable> extends Ack<T> implements HandlerAck {
      * @param message
      */
     public synchronized void setError(Message message) {
+        this.status = AckStatus.ERROR;
         this.countDownLatch.countDown();
         this.throwable = message.getThrowable();
         this.message.setThrowable(throwable);
@@ -221,4 +223,22 @@ class InternalAck<T extends Serializable> extends Ack<T> implements HandlerAck {
         return messageDao;
     }
 
+}
+
+/**
+ * ACK状态枚举
+ */
+enum AckStatus {
+    /**
+     * 等待状态
+     */
+    WAIT,
+    /**
+     * 已完成
+     */
+    DONE,
+    /**
+     * 已发生错误
+     */
+    ERROR
 }

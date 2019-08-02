@@ -27,7 +27,7 @@ public abstract class AbstractMessageMapper implements MessageMapper {
         }
     }
 
-    public void save(BytesMessage message) {
+    public void push(BytesMessage message) {
         this.sqlExecutor.update("INSERT INTO " + table +
                         "(MESSAGE_ID,QUEUE_ID,CREATE_TIME,PUSH_TIME,ARGS,RESULT,STATUS) VALUES (?,?,?,?,?,?,?)",
                 message.getId(),
@@ -36,13 +36,13 @@ public abstract class AbstractMessageMapper implements MessageMapper {
                 new Timestamp(message.getPushTime().getTime()),
                 message.getArgsBytes(),
                 message.getResultBytes(),
-                Message.STATUS_WAIT);
+                Message.Status.Wait.value);
     }
 
     public LinkedList<String> keys(String queueId) {
         return this.sqlExecutor.queryList(
                 "SELECT MESSAGE_ID FROM " + table + " WHERE QUEUE_ID=? AND STATUS=?",
-                new Object[]{queueId, Message.STATUS_WAIT},
+                new Object[]{queueId, Message.Status.Wait.value},
                 new PRInvoker<ResultSet, String>() {
                     public String invoke(ResultSet resultSet) throws Exception {
                         return resultSet.getString(1);
@@ -53,13 +53,13 @@ public abstract class AbstractMessageMapper implements MessageMapper {
     public boolean lock(String key) {
         return 1 == this.sqlExecutor.update(
                 "UPDATE " + table + " SET STATUS=? WHERE MESSAGE_ID=? AND STATUS=?",
-                Message.STATUS_LOCK, key, Message.STATUS_WAIT);
+                Message.Status.Lock.value, key, Message.Status.Wait.value);
     }
 
     public boolean unLock(String key) {
         return 1 == this.sqlExecutor.update(
                 "UPDATE " + table + " SET STATUS=? WHERE MESSAGE_ID=? AND STATUS=?",
-                Message.STATUS_WAIT, key, Message.STATUS_LOCK);
+                Message.Status.Wait.value, key, Message.Status.Lock.value);
     }
 
     public BytesMessage get(final String key) {
@@ -73,7 +73,7 @@ public abstract class AbstractMessageMapper implements MessageMapper {
                         message.setArgsBytes(resultSet.getBytes(1));
                         message.setResultBytes(resultSet.getBytes(2));
                         message.setThrowableBytes(resultSet.getBytes(3));
-                        message.setStatus(resultSet.getString(4));
+                        message.setStatus(Message.Status.get(resultSet.getString(4)));
                         return message;
                     }
                 });
@@ -86,7 +86,7 @@ public abstract class AbstractMessageMapper implements MessageMapper {
                         "DONE_TIME=?, " +
                         "RESULT=? " +
                         "WHERE MESSAGE_ID=?",
-                Message.STATUS_DONE,
+                Message.Status.Done.value,
                 new Timestamp(message.getDoneTime().getTime()),
                 message.getResultBytes(),
                 message.getId());
@@ -99,7 +99,7 @@ public abstract class AbstractMessageMapper implements MessageMapper {
                         "ERROR_TIME=?, " +
                         "THROWABLE=? " +
                         "WHERE MESSAGE_ID=?",
-                Message.STATUS_ERROR,
+                Message.Status.Error.value,
                 new Timestamp(message.getErrorTime().getTime()),
                 message.getThrowableBytes(),
                 message.getId());
@@ -108,6 +108,6 @@ public abstract class AbstractMessageMapper implements MessageMapper {
     public long length(String lineID) {
         return this.sqlExecutor.queryLong(
                 "SELECT COUNT(*) FROM " + table + " WHERE QUEUE_ID=? AND STATUS=?",
-                new Object[]{lineID, Message.STATUS_WAIT});
+                new Object[]{lineID, Message.Status.Wait.value});
     }
 }

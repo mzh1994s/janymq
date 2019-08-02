@@ -60,13 +60,13 @@ public class MongoDbMessageDao extends LockedMessageDao {
             public <TDocument> BsonDocument toBsonDocument(Class<TDocument> tDocumentClass, CodecRegistry codecRegistry) {
                 BsonDocument bsonDocument = new BsonDocument();
                 bsonDocument.append("id", new BsonString(id));
-                bsonDocument.append("status", new BsonString(Message.STATUS_WAIT));
+                bsonDocument.append("status", new BsonString(Message.Status.Wait.value));
                 return bsonDocument;
             }
         }, new Bson() {
             public <TDocument> BsonDocument toBsonDocument(Class<TDocument> tDocumentClass, CodecRegistry codecRegistry) {
                 BsonDocument bsonDocument = new BsonDocument();
-                bsonDocument.append("status", new BsonString(Message.STATUS_LOCK));
+                bsonDocument.append("status", new BsonString(Message.Status.Lock.value));
                 return bsonDocument;
             }
         });
@@ -78,13 +78,13 @@ public class MongoDbMessageDao extends LockedMessageDao {
             public <TDocument> BsonDocument toBsonDocument(Class<TDocument> tDocumentClass, CodecRegistry codecRegistry) {
                 BsonDocument bsonDocument = new BsonDocument();
                 bsonDocument.append("id", new BsonString(id));
-                bsonDocument.append("status", new BsonString(Message.STATUS_LOCK));
+                bsonDocument.append("status", new BsonString(Message.Status.Lock.value));
                 return bsonDocument;
             }
         }, new Bson() {
             public <TDocument> BsonDocument toBsonDocument(Class<TDocument> tDocumentClass, CodecRegistry codecRegistry) {
                 BsonDocument bsonDocument = new BsonDocument();
-                bsonDocument.append("status", new BsonString(Message.STATUS_WAIT));
+                bsonDocument.append("status", new BsonString(Message.Status.Wait.value));
                 return bsonDocument;
             }
         });

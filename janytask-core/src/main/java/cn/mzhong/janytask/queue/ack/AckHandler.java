@@ -8,11 +8,12 @@ import cn.mzhong.janytask.worker.TaskExecutor;
 import org.springframework.scheduling.support.JanyTask$CronSequenceGenerator;
 
 import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AckHandler extends TaskExecutor implements TaskContextAware {
-    final private Map<Message, HandlerAck> handlerMap = new ConcurrentHashMap<Message, HandlerAck>();
+
+    final private List<HandlerAck> handlerAcks = new LinkedList<HandlerAck>();
 
     public AckHandler() {
         super(null, new JanyTask$CronSequenceGenerator("* * * * * ?"));
@@ -23,25 +24,25 @@ public class AckHandler extends TaskExecutor implements TaskContextAware {
     }
 
     public void add(HandlerAck ack) {
-        handlerMap.put(ack.getMessage(), ack);
+        handlerAcks.add(ack);
     }
 
     protected void execute() {
-        Iterator<HandlerAck> iterator = handlerMap.values().iterator();
+        Iterator<HandlerAck> iterator = handlerAcks.iterator();
         while (iterator.hasNext()) {
             HandlerAck handlerAck = iterator.next();
             String id = handlerAck.getMessage().getId();
             MessageDao messageDao = handlerAck.getMessageDao();
             Message message = messageDao.get(id);
-            String status = message.getStatus();
+            Message.Status status = message.getStatus();
             // 根据Message的状态来判断是否已经完成
             // 1、已完成
-            if (Message.STATUS_DONE.equals(status)) {
+            if (status == Message.Status.Done) {
                 iterator.remove();
                 handlerAck.setDone(message);
             }
             // 2、已出错
-            else if (Message.STATUS_ERROR.equals(status)) {
+            else if (status == Message.Status.Error) {
                 iterator.remove();
                 handlerAck.setError(message);
             }

@@ -24,7 +24,7 @@ public class JdbcMessageDao extends LockedMessageDao {
         jdbcMessage.setArgsBytes(serializer.serialize(message.getArgs()));
         jdbcMessage.setPushTime(new Date());
         jdbcMessage.setQueueId(id);
-        messageMapper.save(jdbcMessage);
+        messageMapper.push(jdbcMessage);
     }
 
     public void done(Message message) {

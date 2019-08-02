@@ -5,20 +5,12 @@ import java.util.Arrays;
 import java.util.Date;
 
 public class Message implements Serializable {
-    private static final long serialVersionUID = -2043879152912282934L;
 
-    // 等待状态
-    public final static String STATUS_WAIT = "W";
-    // 锁定状态
-    public final static String STATUS_LOCK = "L";
-    // 完成状态
-    public final static String STATUS_DONE = "D";
-    // 错误状态
-    public final static String STATUS_ERROR = "E";
+    private static final long serialVersionUID = -2043879152912282934L;
 
     protected String id;
     protected String queueId;
-    protected String status;
+    protected Status status;
     protected Date createTime;
     protected Date pushTime;
     protected Date doneTime;
@@ -49,11 +41,11 @@ public class Message implements Serializable {
         this.queueId = queueId;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
@@ -141,4 +133,36 @@ public class Message implements Serializable {
                 ", args=" + Arrays.toString(args) +
                 '}';
     }
+
+    public static enum Status {
+        // 等待状态
+        Wait("W"),
+        // 锁定状态
+        Lock("L"),
+        // 完成状态
+        Done("D"),
+        // 错误状态
+        Error("E");
+
+        public final String value;
+
+        Status(String value) {
+            this.value = value;
+        }
+
+        public static Status get(String value) {
+            Status[] values = Status.values();
+            int index = Status.values().length;
+            while (index-- > 0) {
+                Status status = values[index];
+                if (status.value.equals(value)) {
+                    return status;
+                }
+            }
+            return null;
+        }
+
+    }
 }
+
+

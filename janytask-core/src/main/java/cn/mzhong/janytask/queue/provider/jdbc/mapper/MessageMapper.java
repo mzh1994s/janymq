@@ -28,7 +28,7 @@ public interface MessageMapper {
      *
      * @param message
      */
-    void save(BytesMessage message);
+    void push(BytesMessage message);
 
     /**
      * 返回wait状态下的key，一般情况下返回所有，具体返回数量由实现方决定

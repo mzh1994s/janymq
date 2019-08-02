@@ -10,7 +10,7 @@ public class JdbcTestTaskImpl implements JdbcTestTask {
     private boolean flag;
 
     public Ack<String> testForJdbc(String data) {
-        System.out.println("testForJdbcPipleline：" + data);
+        System.out.println("testForJdbc：" + data);
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
