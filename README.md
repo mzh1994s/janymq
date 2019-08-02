@@ -8,7 +8,7 @@ _宗旨：用尽可能少的维护成本搭建任务平台，用尽可能简单�
 第二步：指定提供商，启动应用程序<br/>
 
 ## 1、生产者和消费者
-### 1.1生产者
+### 1.1、生产者
 我们现在都是面向接口编程，编写一个接口类，加上@Producer注解，标注这个接口是一个生产者接口，在具体方法上加上@Pipeline注解，那么
 这个方法就被认定为一条流水线，生产者通过流水线顶端发送任务，消费者则从末端接收任务。生产者使用代理类发送消息。<br/>
 TestMQ.java
@@ -29,7 +29,7 @@ public interface TestTask {
     void testMap(Map<String, String> value);
 }
 </pre>
-### 1.2消费者
+### 1.2、消费者
 消费者是生产者的实现，将接收到的参数进行处理，与Spring中的Service、ServiceImpl不同的地方是Producer、Consumer之间仅仅是规范如
 何传递消息，当你在Spring应用程序中使用@Autowired注入一个生产者（比如TestTask）时，其实现方并不是TestTaskImpl，而是Producer的
 一个内部代理类。消费者每个线程由框架统一调度。<br/>
@@ -61,7 +61,7 @@ public class TestTaskImpl implements TestTask {
 }
 </pre>
 ## 2、指定提供商，启动应用程序
-### 2.1普通应用方式
+### 2.1、普通应用方式
 <pre>
 public class TestMain {
 
